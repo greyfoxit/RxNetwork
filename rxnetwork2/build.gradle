@@ -1,0 +1,72 @@
+apply plugin: 'com.android.library'
+apply plugin: 'jacoco-android'
+apply plugin: 'checkstyle'
+
+android {
+    compileSdkVersion conf.compileSdk
+    buildToolsVersion conf.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion conf.minSdk
+        targetSdkVersion conf.targetSdk
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled = true
+        }
+    }
+
+    testOptions.unitTests.all {
+        /*testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }*/
+        jacoco {
+            includeNoLocationClasses = true
+        }
+    }
+}
+
+dependencies {
+    compile deps.appcompatv7
+    compile deps.supportannotations
+    compile deps.rxjava
+    compile deps.rxandroid
+
+    testCompile deps.junit
+    testCompile deps.robolectric
+    testCompile deps.mockitocore
+    testCompile deps.assertJAndroid
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = conf.gradleVersion
+}
+
+checkstyle {
+    ignoreFailures = false
+    toolVersion = "7.5"
+    configFile = rootProject.file('checkstyle.xml')
+}
+
+task checkstyle(type: Checkstyle) {
+    source 'src/main/java'
+    include '**/*.java'
+    exclude '**/gen/**'
+
+    classpath = files()
+}
+
+check.dependsOn('checkstyle');
+
+jacocoAndroidUnitTestReport {
+    csv.enabled false
+    html.enabled true
+    xml.enabled true
+}
