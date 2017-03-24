@@ -15,7 +15,7 @@
  */
 package greyfox.rxnetwork2.internal.strategy.providers;
 
-import static android.os.Build.VERSION_CODES.KITKAT_WATCH;
+import static android.os.Build.VERSION_CODES.KITKAT;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,7 +66,7 @@ public class BuiltInNetworkObservingStrategyProvidersTest {
     }
 
     @Test
-    @Config(minSdk = KITKAT_WATCH)
+    @Config(sdk = KITKAT)
     public void onlyOneProviderShouldBeAbleToProvide_forGivenPlatform() {
         assertThat(sut).haveExactly(1, new CanProvide());
     }

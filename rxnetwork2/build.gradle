@@ -24,12 +24,19 @@ android {
     }
 
     testOptions.unitTests.all {
-        /*testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
-        }*/
+        maxParallelForks = 1
+        forkEvery = 1
         jacoco {
             includeNoLocationClasses = true
         }
+    }
+
+    lintOptions {
+        abortOnError false
+        xmlReport false
+        htmlReport true
+        htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
+        xmlOutput file("$project.buildDir/reports/lint/lint-result.xml")
     }
 }
 
