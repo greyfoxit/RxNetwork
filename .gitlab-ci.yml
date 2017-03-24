@@ -1,0 +1,36 @@
+image: registry.gitlab.com/radekkozak/android-docker:latest
+
+before_script:
+  - chmod +x ./gradlew
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+stages:
+  - build
+  - test
+  - reports
+
+build:
+  stage: build
+  script:
+    - ./gradlew :rxnetwork2:clean :rxnetwork2:assembleDebug
+  artifacts:
+      paths:
+      - rxnetwork2/build/outputs/aar/
+
+unitTests:
+  stage: test
+  script:
+    - ./gradlew :rxnetwork2:jacocoTestDebugUnitTestReport
+  artifacts:
+      paths:
+      - rxnetwork2/build/reports/tests/
+      - rxnetwork2/build/reports/jacoco/
+
+codeCoverage:
+  stage: reports
+  script:
+    - bash <(curl -s https://codecov.io/bash) -t $CODECOV_UPLOAD_TOKEN

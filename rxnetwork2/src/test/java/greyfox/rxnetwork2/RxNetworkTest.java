@@ -23,6 +23,7 @@ import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.impl.LollipopNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.impl.PreLollipopNetworkObservingStrategy;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.internal.schedulers.ImmediateThinScheduler;
@@ -59,12 +60,11 @@ public class RxNetworkTest {
     public void shouldIgnoreCustomInitialization_whenAlreadyInitialized() {
         RxNetwork.init(application, CUSTOM_SCHEDULER);
 
-        when(CUSTOM_STRATEGY_FACTORY.get()).thenReturn(CUSTOM_STRATEGY);
         Scheduler CUSTOM_SCHEDULER = ImmediateThinScheduler.INSTANCE;
         RxNetwork.init(CUSTOM_STRATEGY_FACTORY, CUSTOM_SCHEDULER);
 
         assertThat(RxNetwork.scheduler()).isNotEqualTo(CUSTOM_SCHEDULER);
-        assertThat(RxNetwork.strategy()).isNotEqualTo(CUSTOM_STRATEGY);
+        assertThat(RxNetwork.strategy()).isInstanceOf(PreLollipopNetworkObservingStrategy.class);
     }
 
     @Test
