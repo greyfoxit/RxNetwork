@@ -15,7 +15,7 @@
  */
 package greyfox.rxnetwork2.internal.os;
 
-import static android.os.Build.VERSION_CODES.KITKAT_WATCH;
+import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
@@ -45,31 +45,31 @@ public class BuildTest {
     }
 
     @Test
-    @Config(minSdk = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
     public void shouldBe_atLeastLollipop() {
         assertThat(isAtLeastLollipop()).isTrue();
     }
 
     @Test
-    @Config(minSdk = M)
+    @Config(sdk = M)
     public void shouldBe_atLeastMarshmallow() {
         assertThat(isAtLeastMarshmallow()).isTrue();
     }
 
     @Test
-    @Config(minSdk = N)
+    @Config(sdk = N)
     public void shouldBe_atLeastNougat() {
         assertThat(isAtLeastNougat()).isTrue();
     }
 
     @Test
-    @Config(maxSdk = KITKAT_WATCH)
+    @Config(sdk = KITKAT)
     public void shouldBe_lessThanLollipop() {
         assertThat(isLessThanLollipop()).isTrue();
     }
 
     @Test
-    @Config(maxSdk = LOLLIPOP_MR1)
+    @Config(sdk = LOLLIPOP_MR1)
     public void shouldBe_lessThanMarshmallow() {
         assertThat(isLessThanMarshmallow()).isTrue();
     }

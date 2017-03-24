@@ -46,13 +46,13 @@ public class MarshmallowNetworkObservingStrategyProviderTest {
     }
 
     @Test
-    @Config(minSdk = M)
+    @Config(sdk = M)
     public void shouldProvide_whenAtLeastMarshmallow() throws Exception {
         assertThat(sut.canProvide()).isTrue();
     }
 
     @Test
-    @Config(maxSdk = LOLLIPOP_MR1)
+    @Config(sdk = LOLLIPOP_MR1)
     public void shouldNotProvide_whenOnPreMarshmallow() throws Exception {
         assertThat(sut.canProvide()).isFalse();
     }

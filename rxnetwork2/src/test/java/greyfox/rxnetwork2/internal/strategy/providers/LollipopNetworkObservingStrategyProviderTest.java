@@ -48,19 +48,19 @@ public class LollipopNetworkObservingStrategyProviderTest {
     }
 
     @Test
-    @Config(minSdk = LOLLIPOP, maxSdk = LOLLIPOP_MR1)
+    @Config(sdk = {LOLLIPOP, LOLLIPOP_MR1})
     public void shouldProvide_whenAtLeastLollipop_andLowerThanMarshmallow() throws Exception {
         assertThat(sut.canProvide()).isTrue();
     }
 
     @Test
-    @Config(maxSdk = KITKAT)
+    @Config(sdk = KITKAT)
     public void shouldNotProvide_whenOnPreLollipop() throws Exception {
         assertThat(sut.canProvide()).isFalse();
     }
 
     @Test
-    @Config(minSdk = M)
+    @Config(sdk = M)
     public void shouldNotProvide_whenOnMarshmallowOrHigher() throws Exception {
         assertThat(sut.canProvide()).isFalse();
     }
