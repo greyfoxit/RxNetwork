@@ -26,6 +26,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
+import greyfox.rxnetwork2.internal.strategy.network.impl.BuiltInNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.impl.LollipopNetworkObservingStrategy;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Rule;
