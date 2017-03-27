@@ -66,7 +66,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class RxNetwork {
 
     private static final AtomicBoolean initialized = new AtomicBoolean();
-
     private static NetworkObservingStrategy IMPL;
     private static Scheduler SCHEDULER;
 
@@ -84,8 +83,8 @@ public final class RxNetwork {
      * @return {@link NetworkInfo}
      */
     public static Observable<RxNetworkInfo> observe() {
-        checkNotNull(IMPL, "In order to use RxNetwork you must initialize it first " +
-                "with RxNetwork.init method");
+        checkNotNull(IMPL, "In order to use RxNetwork you must initialize it first "
+                + "with RxNetwork.init method");
         final Observable<RxNetworkInfo> observable = IMPL.observe();
         if (SCHEDULER != null) observable.subscribeOn(SCHEDULER);
         return observable;
@@ -144,7 +143,6 @@ public final class RxNetwork {
         checkNotNull(application, "application == null");
         final Collection<NetworkObservingStrategyProvider> providers
                 = BuiltInNetworkObservingStrategyProviders.get(application);
-
         init(BuiltInStrategyFactory.create(providers), scheduler);
     }
 
@@ -179,7 +177,6 @@ public final class RxNetwork {
         if (initialized.get()) {
             return;
         }
-
         IMPL = checkNotNull(factory, "factory == null").get();
         SCHEDULER = scheduler;
         initialized.set(true);

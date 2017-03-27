@@ -111,7 +111,9 @@ public class RxNetworkInfo {
                 .extraInfo(networkInfo.getExtraInfo());
     }
 
-    /** @see NetworkInfo#getState() */
+    /**
+     * @see NetworkInfo#getState()
+     */
     public NetworkInfo.State getState() {
         return state;
     }
@@ -248,8 +250,8 @@ public class RxNetworkInfo {
                     : this.extraInfo.equals(that.extraInfo));
 
             if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-                return equal && ((this.networkCapabilities == null) ?
-                        (that.networkCapabilities == null)
+                return equal && ((this.networkCapabilities == null)
+                        ? (that.networkCapabilities == null)
                         : this.networkCapabilities.equals(that.networkCapabilities));
             } else {
                 return equal;

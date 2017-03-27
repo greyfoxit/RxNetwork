@@ -25,6 +25,9 @@ import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.functions.Function;
 
 /**
+ * Predefined collection of {@link RxNetworkInfo} related functions that can be used for mapping
+ * reactive streams of RxNetwork.
+ *
  * @author Radek Kozak
  */
 @RestrictTo(LIBRARY_GROUP)

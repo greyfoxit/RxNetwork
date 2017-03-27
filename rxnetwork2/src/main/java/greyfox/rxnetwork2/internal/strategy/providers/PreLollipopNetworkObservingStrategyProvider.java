@@ -25,6 +25,8 @@ import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork2.internal.strategy.impl.PreLollipopNetworkObservingStrategy;
 
 /**
+ * Provides network observing strategy implementation for pre-Lollipop devices.
+ *
  * @author Radek Kozak
  */
 final class PreLollipopNetworkObservingStrategyProvider

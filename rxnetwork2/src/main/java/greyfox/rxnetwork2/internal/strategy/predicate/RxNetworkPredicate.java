@@ -49,10 +49,6 @@ public final class RxNetworkPredicate {
      * <p>
      * This can be useful for filtering reactive streams of {@link RxNetwork}, for example:
      * <pre><code>
-     * import static android.net.NetworkInfo.State.CONNECTED;
-     * import static android.net.NetworkInfo.State.CONNECTING;
-     * import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.State.hasState;
-     *
      * RxNetwork.observe()
      *          .subscribeOn(Schedulers.io())
      *          .filter(hasState(CONNECTED, CONNECTING))
@@ -70,6 +66,13 @@ public final class RxNetworkPredicate {
             throw new AssertionError("No instances.");
         }
 
+        /**
+         * Filter for determining if any of provided network states occurred.
+         *
+         * @param networkStates one or many {@link NetworkInfo.State}
+         *
+         * @return {@code true} if any of the given network states occurred, {@code false} otherwise
+         */
         public static Predicate<RxNetworkInfo> hasState(final NetworkInfo.State... networkStates) {
             return new Predicate<RxNetworkInfo>() {
                 @Override
@@ -85,10 +88,6 @@ public final class RxNetworkPredicate {
      * <p>
      * This can be useful for filtering reactive streams of {@link RxNetwork}, for example:
      * <pre><code>
-     * import static android.net.ConnectivityManager.TYPE_MOBILE;
-     * import static android.net.ConnectivityManager.TYPE_WIFI;
-     * import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Type.hasType;
-     *
      * RxNetwork.observe()
      *          .subscribeOn(Schedulers.io())
      *          .filter(hasType(TYPE_WIFI, TYPE_MOBILE))
