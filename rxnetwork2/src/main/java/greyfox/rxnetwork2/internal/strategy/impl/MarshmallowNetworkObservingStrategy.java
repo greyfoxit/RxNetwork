@@ -34,10 +34,8 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
     private static final String TAG = MarshmallowNetworkObservingStrategy.class.getSimpleName();
     private static final IntentFilter IDLE_MODE_CHANGED
             = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
-
     private static ConnectivityManager.NetworkCallback networkCallback;
     private static BroadcastReceiver idleModeReceiver;
-
     private final ConnectivityManager manager;
     @NonNull private final Context context;
     private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
@@ -76,7 +74,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
     }
 
     @RequiresApi(M)
-    private final static class DeviceIdleReceiver extends BroadcastReceiver {
+    private static final class DeviceIdleReceiver extends BroadcastReceiver {
 
         private final ObservableEmitter<RxNetworkInfo> upstream;
 

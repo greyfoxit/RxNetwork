@@ -31,8 +31,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-//import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Capabilities.hasCapability;
-
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -67,11 +65,6 @@ public class MainActivity extends Activity {
                 // you can omit setting scheduler every time by providing
                 // default scheduler in RxNetwork.init method
                 //.subscribeOn(Schedulers.io())
-                //.filter(hasCapability(NET_CAPABILITY_NOT_METERED))
-                //.filter(hasTransport(TRANSPORT_WIFI))
-/*                .filter(hasState(CONNECTED, CONNECTING))
-                .filter(hasType(TYPE_WIFI, TYPE_MOBILE))
-                .filter(IS_MOBILE).filter(IS_WIFI)*/
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::toastNetworkInfo, this::onError, this::onComplete);
     }

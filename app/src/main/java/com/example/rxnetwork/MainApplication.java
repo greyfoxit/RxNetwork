@@ -20,6 +20,8 @@ import greyfox.rxnetwork2.RxNetwork;
 import io.reactivex.schedulers.Schedulers;
 
 /**
+ * Entry point for the whole application.
+ *
  * @author Radek Kozak
  */
 public class MainApplication extends Application {

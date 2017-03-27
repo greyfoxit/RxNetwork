@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
+ * RxNetwork's built-in providers of network observing strategies.
+ *
  * @author Radek Kozak
  */
 public final class BuiltInNetworkObservingStrategyProviders {
@@ -22,6 +24,13 @@ public final class BuiltInNetworkObservingStrategyProviders {
         throw new AssertionError("No instances.");
     }
 
+    /**
+     * Gets collection of unmodifiable {@link NetworkObservingStrategyProvider}'s.
+     *
+     * @param context {@link Context}
+     *
+     * @return Collection of {@linkplain NetworkObservingStrategyProvider providers}
+     */
     public static Collection<NetworkObservingStrategyProvider> get(@NonNull Context context) {
         checkNotNull(context, "context == null");
 

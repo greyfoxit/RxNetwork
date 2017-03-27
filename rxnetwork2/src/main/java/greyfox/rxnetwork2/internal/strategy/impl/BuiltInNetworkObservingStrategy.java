@@ -5,6 +5,8 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Cancellable;
 
 /**
+ * Base class for network observing strategies.
+ *
  * @author Radek Kozak
  */
 abstract class BuiltInNetworkObservingStrategy implements NetworkObservingStrategy {

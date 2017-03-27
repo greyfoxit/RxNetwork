@@ -19,6 +19,9 @@ import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.Observable;
 
 /**
+ * Interface allowing to implement different strategies for monitoring network connectivity change.
+ * (Network monitoring API may differ depending of specific Android version)
+ *
  * @author Radek Kozak
  */
 public interface NetworkObservingStrategy {

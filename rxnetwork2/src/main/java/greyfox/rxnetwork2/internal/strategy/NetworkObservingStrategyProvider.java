@@ -16,11 +16,26 @@
 package greyfox.rxnetwork2.internal.strategy;
 
 /**
+ * Interface allowing to provide concrete {@link NetworkObservingStrategy} based on specific
+ * criteria. Criteria should be implemented via {@link #canProvide()} method.
+ *
  * @author Radek Kozak
  */
 public interface NetworkObservingStrategyProvider<T extends NetworkObservingStrategy> {
 
+    /**
+     * Implement this method to determine under what condition your provider can {@link #provide()}
+     * concrete {@link NetworkObservingStrategy}.
+     *
+     * @return {@code true} if concrete {@link NetworkObservingStrategy} can be provided
+     * for given criteria, {@code false} if not
+     */
     boolean canProvide();
-    //T provide(Context context);
+
+    /**
+     * Implement this to return concrete {@link NetworkObservingStrategy}.
+     *
+     * @return {@link NetworkObservingStrategy}
+     */
     T provide();
 }
