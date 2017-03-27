@@ -30,18 +30,19 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Capabilities.hasCapability;
-import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Capabilities.hasTransport;
-import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.State.hasState;
-import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Type.IS_MOBILE;
-import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Type.IS_WIFI;
-import static greyfox.rxnetwork2.internal.strategy.predicate.RxNetworkPredicate.Type.hasType;
+import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasCapability;
+import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasTransport;
+import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.State.hasState;
+import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_MOBILE;
+import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_WIFI;
+import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Type.hasType;
 
 import android.net.NetworkCapabilities;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork2.internal.os.Build;
+import greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate;
 import io.reactivex.functions.Predicate;
 import org.junit.Rule;
 import org.junit.Test;

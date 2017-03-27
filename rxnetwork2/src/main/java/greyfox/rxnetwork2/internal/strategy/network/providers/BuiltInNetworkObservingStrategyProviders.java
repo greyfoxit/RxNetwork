@@ -1,4 +1,4 @@
-package greyfox.rxnetwork2.internal.strategy.providers;
+package greyfox.rxnetwork2.internal.strategy.network.providers;
 
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
@@ -8,7 +8,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.ArraySet;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 import java.util.Collections;
 

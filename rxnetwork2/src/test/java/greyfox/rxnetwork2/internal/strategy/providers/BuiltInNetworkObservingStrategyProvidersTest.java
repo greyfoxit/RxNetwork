@@ -21,7 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import android.content.Context;
 import greyfox.rxnetwork2.BuildConfig;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import java.util.Collection;
 import org.assertj.core.api.Condition;
 import org.junit.Rule;

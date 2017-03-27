@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.factory;
+package greyfox.rxnetwork2.internal.strategy.network.factory;
 
 import static android.os.Build.VERSION.CODENAME;
 import static android.os.Build.VERSION.SDK_INT;
@@ -24,9 +24,9 @@ import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork2.RxNetwork;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 
 /**

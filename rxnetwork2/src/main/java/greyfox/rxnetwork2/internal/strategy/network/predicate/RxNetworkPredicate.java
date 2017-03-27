@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.predicate;
+package greyfox.rxnetwork2.internal.strategy.network.predicate;
 
 import static android.net.ConnectivityManager.TYPE_MOBILE;
 import static android.net.ConnectivityManager.TYPE_WIFI;

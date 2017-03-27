@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal;
+package greyfox.rxnetwork2.internal.strategy.network.helpers;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static android.support.annotation.VisibleForTesting.PRIVATE;

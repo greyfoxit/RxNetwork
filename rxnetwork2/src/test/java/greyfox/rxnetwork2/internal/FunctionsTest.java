@@ -17,9 +17,10 @@ package greyfox.rxnetwork2.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static greyfox.rxnetwork2.internal.Functions.TO_CONNECTION_STATE;
+import static greyfox.rxnetwork2.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
 
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
+import greyfox.rxnetwork2.internal.strategy.network.helpers.Functions;
 import org.junit.Test;
 
 /**

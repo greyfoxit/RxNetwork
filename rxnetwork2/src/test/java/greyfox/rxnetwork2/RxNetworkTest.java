@@ -20,10 +20,10 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.impl.LollipopNetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.impl.PreLollipopNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.impl.LollipopNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.internal.schedulers.ImmediateThinScheduler;

@@ -1,4 +1,4 @@
-package greyfox.rxnetwork2.internal.strategy.impl;
+package greyfox.rxnetwork2.internal.strategy.network.impl;
 
 import static android.os.Build.VERSION_CODES.M;
 

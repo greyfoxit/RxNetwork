@@ -21,8 +21,9 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import greyfox.rxnetwork2.BuildConfig;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.impl.PreLollipopNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.providers.PreLollipopNetworkObservingStrategyProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

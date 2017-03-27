@@ -18,9 +18,10 @@ package greyfox.rxnetwork2.internal.strategy.factory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import android.content.Context;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.providers.BuiltInNetworkObservingStrategyProviders;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.factory.BuiltInStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import java.util.Collection;
 import java.util.Collections;
 import org.junit.Before;

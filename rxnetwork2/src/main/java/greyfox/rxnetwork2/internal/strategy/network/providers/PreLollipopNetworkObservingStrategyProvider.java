@@ -13,38 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.providers;
+package greyfox.rxnetwork2.internal.strategy.network.providers;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork2.internal.os.Build.isAtLeastLollipop;
-import static greyfox.rxnetwork2.internal.os.Build.isLessThanMarshmallow;
+import static greyfox.rxnetwork2.internal.os.Build.isLessThanLollipop;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.impl.LollipopNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
 
 /**
- * Provides network observing strategy implementation for Lollipop devices.
+ * Provides network observing strategy implementation for pre-Lollipop devices.
  *
  * @author Radek Kozak
  */
-final class LollipopNetworkObservingStrategyProvider
+final class PreLollipopNetworkObservingStrategyProvider
         implements NetworkObservingStrategyProvider {
 
     private final Context context;
 
-    LollipopNetworkObservingStrategyProvider(@NonNull Context context) {
+    PreLollipopNetworkObservingStrategyProvider(@NonNull Context context) {
         this.context = checkNotNull(context, "context == null");
     }
 
     @Override
     public boolean canProvide() {
-        return isAtLeastLollipop() && isLessThanMarshmallow();
+        return isLessThanLollipop();
     }
 
     @Override
-    public LollipopNetworkObservingStrategy provide() {
-        return new LollipopNetworkObservingStrategy(context);
+    public NetworkObservingStrategy provide() {
+        return new PreLollipopNetworkObservingStrategy(context);
     }
 }

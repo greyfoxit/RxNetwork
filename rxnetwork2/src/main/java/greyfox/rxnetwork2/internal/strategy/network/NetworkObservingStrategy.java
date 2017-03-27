@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy;
+package greyfox.rxnetwork2.internal.strategy.network;
 
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.Observable;

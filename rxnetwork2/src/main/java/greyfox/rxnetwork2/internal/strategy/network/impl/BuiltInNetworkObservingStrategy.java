@@ -1,6 +1,6 @@
-package greyfox.rxnetwork2.internal.strategy.impl;
+package greyfox.rxnetwork2.internal.strategy.network.impl;
 
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Cancellable;
 

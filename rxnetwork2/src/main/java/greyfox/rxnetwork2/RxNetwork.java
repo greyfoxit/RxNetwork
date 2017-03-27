@@ -18,18 +18,18 @@ package greyfox.rxnetwork2;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork2.internal.Functions.TO_CONNECTION_STATE;
+import static greyfox.rxnetwork2.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
 
 import android.app.Application;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.factory.BuiltInStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.providers.BuiltInNetworkObservingStrategyProviders;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.factory.BuiltInStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
