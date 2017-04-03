@@ -20,8 +20,6 @@ import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.network.impl.BuiltInNetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Test;
