@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.providers;
+package greyfox.rxnetwork2.internal.strategy.network.providers;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
 
@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import android.content.Context;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import java.util.Collection;
 import org.assertj.core.api.Condition;
 import org.junit.Rule;

@@ -36,6 +36,7 @@ import java.util.Arrays;
  *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
 @RestrictTo(LIBRARY_GROUP)
 public final class RxNetworkPredicate {
 
@@ -57,7 +58,6 @@ public final class RxNetworkPredicate {
      * </code></pre>
      *
      * @author Radek Kozak
-     * @see NetworkInfo.State
      */
     public static final class State {
 
@@ -96,7 +96,6 @@ public final class RxNetworkPredicate {
      * </code></pre>
      *
      * @author Radek Kozak
-     * @see NetworkInfo.State
      */
     public static final class Type {
 

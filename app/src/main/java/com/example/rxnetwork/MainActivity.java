@@ -20,6 +20,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.internal.schedulers.ImmediateThinScheduler;
 
 public class MainActivity extends Activity {
 
@@ -50,7 +52,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        subscriptions.add(rxNetworkSubscription());
+        //subscriptions.add(rxNetworkSubscription());
+        subscriptions.add(rxRealInternetAccessSubscription());
     }
 
     @Override
@@ -59,6 +62,7 @@ public class MainActivity extends Activity {
         subscriptions.clear();
     }
 
+    @NonNull
     @TargetApi(LOLLIPOP)
     protected Disposable rxNetworkSubscription() {
         return RxNetwork.observe()
@@ -69,20 +73,40 @@ public class MainActivity extends Activity {
                 .subscribe(this::toastNetworkInfo, this::onError, this::onComplete);
     }
 
+    @NonNull
+    protected Disposable rxRealInternetAccessSubscription() {
+        /*InternetObservingStrategy socketStrategy = SocketInternetObservingStrategy.create();
+
+        return RxNetwork.observeReal(socketStrategy).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::toastInternetConnection, this::onError, this::onComplete);*/
+
+        /*return RxNetwork.observeReal().observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::toastInternetConnection, this::onError, this::onComplete);*/
+
+        return RxNetwork.observeSimple().subscribeOn(ImmediateThinScheduler.INSTANCE)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::toastInternetConnection, this::onError, this::onComplete);
+    }
+
+    private void toastInternetConnection(Boolean connected) {
+        final String message = "Internet access: " + connected;
+        Log.d(TAG, message);
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
     private void onComplete() {
         Log.d(TAG, "onComplete invoked");
     }
 
-    private void toastNetworkInfo(RxNetworkInfo networkInfo) {
+    private void toastNetworkInfo(@NonNull RxNetworkInfo networkInfo) {
         final String message = "Network connected: " + networkInfo.isConnected();
         netInfo.setText(message);
 
         Log.d(TAG, "toastNetworkInfo: " + message);
-        Toast.makeText(MainActivity.this, "RxNetworkInfo change: "
-                + message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void onError(Throwable throwable) {
+    private void onError(@NonNull Throwable throwable) {
         Log.d(TAG, "onError: " + throwable.getMessage());
     }
 }

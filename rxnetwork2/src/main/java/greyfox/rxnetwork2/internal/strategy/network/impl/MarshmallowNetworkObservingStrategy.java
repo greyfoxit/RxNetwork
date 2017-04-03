@@ -32,13 +32,16 @@ import io.reactivex.subjects.PublishSubject;
 public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
 
     private static final String TAG = MarshmallowNetworkObservingStrategy.class.getSimpleName();
+
     private static final IntentFilter IDLE_MODE_CHANGED
             = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
+
     private static ConnectivityManager.NetworkCallback networkCallback;
     private static BroadcastReceiver idleModeReceiver;
-    private final ConnectivityManager manager;
+
+    @NonNull private final ConnectivityManager manager;
     @NonNull private final Context context;
-    private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
+    @NonNull private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
 
     public MarshmallowNetworkObservingStrategy(@NonNull Context context) {
         this.context = checkNotNull(context, "context == null");
@@ -106,6 +109,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
         @Override
         public void subscribe(@NonNull final ObservableEmitter<RxNetworkInfo> upstream)
                 throws Exception {
+
             checkNotNull(upstream, "upstream == null");
             registerIdleModeReceiver(upstream);
             registerNetworkCallback(upstream);
@@ -134,13 +138,11 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
 
         @Override
         public void onAvailable(Network network) {
-            //networkChange.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
             upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
         }
 
         @Override
         public void onLost(Network network) {
-            //networkChange.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
             upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
         }
     }

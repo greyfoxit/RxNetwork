@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.providers;
+package greyfox.rxnetwork2.internal.strategy.network.providers;
 
 import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.network.providers.PreLollipopNetworkObservingStrategyProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

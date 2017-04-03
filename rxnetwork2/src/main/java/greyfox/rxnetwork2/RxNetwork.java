@@ -23,8 +23,11 @@ import static greyfox.rxnetwork2.internal.strategy.network.helpers.Functions.TO_
 import android.app.Application;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
+import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
@@ -66,8 +69,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class RxNetwork {
 
     private static final AtomicBoolean initialized = new AtomicBoolean();
-    private static NetworkObservingStrategy IMPL;
-    private static Scheduler SCHEDULER;
+    @Nullable private static NetworkObservingStrategy IMPL;
+    @Nullable private static Scheduler SCHEDULER;
 
     @VisibleForTesting(otherwise = PRIVATE)
     RxNetwork() {
@@ -92,7 +95,7 @@ public final class RxNetwork {
 
     /**
      * Simple network connectivity observable based on {@linkplain #observe()}
-     * that filters all the unnecessary information builderFrom {@link NetworkInfo} and shows only
+     * that filters all the unnecessary information from {@link NetworkInfo} and shows only
      * bare connection status changes.
      * <p>
      * Use this if you don't care about all the {@link NetworkInfo} details.
@@ -111,10 +114,32 @@ public final class RxNetwork {
      *
      * @return {@link NetworkInfo} Observable
      */
-    public static Observable<RxNetworkInfo> observeWith(
-            @NonNull NetworkObservingStrategy strategy) {
-        final Observable<RxNetworkInfo> observable
-                = checkNotNull(strategy, "strategy == null").observe();
+    public static Observable<RxNetworkInfo> observeWith(@NonNull NetworkObservingStrategy strategy) {
+        checkNotNull(strategy, "strategy == null");
+        final Observable<RxNetworkInfo> observable = strategy.observe();
+        if (SCHEDULER != null) observable.subscribeOn(SCHEDULER);
+        return observable;
+    }
+
+    /**
+     * Real internet connectivity observable.
+     *
+     * @return {@code true} if there is real internet access, {@code false} otherwise
+     */
+    @NonNull
+    public static Observable<Boolean> observeReal() {
+        return observeReal(BuiltInInternetObservingStrategy.create());
+    }
+
+    /**
+     * Real internet connectivity observable with custom {@link InternetObservingStrategy}.
+     *
+     * @return {@code true} if there is real internet access, {@code false} otherwise
+     */
+    @NonNull
+    public static Observable<Boolean> observeReal(@NonNull InternetObservingStrategy strategy) {
+        checkNotNull(strategy, "strategy == null");
+        final Observable<Boolean> observable = strategy.observe();
         if (SCHEDULER != null) observable.subscribeOn(SCHEDULER);
         return observable;
     }
@@ -122,9 +147,7 @@ public final class RxNetwork {
     /**
      * Registers {@link RxNetwork} class with application.
      */
-    public static void init(@NonNull Application application) {
-        init(application, null);
-    }
+    public static void init(@NonNull Application application) { init(application, null); }
 
     /**
      * Registers {@link RxNetwork} class with default, built-in network observing
@@ -143,6 +166,7 @@ public final class RxNetwork {
         checkNotNull(application, "application == null");
         final Collection<NetworkObservingStrategyProvider> providers
                 = BuiltInNetworkObservingStrategyProviders.get(application);
+
         init(BuiltInStrategyFactory.create(providers), scheduler);
     }
 
@@ -182,11 +206,13 @@ public final class RxNetwork {
         initialized.set(true);
     }
 
+    @Nullable
     @VisibleForTesting(otherwise = PRIVATE)
     static NetworkObservingStrategy strategy() {
         return IMPL;
     }
 
+    @Nullable
     @VisibleForTesting(otherwise = PRIVATE)
     static Scheduler scheduler() {
         return SCHEDULER;

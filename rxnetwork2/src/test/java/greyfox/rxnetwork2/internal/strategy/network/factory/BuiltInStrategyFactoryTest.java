@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.factory;
+package greyfox.rxnetwork2.internal.strategy.network.factory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import android.content.Context;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.network.factory.BuiltInStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import java.util.Collection;
 import java.util.Collections;

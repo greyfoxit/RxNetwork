@@ -37,19 +37,19 @@ import java.util.Collection;
  * @author Radek Kozak
  */
 @SuppressWarnings("WeakerAccess")
-public final class BuiltInStrategyFactory
-        implements NetworkObservingStrategyFactory<NetworkObservingStrategy> {
+public final class BuiltInStrategyFactory implements
+        NetworkObservingStrategyFactory<NetworkObservingStrategy> {
 
     private final Collection<NetworkObservingStrategyProvider> strategyProviders;
 
     @VisibleForTesting(otherwise = PRIVATE)
-    BuiltInStrategyFactory(
-            @NonNull Collection<NetworkObservingStrategyProvider> strategyProviders) {
+    BuiltInStrategyFactory(@NonNull Collection
+            <NetworkObservingStrategyProvider> strategyProviders) {
         this.strategyProviders = checkNotNull(strategyProviders, "strategyProviders == null");
     }
 
-    public static NetworkObservingStrategyFactory create(
-            Collection<NetworkObservingStrategyProvider> providers) {
+    public static NetworkObservingStrategyFactory create(@NonNull Collection
+            <NetworkObservingStrategyProvider> providers) {
         return new BuiltInStrategyFactory(providers);
     }
 

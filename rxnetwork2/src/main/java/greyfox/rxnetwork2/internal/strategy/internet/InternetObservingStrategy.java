@@ -13,27 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.rxnetwork;
+package greyfox.rxnetwork2.internal.strategy.internet;
 
-import android.app.Application;
-import greyfox.rxnetwork2.RxNetwork;
+import io.reactivex.Observable;
 
 /**
- * Entry point for the whole application.
+ * Interface allowing to implement different strategies for monitoring real internet
+ * connectivity changes.
  *
  * @author Radek Kozak
  */
-public class MainApplication extends Application {
+public interface InternetObservingStrategy {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        RxNetwork.init(this);
-        //RxNetwork.init(this, Schedulers.io());
-
-        /*RxNetwork.init(BuiltInStrategyFactory.create(this));
-
-        RxNetwork.init(BuiltInStrategyFactory.create(this), Schedulers.io());*/
-    }
+    Observable<Boolean> observe();
 }

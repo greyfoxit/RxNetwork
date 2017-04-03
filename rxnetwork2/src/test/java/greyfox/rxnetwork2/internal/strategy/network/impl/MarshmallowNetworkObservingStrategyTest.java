@@ -13,39 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.impl;
+package greyfox.rxnetwork2.internal.strategy.network.impl;
+
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.os.Build.VERSION_CODES.M;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.network.impl.BuiltInNetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
-@RunWith(MockitoJUnitRunner.class)
-public class PreLollipopNetworkObservingStrategyTest {
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = M)
+public class MarshmallowNetworkObservingStrategyTest {
+
+    @Rule public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock Context context;
+    @Mock ConnectivityManager connectivityManager;
 
     BuiltInNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
     @Before
     public void setUp() {
-        sut = spy(new PreLollipopNetworkObservingStrategy(context));
+        when(context.getSystemService(CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
+        sut = spy(new MarshmallowNetworkObservingStrategy(context));
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithoutContext() {
-        new PreLollipopNetworkObservingStrategy(null);
+        new MarshmallowNetworkObservingStrategy(null);
     }
 
     @Test

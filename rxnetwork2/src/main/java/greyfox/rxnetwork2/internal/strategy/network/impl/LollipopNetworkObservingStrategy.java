@@ -42,12 +42,13 @@ import io.reactivex.ObservableOnSubscribe;
 public class LollipopNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
 
     private static final String TAG = LollipopNetworkObservingStrategy.class.getSimpleName();
+
     private final ConnectivityManager manager;
     private NetworkCallback networkCallback;
 
     public LollipopNetworkObservingStrategy(@NonNull Context context) {
-        manager = (ConnectivityManager) checkNotNull(context, "context == null")
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        checkNotNull(context, "context == null");
+        manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @Override

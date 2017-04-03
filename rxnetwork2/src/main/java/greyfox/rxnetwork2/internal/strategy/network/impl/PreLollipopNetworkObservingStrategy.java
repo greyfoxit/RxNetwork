@@ -38,9 +38,11 @@ import io.reactivex.ObservableOnSubscribe;
 public class PreLollipopNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
 
     private static final String TAG = PreLollipopNetworkObservingStrategy.class.getSimpleName();
+
     private static final IntentFilter CONNECTIVITY_FILTER
             = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-    private final Context context;
+
+    @NonNull private final Context context;
     private BroadcastReceiver broadcastReceiver;
 
     public PreLollipopNetworkObservingStrategy(@NonNull Context context) {

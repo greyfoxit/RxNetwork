@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal;
+package greyfox.rxnetwork2.internal.strategy.network.helpers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static greyfox.rxnetwork2.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
 
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.network.helpers.Functions;
 import org.junit.Test;
 
 /**

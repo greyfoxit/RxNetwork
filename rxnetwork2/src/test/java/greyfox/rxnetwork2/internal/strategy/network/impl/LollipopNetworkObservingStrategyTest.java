@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package greyfox.rxnetwork2.internal.strategy.impl;
+package greyfox.rxnetwork2.internal.strategy.network.impl;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
-import static android.os.Build.VERSION_CODES.M;
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -26,8 +26,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.network.impl.BuiltInNetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.network.impl.MarshmallowNetworkObservingStrategy;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,10 +37,13 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+/**
+ * @author Radek Kozak
+ */
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = M)
-public class MarshmallowNetworkObservingStrategyTest {
+@Config(constants = BuildConfig.class, sdk = LOLLIPOP)
+public class LollipopNetworkObservingStrategyTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -55,12 +56,12 @@ public class MarshmallowNetworkObservingStrategyTest {
     @Before
     public void setUp() {
         when(context.getSystemService(CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
-        sut = spy(new MarshmallowNetworkObservingStrategy(context));
+        sut = spy(new LollipopNetworkObservingStrategy(context));
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithoutContext() {
-        new MarshmallowNetworkObservingStrategy(null);
+        new LollipopNetworkObservingStrategy(null);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class MarshmallowNetworkObservingStrategyTest {
     }
 
     @Test
-    public void shouldDisposeCorrectly_whenDisposed() {
+    public void shouldDisposeCorrectly() {
         sut.observe().subscribeWith(testObserver).assertSubscribed();
 
         testObserver.dispose();

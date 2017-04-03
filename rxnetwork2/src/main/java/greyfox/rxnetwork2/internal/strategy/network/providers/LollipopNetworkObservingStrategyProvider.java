@@ -29,8 +29,7 @@ import greyfox.rxnetwork2.internal.strategy.network.impl.LollipopNetworkObservin
  *
  * @author Radek Kozak
  */
-final class LollipopNetworkObservingStrategyProvider
-        implements NetworkObservingStrategyProvider {
+final class LollipopNetworkObservingStrategyProvider implements NetworkObservingStrategyProvider {
 
     private final Context context;
 
