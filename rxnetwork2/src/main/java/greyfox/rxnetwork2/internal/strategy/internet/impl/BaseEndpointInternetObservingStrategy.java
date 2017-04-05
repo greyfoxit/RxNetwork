@@ -7,6 +7,8 @@ import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Radek Kozak
@@ -17,6 +19,8 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
     abstract long delay();
 
     abstract long interval();
+
+    abstract Logger logger();
 
     Function<Long, Boolean> toConnectionState() {
         return new Function<Long, Boolean>() {
@@ -35,24 +39,29 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
 
     protected abstract boolean checkConnection();
 
+    void onError(String message, Exception exception) {
+        logger().log(Level.WARNING, message + ": " + exception.getMessage()
+                + ((exception.getCause() != null) ? ": " + exception.getCause().getMessage() : ""));
+    }
+
     /**
      * {@code BuiltInInternetObservingStrategy} builder static inner class.
      */
     public static abstract class Builder<T extends Builder> {
 
-        private long delay = Config.DEFAULT_DELAY_MS;
-        //private int timeout = Config.DEFAULT_TIMEOUT_MS;
-        private long interval = Config.DEFAULT_INTERVAL_MS;
-        private String endpoint = Config.DEFAULT_ENDPOINT;
-        private int port = Config.DEFAULT_PORT;
+        static final int DEFAULT_DELAY_MS = 0;
+        static final int DEFAULT_INTERVAL_MS = 3000;
+        static final String DEFAULT_ENDPOINT = "www.google.cn";
+        static final int DEFAULT_PORT = 80;
+
+        private long delay = DEFAULT_DELAY_MS;
+        private long interval = DEFAULT_INTERVAL_MS;
+        private String endpoint = DEFAULT_ENDPOINT;
+        private int port = DEFAULT_PORT;
 
         public long delay() {
             return this.delay;
         }
-
-        /*public int timeout() {
-            return this.timeout;
-        }*/
 
         public long interval() {
             return this.interval;
@@ -79,20 +88,6 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
             this.delay = delay;
             return self();
         }
-
-        /**
-         * Sets the {@code timeout} and returns a reference to this Builder so that the methods can
-         * be chained together.
-         *
-         * @param timeout the {@code timeout} to set
-         *
-         * @return a reference to this Builder
-         */
-        /*@NonNull
-        public T timeout(int timeout) {
-            this.timeout = timeout;
-            return self();
-        }*/
 
         /**
          * Sets the {@code interval} and returns a reference to this Builder so that the methods can
@@ -153,14 +148,5 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
             //noinspection unchecked
             return (T) this;
         }
-    }
-
-    public static final class Config {
-
-        static final int DEFAULT_DELAY_MS = 0;
-        static final int DEFAULT_INTERVAL_MS = 3000;
-        //static final int DEFAULT_TIMEOUT_MS = 3000;
-        static final String DEFAULT_ENDPOINT = "www.google.cn";
-        static final int DEFAULT_PORT = 80;
     }
 }

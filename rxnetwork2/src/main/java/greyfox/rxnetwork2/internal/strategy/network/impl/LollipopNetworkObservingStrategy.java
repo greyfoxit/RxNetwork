@@ -26,12 +26,12 @@ import android.net.Network;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfoHelper;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import java.util.logging.Logger;
 
 /**
  * RxNetworkInfo observing strategy for Android devices with API 21 (Lollipop) or higher.
@@ -40,8 +40,6 @@ import io.reactivex.ObservableOnSubscribe;
  */
 @RequiresApi(LOLLIPOP)
 public class LollipopNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
-
-    private static final String TAG = LollipopNetworkObservingStrategy.class.getSimpleName();
 
     private final ConnectivityManager manager;
     private NetworkCallback networkCallback;
@@ -65,8 +63,13 @@ public class LollipopNetworkObservingStrategy extends BuiltInNetworkObservingStr
         try {
             manager.unregisterNetworkCallback(networkCallback);
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't unregister network callback: " + e.getMessage());
+            onError("Could not unregister network callback", e);
         }
+    }
+
+    @Override
+    Logger logger() {
+        return Logger.getLogger(LollipopNetworkObservingStrategy.class.getSimpleName());
     }
 
     private final class LollipopOnSubscribe implements ObservableOnSubscribe<RxNetworkInfo> {

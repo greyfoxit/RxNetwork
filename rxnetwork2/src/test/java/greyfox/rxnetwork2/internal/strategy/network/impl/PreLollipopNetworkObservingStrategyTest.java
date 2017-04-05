@@ -15,30 +15,50 @@
  */
 package greyfox.rxnetwork2.internal.strategy.network.impl;
 
+import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
+import greyfox.rxnetwork2.internal.net.RxNetworkInfoHelper;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class PreLollipopNetworkObservingStrategyTest {
 
-    @Mock Context context;
+    @Rule public MockitoRule rule = MockitoJUnit.rule();
+
+    Context context;
 
     BuiltInNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
+    RxNetworkInfo VALID_RXNETWORK_INFO;
+
     @Before
     public void setUp() {
+        context = spy(RuntimeEnvironment.application.getApplicationContext());
         sut = spy(new PreLollipopNetworkObservingStrategy(context));
+        VALID_RXNETWORK_INFO = RxNetworkInfoHelper.getNetworkInfoFrom(context);
     }
 
     @Test(expected = NullPointerException.class)
@@ -47,10 +67,11 @@ public class PreLollipopNetworkObservingStrategyTest {
     }
 
     @Test
-    public void shouldSubscribeCorrectly() {
+    public void shouldReceiveCorrectValue_whenConnectivityChanges() {
         sut.observe().subscribeWith(testObserver);
 
-        testObserver.assertSubscribed().assertEmpty();
+        RuntimeEnvironment.application.sendBroadcast(new Intent(CONNECTIVITY_ACTION));
+        testObserver.assertSubscribed().assertValue(VALID_RXNETWORK_INFO);
     }
 
     @Test
@@ -60,6 +81,18 @@ public class PreLollipopNetworkObservingStrategyTest {
         testObserver.dispose();
 
         verify(sut).dispose();
+        testObserver.isDisposed();
+    }
+
+    @Test
+    public void shouldDisposeWithException_whenDisposed() {
+        doThrow(Exception.class).when(context).unregisterReceiver(any(BroadcastReceiver.class));
+        sut.observe().subscribeWith(testObserver).assertSubscribed();
+
+        testObserver.dispose();
+
+        verify(sut).dispose();
+        verify(sut).onError(anyString(), any(Exception.class));
         testObserver.isDisposed();
     }
 }

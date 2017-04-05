@@ -1,6 +1,10 @@
 package greyfox.rxnetwork2.internal.strategy.network.impl;
 
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION_CODES.M;
+
+import static java.util.logging.Logger.getLogger;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 
@@ -14,13 +18,13 @@ import android.net.NetworkRequest;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfoHelper;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.subjects.PublishSubject;
+import java.util.logging.Logger;
 
 /**
  * RxNetworkInfo observing strategy for Android devices with API 23 (Marshmallow) or higher.
@@ -30,21 +34,21 @@ import io.reactivex.subjects.PublishSubject;
 @RequiresApi(M)
 public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
 
-    private static final String TAG = MarshmallowNetworkObservingStrategy.class.getSimpleName();
-
     private static final IntentFilter IDLE_MODE_CHANGED
             = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
 
     private static ConnectivityManager.NetworkCallback networkCallback;
     private static BroadcastReceiver idleModeReceiver;
 
-    @NonNull private final ConnectivityManager manager;
+    @NonNull private final ConnectivityManager connectivityManager;
+    @NonNull private final PowerManager powerManager;
     @NonNull private final Context context;
     @NonNull private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
 
     public MarshmallowNetworkObservingStrategy(@NonNull Context context) {
         this.context = checkNotNull(context, "context");
-        manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+        powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
     }
 
     @Override
@@ -59,24 +63,29 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
         unregisterIdleModeReceiver();
     }
 
+    @Override
+    Logger logger() {
+        return getLogger(MarshmallowNetworkObservingStrategy.class.getSimpleName());
+    }
+
     private void unregisterIdleModeReceiver() {
         try {
             context.unregisterReceiver(idleModeReceiver);
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't unregister idle mode broadcast receiver: " + e.getMessage());
+            onError("Could not unregister idle mode broadcast receiver", e);
         }
     }
 
     private void unregisterNetworkCallback() {
         try {
-            manager.unregisterNetworkCallback(networkCallback);
+            connectivityManager.unregisterNetworkCallback(networkCallback);
         } catch (Exception e) {
-            Log.e(TAG, "Couldn't unregister network callback: " + e.getMessage());
+            onError("Could not unregister network callback", e);
         }
     }
 
     @RequiresApi(M)
-    private static final class DeviceIdleReceiver extends BroadcastReceiver {
+    private final class DeviceIdleReceiver extends BroadcastReceiver {
 
         private final ObservableEmitter<RxNetworkInfo> upstream;
 
@@ -95,11 +104,9 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
 
         private boolean isDeviceInIdleMode(final Context context) {
             final String packageName = context.getPackageName();
-            final PowerManager manager = (PowerManager)
-                    context.getSystemService(Context.POWER_SERVICE);
 
-            return manager.isDeviceIdleMode()
-                    && !manager.isIgnoringBatteryOptimizations(packageName);
+            return powerManager.isDeviceIdleMode()
+                    && !powerManager.isIgnoringBatteryOptimizations(packageName);
         }
     }
 
@@ -123,7 +130,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
         private void registerNetworkCallback(ObservableEmitter<RxNetworkInfo> upstream) {
             networkCallback = new MarshmallowNetworkCallback(upstream);
             NetworkRequest request = new NetworkRequest.Builder().build();
-            manager.registerNetworkCallback(request, networkCallback);
+            connectivityManager.registerNetworkCallback(request, networkCallback);
         }
     }
 
@@ -137,12 +144,12 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
 
         @Override
         public void onAvailable(Network network) {
-            upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
+            upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, connectivityManager));
         }
 
         @Override
         public void onLost(Network network) {
-            upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
+            upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, connectivityManager));
         }
     }
 }

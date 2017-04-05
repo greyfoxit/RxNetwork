@@ -15,6 +15,8 @@
  */
 package greyfox.rxnetwork2.internal.strategy.network.impl;
 
+import static java.util.logging.Logger.getLogger;
+
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 
 import android.content.BroadcastReceiver;
@@ -23,23 +25,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfoHelper;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import java.util.logging.Logger;
 
 /**
  * RxNetworkInfo observing strategy for pre-Lollipop Android devices (API < 21).
  *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
 public class PreLollipopNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
 
-    private static final String TAG = PreLollipopNetworkObservingStrategy.class.getSimpleName();
-
-    private static final IntentFilter CONNECTIVITY_FILTER
+    private static final IntentFilter CONNECTIVITY_INTENT_FILTER
             = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
 
     @NonNull private final Context context;
@@ -55,16 +56,21 @@ public class PreLollipopNetworkObservingStrategy extends BuiltInNetworkObserving
     }
 
     private void register() {
-        context.registerReceiver(broadcastReceiver, CONNECTIVITY_FILTER);
+        context.registerReceiver(broadcastReceiver, CONNECTIVITY_INTENT_FILTER);
     }
 
     @Override
     void dispose() {
         try {
             context.unregisterReceiver(broadcastReceiver);
-        } catch (Exception e) {
-            Log.e(TAG, "Couldn't unregister broadcast receiver: " + e.getMessage());
+        } catch (Exception exc) {
+            onError("Could not unregister broadcast receiver", exc);
         }
+    }
+
+    @Override
+    Logger logger() {
+        return getLogger(PreLollipopNetworkObservingStrategy.class.getSimpleName());
     }
 
     private final class PreLollipopOnSubscribe implements ObservableOnSubscribe<RxNetworkInfo> {

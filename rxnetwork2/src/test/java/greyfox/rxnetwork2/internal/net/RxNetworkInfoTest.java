@@ -17,26 +17,37 @@ package greyfox.rxnetwork2.internal.net;
 
 import static android.net.ConnectivityManager.TYPE_WIFI;
 import static android.net.NetworkInfo.DetailedState.CONNECTED;
-import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
+import greyfox.rxnetwork2.helpers.robolectric.shadows.ShadowNetworkCapabilities;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowNetwork;
 import org.robolectric.shadows.ShadowNetworkInfo;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings("WeakerAccess, ConstantConditions")
+@RequiresApi(LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = {KITKAT, LOLLIPOP})
+@Config(constants = BuildConfig.class, sdk = LOLLIPOP, shadows = ShadowNetworkCapabilities.class)
 public class RxNetworkInfoTest {
 
     static NetworkInfo NETWORK_INFO
             = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_WIFI, 0, true, true);
+
+    static int NETWORK_ID = 100;
+    static Network NETWORK = ShadowNetwork.newInstance(NETWORK_ID);
+
+    Object NOT_RXNETWORK_INFO_INSTANCE = new Object();
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaConstructor() {
@@ -50,25 +61,71 @@ public class RxNetworkInfoTest {
 
     @Test
     public void shouldBeEqualToSelf() {
-        final RxNetworkInfo sut = RxNetworkInfo.create();
+        RxNetworkInfo sut = RxNetworkInfo.create();
 
-        assertThat(sut).isEqualTo(sut).isEqualToComparingFieldByField(sut);
+        assertThat(sut).isEqualTo(sut);
     }
 
     @Test
-    public void shouldBeEqual_whenCreatedFromSameBuilder() {
-        final RxNetworkInfo.Builder builder = RxNetworkInfo.builder();
+    public void shouldNotBeEqual_whenNotAnInstanceOfRxNetworkInfo() {
+        RxNetworkInfo sut = RxNetworkInfo.create();
 
-        RxNetworkInfo rxni = new RxNetworkInfo(builder);
-        RxNetworkInfo rxni2 = new RxNetworkInfo(builder);
+        assertThat(sut).isNotEqualTo(NOT_RXNETWORK_INFO_INSTANCE);
+    }
+
+    @Test
+    public void shouldNotBeEqualToNull() {
+        RxNetworkInfo sut = RxNetworkInfo.create();
+
+        assertThat(sut).isNotEqualTo(null);
+    }
+
+    @Test
+    public void defaults_shouldBeEqual() {
+        RxNetworkInfo rxni = RxNetworkInfo.create();
+        RxNetworkInfo rxni2 = RxNetworkInfo.create();
 
         assertEqual(rxni, rxni2);
     }
 
     @Test
-    public void shouldBeEqual_whenCreatedFromDefaultBuilder() {
-        RxNetworkInfo rxni = new RxNetworkInfo(RxNetworkInfo.builder());
-        RxNetworkInfo rxni2 = new RxNetworkInfo(RxNetworkInfo.builder());
+    public void shouldBeEqual_whenCreatedFromSameBuilder() {
+        final RxNetworkInfo rxni = RxNetworkInfo.builder().build();
+        final RxNetworkInfo rxni2 = RxNetworkInfo.builder().build();
+
+        assertEqual(rxni, rxni2);
+    }
+
+    @Test
+    public void shouldBeEqual_whenCreatedFromSameDetailedBuilder() {
+        RxNetworkInfo rxni = detailedRxNetworkInfoBuilder().build();
+        RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilder().build();
+
+        assertEqual(rxni, rxni2);
+    }
+
+    @Test
+    public void shouldBeEqual_whenCreatedFromSameDetailedBuilder_withNullsAndOpposites() {
+        RxNetworkInfo rxni = detailedRxNetworkInfoBuilderWithNullsAndOpposites().build();
+        RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilderWithNullsAndOpposites().build();
+
+        assertEqual(rxni, rxni2);
+    }
+
+    @Test
+    public void shouldBeEqual_whenCreatedFromSameDetailedBuilder_withNullNetworkCapabilities() {
+        RxNetworkInfo rxni = detailedRxNetworkInfoBuilder().networkCapabilities(null).build();
+        RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilder().networkCapabilities(null).build();
+
+        assertEqual(rxni, rxni2);
+    }
+
+    @Test
+    public void shouldBeEqual_whenCreatedFromSameDetailedBuilder_withNetworkCapabilities() {
+        NetworkCapabilities nc = ShadowNetworkCapabilities.newInstance(1, 1, 1, 1, "spec", 1);
+
+        RxNetworkInfo rxni = detailedRxNetworkInfoBuilder().networkCapabilities(nc).build();
+        RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilder().networkCapabilities(nc).build();
 
         assertEqual(rxni, rxni2);
     }
@@ -89,21 +146,42 @@ public class RxNetworkInfoTest {
         assertNotEqual(rxni, rxni2);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenProvidedNullNetworkInfo() {
         RxNetworkInfo.createFrom(null);
     }
 
-    private void assertEqual(RxNetworkInfo rxni, RxNetworkInfo rxni2) {
+    private void assertEqual(@NonNull RxNetworkInfo rxni, @NonNull RxNetworkInfo rxni2) {
+        assertThat(rxni).isNotNull();
+        assertThat(rxni2).isNotNull();
         assertThat(rxni).isEqualTo(rxni2);
+        assertThat(rxni.equals(rxni2)).isTrue();
         assertThat(rxni.hashCode()).isEqualTo(rxni2.hashCode());
         assertThat(rxni.toString()).isEqualTo(rxni2.toString());
     }
 
-    private void assertNotEqual(RxNetworkInfo rxni, RxNetworkInfo rxni2) {
+    private void assertNotEqual(@NonNull RxNetworkInfo rxni, @NonNull RxNetworkInfo rxni2) {
+        assertThat(rxni).isNotNull();
+        assertThat(rxni2).isNotNull();
         assertThat(rxni).isNotEqualTo(rxni2);
+        assertThat(rxni.equals(rxni2)).isFalse();
         assertThat(rxni.hashCode()).isNotEqualTo(rxni2.hashCode());
         assertThat(rxni.toString()).isNotEqualTo(rxni2.toString());
+    }
+
+    private RxNetworkInfo.Builder detailedRxNetworkInfoBuilder() {
+        return RxNetworkInfo.builder().available(true).connected(true)
+                .connectedOrConnecting(true).detailedState(CONNECTED).extraInfo("extra info")
+                .failover(true).reason("some reason").roaming(true)
+                .state(NetworkInfo.State.CONNECTED).subType(0).subTypeName("type one")
+                .type(1).typeName("type one");
+    }
+
+    private RxNetworkInfo.Builder detailedRxNetworkInfoBuilderWithNullsAndOpposites() {
+        return RxNetworkInfo.builder().available(false).connected(false)
+                .connectedOrConnecting(false).detailedState(null).extraInfo(null)
+                .failover(false).reason(null).roaming(false)
+                .state(null).subType(0).subTypeName(null)
+                .type(1).typeName(null);
     }
 }

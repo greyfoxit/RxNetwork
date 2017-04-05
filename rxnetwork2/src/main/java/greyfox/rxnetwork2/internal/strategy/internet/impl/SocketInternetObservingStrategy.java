@@ -3,7 +3,6 @@ package greyfox.rxnetwork2.internal.strategy.internet.impl;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
-import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
@@ -15,7 +14,7 @@ import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.logging.Level;
+import java.net.SocketAddress;
 import java.util.logging.Logger;
 
 /**
@@ -23,9 +22,6 @@ import java.util.logging.Logger;
  */
 
 public class SocketInternetObservingStrategy extends BaseEndpointInternetObservingStrategy {
-
-    private static final Logger logger
-            = getLogger(SocketInternetObservingStrategy.class.getSimpleName());
 
     /** Canonical hostname. */
     @NonNull private final String host;
@@ -44,7 +40,7 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
 
     @VisibleForTesting(otherwise = PRIVATE)
     @RestrictTo(LIBRARY_GROUP)
-    private SocketInternetObservingStrategy(@NonNull Builder builder) {
+    SocketInternetObservingStrategy(@NonNull Builder builder) {
         checkNotNull(builder, "builder");
 
         delay = builder.delay();
@@ -75,24 +71,39 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
     }
 
     @Override
+    Logger logger() {
+        return getLogger(SocketInternetObservingStrategy.class.getSimpleName());
+    }
+
+    @Override
     protected boolean checkConnection() {
         boolean isConnected;
         Socket socket = null;
         try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(host, port), timeout);
-            isConnected = socket.isConnected();
+            socket = connectSocketTo(new InetSocketAddress(host, port), timeout);
+            isConnected = isSocketConnected(socket);
         } catch (IOException ioe) {
-            logger.log(WARNING, "Problem occurred while checking endpoint: " + ioe.getMessage());
+            onError("Problem occurred while checking endpoint", ioe);
             isConnected = Boolean.FALSE;
         } finally {
             try {
                 if (socket != null) socket.close();
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Could not close the socket: " + ioe.getMessage());
+                onError("Could not close the socket", ioe);
             }
         }
+
         return isConnected;
+    }
+
+    Socket connectSocketTo(SocketAddress socketAddress, int timeout) throws IOException {
+        final Socket socket = new Socket();
+        socket.connect(socketAddress, timeout);
+        return socket;
+    }
+
+    boolean isSocketConnected(Socket socket) {
+        return socket.isConnected();
     }
 
     /**
@@ -101,7 +112,9 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
     public static final class Builder extends
             BaseEndpointInternetObservingStrategy.Builder<SocketInternetObservingStrategy.Builder> {
 
-        private int timeout = Config.DEFAULT_TIMEOUT_MS;
+        private static final int DEFAULT_TIMEOUT_MS = 3000;
+
+        private int timeout = DEFAULT_TIMEOUT_MS;
 
         public int timeout() {
             return this.timeout;
@@ -118,7 +131,7 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
         @NonNull
         public Builder timeout(int timeout) {
             this.timeout = timeout;
-            return this;
+            return self();
         }
 
         /**
@@ -130,13 +143,8 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
          */
         @NonNull
         @Override
-        public InternetObservingStrategy build() {
+        public SocketInternetObservingStrategy build() {
             return new SocketInternetObservingStrategy(this);
         }
-    }
-
-    public static final class Config {
-
-        static final int DEFAULT_TIMEOUT_MS = 3000;
     }
 }

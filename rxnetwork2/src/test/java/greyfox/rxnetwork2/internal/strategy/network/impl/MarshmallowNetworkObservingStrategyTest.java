@@ -15,16 +15,28 @@
  */
 package greyfox.rxnetwork2.internal.strategy.network.impl;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION_CODES.M;
+import static android.os.PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.ConnectivityManager.NetworkCallback;
+import android.os.Build;
+import android.os.PowerManager;
+import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
+import greyfox.rxnetwork2.helpers.robolectric.shadows.ShadowConnectivityManagerWithCallback;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
@@ -35,24 +47,29 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+@RequiresApi(api = Build.VERSION_CODES.M)
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = M)
+@Config(constants = BuildConfig.class, sdk = M,
+        shadows = ShadowConnectivityManagerWithCallback.class)
 public class MarshmallowNetworkObservingStrategyTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
 
-    @Mock Context context;
-    @Mock ConnectivityManager connectivityManager;
-
+    Context context;
     BuiltInNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
+    @Mock PowerManager powerManager;
+
+    RxNetworkInfo DEFAULT_RXNETWORK_INFO = RxNetworkInfo.create();
+
     @Before
     public void setUp() {
-        when(context.getSystemService(CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
+        context = spy(RuntimeEnvironment.application.getApplicationContext());
         sut = spy(new MarshmallowNetworkObservingStrategy(context));
     }
 
@@ -69,6 +86,30 @@ public class MarshmallowNetworkObservingStrategyTest {
     }
 
     @Test
+    public void shouldGetValue_whenIdleModeChanged_andDeviceNotIdled() {
+        setUpDeviceIdleMode(false);
+
+        sut.observe().subscribeWith(testObserver);
+        testObserver.assertSubscribed().assertEmpty();
+
+        RuntimeEnvironment.application.sendBroadcast(new Intent(ACTION_DEVICE_IDLE_MODE_CHANGED));
+
+        testObserver.assertSubscribed().assertValueCount(1);
+    }
+
+    @Test
+    public void shouldGetValue_whenIdleModeChanged_andDeviceIdled() {
+        setUpDeviceIdleMode(true);
+
+        sut.observe().subscribeWith(testObserver);
+        testObserver.assertSubscribed().assertEmpty();
+
+        RuntimeEnvironment.application.sendBroadcast(new Intent(ACTION_DEVICE_IDLE_MODE_CHANGED));
+
+        testObserver.assertSubscribed().assertValue(DEFAULT_RXNETWORK_INFO);
+    }
+
+    @Test
     public void shouldDisposeCorrectly_whenDisposed() {
         sut.observe().subscribeWith(testObserver).assertSubscribed();
 
@@ -76,5 +117,52 @@ public class MarshmallowNetworkObservingStrategyTest {
 
         verify(sut).dispose();
         testObserver.isDisposed();
+    }
+
+    @Test
+    public void shouldCatch_whenReceiverUnregisterException() {
+        setupNetworkCallbackUnregisterException();
+
+        sut.observe().subscribeWith(testObserver).assertSubscribed();
+        testObserver.dispose();
+
+        verify(sut).dispose();
+        verify(sut).onError(anyString(), any(Exception.class));
+        testObserver.isDisposed();
+    }
+
+    @Test
+    public void shouldCatch_whenNetworkCallbackUnregisterException() {
+        setupForBroadcastReceiverUnregisterException();
+
+        sut.observe().subscribeWith(testObserver).assertSubscribed();
+        testObserver.dispose();
+
+        verify(sut).dispose();
+        verify(sut).onError(anyString(), any(Exception.class));
+        testObserver.isDisposed();
+    }
+
+    private void setupForBroadcastReceiverUnregisterException() {
+        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+        doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
+        doThrow(Exception.class).when(context).unregisterReceiver(any(BroadcastReceiver.class));
+        sut = spy(new MarshmallowNetworkObservingStrategy(context));
+    }
+
+    private void setupNetworkCallbackUnregisterException() {
+        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+        doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
+        doThrow(Exception.class).when(connectivityManager)
+                .unregisterNetworkCallback(any(NetworkCallback.class));
+
+        sut = spy(new MarshmallowNetworkObservingStrategy(context));
+    }
+
+    private void setUpDeviceIdleMode(boolean isIdle) {
+        context = spy(RuntimeEnvironment.application.getApplicationContext());
+        doReturn(isIdle).when(powerManager).isDeviceIdleMode();
+        doReturn(powerManager).when(context).getSystemService(POWER_SERVICE);
+        sut = spy(new MarshmallowNetworkObservingStrategy(context));
     }
 }

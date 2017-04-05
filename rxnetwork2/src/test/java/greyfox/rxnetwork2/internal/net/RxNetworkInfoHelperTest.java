@@ -23,13 +23,18 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.robolectric.shadows.ShadowNetworkInfo.newInstance;
+
+import static greyfox.rxnetwork2.internal.net.RxNetworkInfo.builderFrom;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
+import greyfox.rxnetwork2.helpers.robolectric.shadows.ShadowNetworkCapabilities;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,9 +49,11 @@ import org.robolectric.shadows.ShadowNetwork;
 import org.robolectric.shadows.ShadowNetworkInfo;
 
 @SuppressWarnings({"WeakerAccess", "deprecation"})
+@RequiresApi(LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class,
-        shadows = {ShadowConnectivityManager.class, ShadowNetworkInfo.class, ShadowNetwork.class})
+@Config(constants = BuildConfig.class, sdk = LOLLIPOP,
+        shadows = {ShadowConnectivityManager.class, ShadowNetworkInfo.class,
+                ShadowNetwork.class, ShadowNetworkCapabilities.class})
 public class RxNetworkInfoHelperTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
@@ -55,16 +62,19 @@ public class RxNetworkInfoHelperTest {
     @Mock ConnectivityManager connectivityManager;
 
     Network NETWORK;
+    NetworkInfo NETWORK_INFO;
     RxNetworkInfo DEFAULT_RXNETWORK_INFO;
     RxNetworkInfo VALID_RXNETWORK_INFO;
-    NetworkInfo NETWORK_INFO;
+    RxNetworkInfo VALID_RXNETWORK_INFO_DETAILED;
 
     @Before
     public void setUp() {
-        NETWORK_INFO
-                = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS, true, true);
         DEFAULT_RXNETWORK_INFO = RxNetworkInfo.create();
-        VALID_RXNETWORK_INFO = RxNetworkInfo.createFrom(NETWORK_INFO);
+        NETWORK_INFO = newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS, true, true);
+        RxNetworkInfo.Builder builder = builderFrom(NETWORK_INFO);
+        VALID_RXNETWORK_INFO = builder.build();
+        NetworkCapabilities networkCapabilities = getNetworkCapabilities();
+        VALID_RXNETWORK_INFO_DETAILED = builder.networkCapabilities(networkCapabilities).build();
     }
 
     @Test(expected = AssertionError.class)
@@ -102,10 +112,10 @@ public class RxNetworkInfoHelperTest {
     }
 
     @Test
-    @Config(sdk = LOLLIPOP)
-    @RequiresApi(LOLLIPOP)
     public void shouldNeverBeNull_whenFromNetwork() {
         NETWORK = getNetwork();
+        NetworkCapabilities nc = ShadowNetworkCapabilities.newInstance(1, 1, 1, 1, "spec", 1);
+        doReturn(nc).when(connectivityManager).getNetworkCapabilities(NETWORK);
 
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(NETWORK, connectivityManager);
 
@@ -113,8 +123,6 @@ public class RxNetworkInfoHelperTest {
     }
 
     @Test
-    @Config(sdk = LOLLIPOP)
-    @RequiresApi(LOLLIPOP)
     public void shouldFallbackToDefault_whenNetworkInfoFromNetworkNull() {
         NETWORK = getNetwork();
         doReturn(null).when(connectivityManager).getNetworkInfo(NETWORK);
@@ -125,19 +133,26 @@ public class RxNetworkInfoHelperTest {
     }
 
     @Test
-    @Config(sdk = LOLLIPOP)
-    @RequiresApi(LOLLIPOP)
     public void shouldReturnProperNetworkInfo_whenProvidedNetwork() {
-        NETWORK = getNetwork();
-        doReturn(NETWORK_INFO).when(connectivityManager).getNetworkInfo(NETWORK);
+        setUpNetworkWithNetworkCapabilities();
 
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(NETWORK, connectivityManager);
 
-        assertThat(sut).isEqualTo(VALID_RXNETWORK_INFO);
+        assertThat(sut).isEqualTo(VALID_RXNETWORK_INFO_DETAILED);
     }
 
-    @RequiresApi(LOLLIPOP)
+    private void setUpNetworkWithNetworkCapabilities() {
+        NETWORK = getNetwork();
+        doReturn(NETWORK_INFO).when(connectivityManager).getNetworkInfo(NETWORK);
+        NetworkCapabilities nc = getNetworkCapabilities();
+        doReturn(nc).when(connectivityManager).getNetworkCapabilities(NETWORK);
+    }
+
     private Network getNetwork() {
         return ShadowNetwork.newInstance(NETWORK_INFO.getType());
+    }
+
+    private NetworkCapabilities getNetworkCapabilities() {
+        return ShadowNetworkCapabilities.newInstance(1, 1, 1, 1, "spec", 1);
     }
 }

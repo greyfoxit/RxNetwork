@@ -1,38 +1,36 @@
 package greyfox.rxnetwork2.internal.strategy.internet.impl;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
-import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static java.net.HttpURLConnection.HTTP_OK;
 
 import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.internet.error.InternetObservingStrategyException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
+/**
+ * @author Radek Kozak
+ */
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
-public class BuiltInInternetObservingStrategyTest {
+@RunWith(MockitoJUnitRunner.class)
+public class Http200InternetObservingStrategyTest {
 
-    private static final BuiltInInternetObservingStrategy.Builder NULL_BUILDER = null;
-    private static final String INVALID_HOST = "htt:/invalid.endpoint";
+    static final String INVALID_HOST = "htt:/invalid.endpoint";
 
-    // built-in strategy uses HTTP Status-Code 204: No Content to validate connection
-    private static final int VALID_SERVER_RESPONSE = HTTP_NO_CONTENT;
-    private static final int INVALID_SERVER_RESPONSE = HTTP_INTERNAL_ERROR;
-    private static final int VALID_TIMEOUT_MS = 100;
+    static final int VALID_SERVER_RESPONSE = HTTP_OK;
+    static final int INVALID_SERVER_RESPONSE = HTTP_INTERNAL_ERROR;
 
     MockWebServer server;
 
@@ -49,34 +47,53 @@ public class BuiltInInternetObservingStrategyTest {
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
-        new BuiltInInternetObservingStrategy();
+        new Http200InternetObservingStrategy();
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new BuiltInInternetObservingStrategy(NULL_BUILDER);
+        new Http200InternetObservingStrategy(null);
     }
 
     @Test
-    public void shouldSubscribeCorrectly_whenCreatedFromDefaultFactory() {
-        InternetObservingStrategy sut = BuiltInInternetObservingStrategy.create();
+    public void shouldSubscribeCorrectly() {
+        InternetObservingStrategy sut = Http200InternetObservingStrategy.create();
 
         sut.observe().test().assertSubscribed();
     }
 
     @Test
-    public void shouldSubscribeCorrectly_whenCreatedFromDetailedBuilder() {
-        InternetObservingStrategy sut = detailedStrategyBuilder().build();
+    public void internetConnectionShouldBeTrue()
+            throws InternetObservingStrategyException, IOException {
 
-        sut.observe().test().assertSubscribed();
+        Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
+        HttpURLConnection urlConnection = spy((HttpURLConnection) server.url("/").url()
+                .openConnection());
+        doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
+        sut.isConnected(urlConnection);
+
+        assertThat(sut.observe().blockingFirst()).isTrue();
     }
 
     @Test
-    public void shouldThrow_whenTryingToObserveInvalidEndpoint() {
-        InternetObservingStrategy sut = BuiltInInternetObservingStrategy.builder()
+    public void internetConnectionShouldBeFalse_whenTryingToObserveInvalidEndpoint() {
+        InternetObservingStrategy sut = Http200InternetObservingStrategy.builder()
                 .endpoint(INVALID_HOST).build();
 
         assertThat(sut.observe().blockingFirst()).isFalse();
+    }
+
+    @Test(expected = InternetObservingStrategyException.class)
+    public void shouldThrow_whenConnectionError()
+            throws InternetObservingStrategyException, IOException {
+
+        Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
+        HttpURLConnection urlConnection = spy((HttpURLConnection) server.url("/").url()
+                .openConnection());
+        doThrow(IOException.class).when(urlConnection).getResponseCode();
+        sut.isConnected(urlConnection);
+
+        sut.observe().blockingFirst();
     }
 
     @Test
@@ -87,20 +104,6 @@ public class BuiltInInternetObservingStrategyTest {
         InternetObservingStrategy sut = buildStrategy(server);
 
         assertThat(sut.observe().blockingFirst()).isTrue();
-    }
-
-    @Test
-    public void shouldLogError_whenProblemGettingResponseCode()
-            throws IOException, InternetObservingStrategyException {
-
-        BuiltInInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
-        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
-        doThrow(IOException.class).when(urlConnection).getResponseCode();
-
-        doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
-
-        assertThat(sut.observe().blockingFirst()).isFalse();
-        verify(sut).onError(anyString(), any(Exception.class));
     }
 
     @Test
@@ -117,13 +120,8 @@ public class BuiltInInternetObservingStrategyTest {
         server.enqueue(new MockResponse().setResponseCode(httpStatusCode));
     }
 
-    private InternetObservingStrategy buildStrategy(MockWebServer server) {
+    private BuiltInInternetObservingStrategy buildStrategy(MockWebServer server) {
         String testEndpoint = server.url("/").toString();
-        return BuiltInInternetObservingStrategy.builder().endpoint(testEndpoint).build();
-    }
-
-    private BuiltInInternetObservingStrategy.Builder detailedStrategyBuilder() {
-        return BuiltInInternetObservingStrategy.builder().timeout(VALID_TIMEOUT_MS);
+        return Http200InternetObservingStrategy.builder().endpoint(testEndpoint).build();
     }
 }
-
