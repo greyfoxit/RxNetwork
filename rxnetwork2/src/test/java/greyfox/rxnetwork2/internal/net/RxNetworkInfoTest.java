@@ -20,7 +20,7 @@ import static android.net.NetworkInfo.DetailedState.CONNECTED;
 import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import android.net.NetworkInfo;
 import greyfox.rxnetwork2.BuildConfig;

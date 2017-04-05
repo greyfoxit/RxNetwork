@@ -15,8 +15,8 @@
  */
 package greyfox.rxnetwork2.common.base;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.fail;
 
 import org.junit.Test;
 

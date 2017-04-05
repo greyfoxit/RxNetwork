@@ -36,7 +36,11 @@ dependencies {
 
     compile deps.constraintLayout
     compile deps.butterknife
-    compile deps.butterknifeCompiler
+    compile deps.toothpickRuntime
+    compile deps.supportannotations
+
+    annotationProcessor deps.toothpickCompiler
+    annotationProcessor deps.butterknifeCompiler
 }
 
 retrolambda {

@@ -17,9 +17,12 @@ package com.example.rxnetwork;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,15 +33,23 @@ import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import javax.inject.Inject;
+import toothpick.Toothpick;
 
+@SuppressWarnings("NullableProblems")
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    @Inject @NonNull public RxNetwork rxNetwork;
     @BindView(R.id.networkInfo) TextView netInfo;
+
     private CompositeDisposable subscriptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Toothpick.inject(this, Toothpick.openScopes(RxNetwork.class, this));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -51,6 +62,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         subscriptions.add(rxNetworkSubscription());
+        //subscriptions.add(rxRealInternetAccessSubscription());
     }
 
     @Override
@@ -59,30 +71,40 @@ public class MainActivity extends Activity {
         subscriptions.clear();
     }
 
+    @NonNull
     @TargetApi(LOLLIPOP)
     protected Disposable rxNetworkSubscription() {
-        return RxNetwork.observe()
-                // you can omit setting scheduler every time by providing
-                // default scheduler in RxNetwork.init method
-                //.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        return rxNetwork.observe()
+                .observeOn(mainThread())
                 .subscribe(this::toastNetworkInfo, this::onError, this::onComplete);
+    }
+
+    @NonNull
+    protected Disposable rxRealInternetAccessSubscription() {
+        return rxNetwork.observeReal()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::toastInternetConnection, this::onError, this::onComplete);
+    }
+
+    private void toastInternetConnection(Boolean connected) {
+        final String message = "Internet access: " + connected;
+        Log.d(TAG, message);
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void onComplete() {
         Log.d(TAG, "onComplete invoked");
     }
 
-    private void toastNetworkInfo(RxNetworkInfo networkInfo) {
+    private void toastNetworkInfo(@NonNull RxNetworkInfo networkInfo) {
         final String message = "Network connected: " + networkInfo.isConnected();
         netInfo.setText(message);
 
         Log.d(TAG, "toastNetworkInfo: " + message);
-        Toast.makeText(MainActivity.this, "RxNetworkInfo change: "
-                + message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void onError(Throwable throwable) {
+    private void onError(@NonNull Throwable throwable) {
         Log.d(TAG, "onError: " + throwable.getMessage());
     }
 }

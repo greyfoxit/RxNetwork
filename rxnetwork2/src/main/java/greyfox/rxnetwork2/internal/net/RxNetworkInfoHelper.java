@@ -51,12 +51,11 @@ public final class RxNetworkInfoHelper {
     public static RxNetworkInfo getNetworkInfoFrom(@NonNull final Context context) {
         checkNotNull(context, "context == null");
 
-        final ConnectivityManager manager
-                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final ConnectivityManager manager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
-        return (networkInfo == null) ? RxNetworkInfo.create()
-                : RxNetworkInfo.createFrom(networkInfo);
+        return networkInfo == null ? RxNetworkInfo.create() : RxNetworkInfo.createFrom(networkInfo);
     }
 
     /**
@@ -71,13 +70,13 @@ public final class RxNetworkInfoHelper {
      */
     @RequiresApi(LOLLIPOP)
     public static RxNetworkInfo getNetworkInfoFrom(@NonNull Network network,
-                                                   @NonNull ConnectivityManager manager) {
+            @NonNull ConnectivityManager manager) {
+
         checkNotNull(network, "network == null");
         checkNotNull(manager, "manager == null");
 
         final NetworkCapabilities networkCapabilities = manager.getNetworkCapabilities(network);
         final NetworkInfo networkInfo = manager.getNetworkInfo(network);
-
         final RxNetworkInfo rxNetworkInfo;
 
         if (networkInfo != null) {

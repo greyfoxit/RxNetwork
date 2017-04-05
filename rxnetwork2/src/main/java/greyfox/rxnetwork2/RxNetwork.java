@@ -18,23 +18,24 @@ package greyfox.rxnetwork2;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork2.internal.Functions.TO_CONNECTION_STATE;
+import static greyfox.rxnetwork2.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
 
 import android.app.Application;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategy;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.factory.BuiltInStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.providers.BuiltInNetworkObservingStrategyProviders;
+import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork2.internal.strategy.network.factory.BuiltInStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * RxNetwork is a class that listens to network connectivity changes in a reactive manner.
@@ -54,7 +55,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *        // initialize like this
  *        RxNetwork.init(this));
  *
- *        // or like this - passing default scheduler
+ *        // or like this - passing default defaultScheduler
  *        RxNetwork.init(this, Schedulers.io());
  *    }
  * }
@@ -65,13 +66,43 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SuppressWarnings("WeakerAccess")
 public final class RxNetwork {
 
-    private static final AtomicBoolean initialized = new AtomicBoolean();
-    private static NetworkObservingStrategy IMPL;
-    private static Scheduler SCHEDULER;
+    @Nullable private final Scheduler scheduler;
+    @NonNull private final NetworkObservingStrategy networkObservingStrategy;
+    @NonNull private final InternetObservingStrategy internetObservingStrategy;
 
     @VisibleForTesting(otherwise = PRIVATE)
     RxNetwork() {
-        throw new AssertionError("No instances.");
+        throw new AssertionError("Use static factory methods or Builder to initialize RxNetwork");
+    }
+
+    @VisibleForTesting(otherwise = PRIVATE)
+    RxNetwork(@NonNull Builder builder) {
+        checkNotNull(builder, "builder == null");
+        this.scheduler = builder.scheduler;
+        this.networkObservingStrategy = builder.networkObservingStrategy;
+        this.internetObservingStrategy = builder.internetObservingStrategy;
+    }
+
+    @NonNull
+    public static RxNetwork init(@NonNull Application application) {
+        checkNotNull(application, "application == null");
+        return builder().init(application);
+    }
+
+    @NonNull
+    public static Builder builder() { return new Builder(); }
+
+    @Nullable
+    public Scheduler scheduler() { return this.scheduler; }
+
+    @NonNull
+    public NetworkObservingStrategy networkObservingStrategy() {
+        return this.networkObservingStrategy;
+    }
+
+    @NonNull
+    public InternetObservingStrategy internetObservingStrategy() {
+        return this.internetObservingStrategy;
     }
 
     /**
@@ -82,26 +113,8 @@ public final class RxNetwork {
      *
      * @return {@link NetworkInfo}
      */
-    public static Observable<RxNetworkInfo> observe() {
-        checkNotNull(IMPL, "In order to use RxNetwork you must initialize it first "
-                + "with RxNetwork.init method");
-        final Observable<RxNetworkInfo> observable = IMPL.observe();
-        if (SCHEDULER != null) observable.subscribeOn(SCHEDULER);
-        return observable;
-    }
-
-    /**
-     * Simple network connectivity observable based on {@linkplain #observe()}
-     * that filters all the unnecessary information builderFrom {@link NetworkInfo} and shows only
-     * bare connection status changes.
-     * <p>
-     * Use this if you don't care about all the {@link NetworkInfo} details.
-     *
-     * @return {@code true} if network available and connected or connecting, {@code false} if not
-     */
-    public static Observable<Boolean> observeSimple() {
-        return observe().map(TO_CONNECTION_STATE);
-    }
+    @NonNull
+    public Observable<RxNetworkInfo> observe() { return observe(networkObservingStrategy); }
 
     /**
      * RxNetworkInfo connectivity observable with all the original {@link NetworkInfo} information
@@ -111,91 +124,92 @@ public final class RxNetwork {
      *
      * @return {@link NetworkInfo} Observable
      */
-    public static Observable<RxNetworkInfo> observeWith(
-            @NonNull NetworkObservingStrategy strategy) {
-        final Observable<RxNetworkInfo> observable
-                = checkNotNull(strategy, "strategy == null").observe();
-        if (SCHEDULER != null) observable.subscribeOn(SCHEDULER);
+    @NonNull
+    public Observable<RxNetworkInfo> observe(@NonNull NetworkObservingStrategy strategy) {
+        checkNotNull(strategy, "strategy == null");
+        final Observable<RxNetworkInfo> observable = strategy.observe();
+        if (scheduler != null) observable.subscribeOn(scheduler);
         return observable;
     }
 
     /**
-     * Registers {@link RxNetwork} class with application.
-     */
-    public static void init(@NonNull Application application) {
-        init(application, null);
-    }
-
-    /**
-     * Registers {@link RxNetwork} class with default, built-in network observing
-     * {@link BuiltInStrategyFactory factory} and specific {@link Scheduler}.
+     * Simple network connectivity observable based on {@linkplain #observe()}
+     * that filters all the unnecessary information from {@link NetworkInfo} and shows only
+     * bare connection status changes.
      * <p>
-     * Passed scheduler would be used by default on all available {@link RxNetwork} streams via
-     * {@link Observable#subscribeOn subscribeOn} method to save you builderFrom headache of
-     * defining it
-     * manually on every subscription.
-     * <p>
-     * As per all network-related operations it's advised that you operate outside
-     * Android's mainThread. Preferably you would use {@link Schedulers#io()} scheduler
-     * for all of your {@link RxNetwork}'s work.
-     */
-    public static void init(@NonNull Application application, Scheduler scheduler) {
-        checkNotNull(application, "application == null");
-        final Collection<NetworkObservingStrategyProvider> providers
-                = BuiltInNetworkObservingStrategyProviders.get(application);
-        init(BuiltInStrategyFactory.create(providers), scheduler);
-    }
-
-    /**
-     * Registers concrete implementation of {@link NetworkObservingStrategyFactory}
-     * with {@linkplain #RxNetwork}.
-     * <p>
-     * By default it is {@link BuiltInStrategyFactory} (it should be sufficient
-     * for most network observing needs) but it can be any other implementation of
-     * {@link NetworkObservingStrategyFactory}.
+     * Use this if you don't care about all the {@link NetworkInfo} details.
      *
-     * @param factory custom {@link NetworkObservingStrategyFactory}
+     * @return {@code true} if network available and connected or connecting, {@code false} if not
      */
-    public static void init(@NonNull NetworkObservingStrategyFactory factory) {
-        init(factory, null);
-    }
+    @NonNull
+    public Observable<Boolean> observeSimple() { return observe().map(TO_CONNECTION_STATE); }
 
     /**
-     * Registers concrete implementation of {@link NetworkObservingStrategyFactory}
-     * with {@linkplain #RxNetwork} along with specific {@link Scheduler}.
-     * <p>
-     * Passed scheduler would be used by default on all available {@link RxNetwork} streams via
-     * {@link Observable#subscribeOn subscribeOn} method along with, resolved through factory,
-     * strategy. This approach saves you builderFrom headache of defining scheduler manually on
-     * every
-     * subscription.
+     * Real internet connectivity observable.
      *
-     * @param factory   custom {@link NetworkObservingStrategyFactory}
-     * @param scheduler custom {@link Scheduler}
+     * @return {@code true} if there is real internet access, {@code false} otherwise
      */
-    public static void init(@NonNull NetworkObservingStrategyFactory factory, Scheduler scheduler) {
-        if (initialized.get()) {
-            return;
+    @NonNull
+    public Observable<Boolean> observeReal() { return observeReal(internetObservingStrategy); }
+
+    /**
+     * Real internet connectivity observable with custom {@link InternetObservingStrategy}.
+     *
+     * @return {@code true} if there is real internet access, {@code false} otherwise
+     */
+    @NonNull
+    public Observable<Boolean> observeReal(@NonNull InternetObservingStrategy strategy) {
+        checkNotNull(strategy, "strategy == null");
+        final Observable<Boolean> observable = strategy.observe();
+        if (scheduler != null) observable.subscribeOn(scheduler);
+        return observable;
+    }
+
+    public static final class Builder {
+
+        private Scheduler scheduler;
+        private NetworkObservingStrategy networkObservingStrategy;
+        private InternetObservingStrategy internetObservingStrategy;
+
+        public Builder defaultScheduler(@NonNull Scheduler scheduler) {
+            this.scheduler = checkNotNull(scheduler, "defaultScheduler == null");
+            return this;
         }
-        IMPL = checkNotNull(factory, "factory == null").get();
-        SCHEDULER = scheduler;
-        initialized.set(true);
-    }
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    static NetworkObservingStrategy strategy() {
-        return IMPL;
-    }
+        public Builder networkObservingStrategy(@NonNull NetworkObservingStrategy strategy) {
+            networkObservingStrategy = checkNotNull(strategy, "strategy == null");
+            return this;
+        }
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    static Scheduler scheduler() {
-        return SCHEDULER;
-    }
+        public Builder networkObservingStrategyFactory(
+                @NonNull NetworkObservingStrategyFactory factory) {
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    static void resetForTesting() {
-        IMPL = null;
-        SCHEDULER = null;
-        initialized.set(false);
+            checkNotNull(factory, "factory == null");
+            networkObservingStrategy = factory.get();
+            return this;
+        }
+
+        public Builder internetObservingStrategy(@NonNull InternetObservingStrategy strategy) {
+            this.internetObservingStrategy = checkNotNull(strategy, "strategy == null");
+            return this;
+        }
+
+        @NonNull
+        public RxNetwork init(@NonNull Application application) {
+            checkNotNull(application, "application == null");
+
+            if (networkObservingStrategy == null) {
+                final Collection<NetworkObservingStrategyProvider> providers
+                        = BuiltInNetworkObservingStrategyProviders.get(application);
+
+                networkObservingStrategy = BuiltInStrategyFactory.create(providers).get();
+            }
+
+            if (internetObservingStrategy == null) {
+                internetObservingStrategy = BuiltInInternetObservingStrategy.create();
+            }
+
+            return new RxNetwork(this);
+        }
     }
 }

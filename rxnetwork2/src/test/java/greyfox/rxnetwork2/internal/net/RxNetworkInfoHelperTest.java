@@ -21,8 +21,8 @@ import static android.net.ConnectivityManager.TYPE_MOBILE_MMS;
 import static android.net.NetworkInfo.DetailedState.CONNECTED;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -61,11 +61,10 @@ public class RxNetworkInfoHelperTest {
 
     @Before
     public void setUp() {
-        NETWORK_INFO = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS,
-                true, true);
+        NETWORK_INFO
+                = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS, true, true);
         DEFAULT_RXNETWORK_INFO = RxNetworkInfo.create();
         VALID_RXNETWORK_INFO = RxNetworkInfo.createFrom(NETWORK_INFO);
-        when(context.getSystemService(CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
     }
 
     @Test(expected = AssertionError.class)
@@ -75,6 +74,8 @@ public class RxNetworkInfoHelperTest {
 
     @Test
     public void shouldNeverBeNull_whenFromContext() {
+        doReturn(connectivityManager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(context);
 
         assertThat(sut).isNotNull();
@@ -82,7 +83,8 @@ public class RxNetworkInfoHelperTest {
 
     @Test
     public void shouldFallbackToDefault_whenActiveNetworkInfoNull() {
-        when(connectivityManager.getActiveNetworkInfo()).thenReturn(null);
+        doReturn(connectivityManager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+        doReturn(null).when(connectivityManager).getActiveNetworkInfo();
 
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(context);
 
@@ -91,7 +93,8 @@ public class RxNetworkInfoHelperTest {
 
     @Test
     public void shouldReturnProperNetworkInfo_whenFromContext() {
-        when(connectivityManager.getActiveNetworkInfo()).thenReturn(NETWORK_INFO);
+        doReturn(connectivityManager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+        doReturn(NETWORK_INFO).when(connectivityManager).getActiveNetworkInfo();
 
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(context);
 
@@ -114,7 +117,7 @@ public class RxNetworkInfoHelperTest {
     @RequiresApi(LOLLIPOP)
     public void shouldFallbackToDefault_whenNetworkInfoFromNetworkNull() {
         NETWORK = getNetwork();
-        when(connectivityManager.getNetworkInfo(NETWORK)).thenReturn(null);
+        doReturn(null).when(connectivityManager).getNetworkInfo(NETWORK);
 
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(NETWORK, connectivityManager);
 
@@ -126,7 +129,7 @@ public class RxNetworkInfoHelperTest {
     @RequiresApi(LOLLIPOP)
     public void shouldReturnProperNetworkInfo_whenProvidedNetwork() {
         NETWORK = getNetwork();
-        when(connectivityManager.getNetworkInfo(NETWORK)).thenReturn(NETWORK_INFO);
+        doReturn(NETWORK_INFO).when(connectivityManager).getNetworkInfo(NETWORK);
 
         RxNetworkInfo sut = RxNetworkInfoHelper.getNetworkInfoFrom(NETWORK, connectivityManager);
 
