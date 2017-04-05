@@ -49,7 +49,7 @@ public final class RxNetworkInfoHelper {
      * @return {@link RxNetworkInfo} instance
      */
     public static RxNetworkInfo getNetworkInfoFrom(@NonNull final Context context) {
-        checkNotNull(context, "context == null");
+        checkNotNull(context, "context");
 
         final ConnectivityManager manager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -72,8 +72,8 @@ public final class RxNetworkInfoHelper {
     public static RxNetworkInfo getNetworkInfoFrom(@NonNull Network network,
             @NonNull ConnectivityManager manager) {
 
-        checkNotNull(network, "network == null");
-        checkNotNull(manager, "manager == null");
+        checkNotNull(network, "network");
+        checkNotNull(manager, "manager");
 
         final NetworkCapabilities networkCapabilities = manager.getNetworkCapabilities(network);
         final NetworkInfo networkInfo = manager.getNetworkInfo(network);

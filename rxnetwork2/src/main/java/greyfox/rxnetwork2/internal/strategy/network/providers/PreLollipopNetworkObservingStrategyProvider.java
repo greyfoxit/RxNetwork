@@ -34,7 +34,7 @@ final class PreLollipopNetworkObservingStrategyProvider implements NetworkObserv
     private final Context context;
 
     PreLollipopNetworkObservingStrategyProvider(@NonNull Context context) {
-        this.context = checkNotNull(context, "context == null");
+        this.context = checkNotNull(context, "context");
     }
 
     @Override

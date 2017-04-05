@@ -47,7 +47,7 @@ public class LollipopNetworkObservingStrategy extends BuiltInNetworkObservingStr
     private NetworkCallback networkCallback;
 
     public LollipopNetworkObservingStrategy(@NonNull Context context) {
-        checkNotNull(context, "context == null");
+        checkNotNull(context, "context");
         manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 

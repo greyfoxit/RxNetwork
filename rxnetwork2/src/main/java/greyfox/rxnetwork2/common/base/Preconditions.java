@@ -18,6 +18,8 @@ package greyfox.rxnetwork2.common.base;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
+import static java.lang.String.format;
+
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
@@ -36,7 +38,7 @@ public final class Preconditions {
 
     @VisibleForTesting(otherwise = PRIVATE)
     Preconditions() {
-        throw new AssertionError("No instances.");
+        throw new AssertionError("No instances");
     }
 
     /**
@@ -49,23 +51,38 @@ public final class Preconditions {
      * @throws NullPointerException if {@code reference} is null
      */
     public static <T> T checkNotNull(T reference) {
-        return checkNotNull(reference, "Parameter can't be null.");
+        return checkNotNull(reference, "Provided reference must not be null");
+    }
+
+    /**
+     * Ensures that an object reference passed as a parameter to the calling method is not null.
+     *
+     * @param reference an object reference
+     * @param name      an object reference name
+     *
+     * @return the non-null reference that was validated
+     *
+     * @throws NullPointerException if {@code reference} is null
+     */
+    public static <T> T checkNotNull(T reference, String name) {
+        if (reference == null) throw new NullPointerException(name + " must not be null");
+        return reference;
     }
 
     /**
      * Ensures that an object reference passed as a parameter to the calling method is not null.
      *
      * @param reference    an object reference
-     * @param errorMessage the exception message to use if the check fails
+     * @param errorMessage printf-style template for the exception message should the check fail
+     * @param errorArgs    arguments to be substituted into the message template. Arguments are
+     *                     converted to strings using String.valueOf(Object)
      *
      * @return the non-null reference that was validated
      *
      * @throws NullPointerException if {@code reference} is null
      */
-    public static <T> T checkNotNull(T reference, String errorMessage) {
-        if (reference == null) {
-            throw new NullPointerException(errorMessage);
-        }
+    public static <T> T checkNotNull(T reference, String errorMessage, Object... errorArgs) {
+        if (reference == null) throw new NullPointerException(format(errorMessage, errorArgs));
         return reference;
     }
 }

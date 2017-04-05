@@ -77,7 +77,7 @@ public final class RxNetwork {
 
     @VisibleForTesting(otherwise = PRIVATE)
     RxNetwork(@NonNull Builder builder) {
-        checkNotNull(builder, "builder == null");
+        checkNotNull(builder, "builder");
         this.scheduler = builder.scheduler;
         this.networkObservingStrategy = builder.networkObservingStrategy;
         this.internetObservingStrategy = builder.internetObservingStrategy;
@@ -85,7 +85,7 @@ public final class RxNetwork {
 
     @NonNull
     public static RxNetwork init(@NonNull Application application) {
-        checkNotNull(application, "application == null");
+        checkNotNull(application, "Cannot initialize RxNetwork with null application");
         return builder().init(application);
     }
 
@@ -126,7 +126,7 @@ public final class RxNetwork {
      */
     @NonNull
     public Observable<RxNetworkInfo> observe(@NonNull NetworkObservingStrategy strategy) {
-        checkNotNull(strategy, "strategy == null");
+        checkNotNull(strategy, "strategy");
         final Observable<RxNetworkInfo> observable = strategy.observe();
         if (scheduler != null) observable.subscribeOn(scheduler);
         return observable;
@@ -159,7 +159,7 @@ public final class RxNetwork {
      */
     @NonNull
     public Observable<Boolean> observeReal(@NonNull InternetObservingStrategy strategy) {
-        checkNotNull(strategy, "strategy == null");
+        checkNotNull(strategy, "strategy");
         final Observable<Boolean> observable = strategy.observe();
         if (scheduler != null) observable.subscribeOn(scheduler);
         return observable;
@@ -172,31 +172,31 @@ public final class RxNetwork {
         private InternetObservingStrategy internetObservingStrategy;
 
         public Builder defaultScheduler(@NonNull Scheduler scheduler) {
-            this.scheduler = checkNotNull(scheduler, "defaultScheduler == null");
+            this.scheduler = checkNotNull(scheduler, "scheduler");
             return this;
         }
 
         public Builder networkObservingStrategy(@NonNull NetworkObservingStrategy strategy) {
-            networkObservingStrategy = checkNotNull(strategy, "strategy == null");
+            networkObservingStrategy = checkNotNull(strategy, "strategy");
             return this;
         }
 
         public Builder networkObservingStrategyFactory(
                 @NonNull NetworkObservingStrategyFactory factory) {
 
-            checkNotNull(factory, "factory == null");
+            checkNotNull(factory, "factory");
             networkObservingStrategy = factory.get();
             return this;
         }
 
         public Builder internetObservingStrategy(@NonNull InternetObservingStrategy strategy) {
-            this.internetObservingStrategy = checkNotNull(strategy, "strategy == null");
+            this.internetObservingStrategy = checkNotNull(strategy, "strategy");
             return this;
         }
 
         @NonNull
         public RxNetwork init(@NonNull Application application) {
-            checkNotNull(application, "application == null");
+            checkNotNull(application, "Cannot initialize RxNetwork with null application");
 
             if (networkObservingStrategy == null) {
                 final Collection<NetworkObservingStrategyProvider> providers

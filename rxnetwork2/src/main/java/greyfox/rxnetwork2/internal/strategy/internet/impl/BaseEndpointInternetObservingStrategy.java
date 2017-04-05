@@ -118,7 +118,7 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
          */
         @NonNull
         public T endpoint(@NonNull String endpoint) {
-            this.endpoint = checkNotNull(endpoint, "endpoint == null");
+            this.endpoint = checkNotNull(endpoint, "endpoint");
             return self();
         }
 

@@ -33,7 +33,7 @@ public class PingInternetObservingStrategy extends BaseEndpointInternetObserving
     @VisibleForTesting(otherwise = PRIVATE)
     @RestrictTo(LIBRARY_GROUP)
     private PingInternetObservingStrategy(@NonNull Builder builder) {
-        checkNotNull(builder, "builder == null");
+        checkNotNull(builder, "builder");
 
         delay = builder.delay();
         interval = builder.interval();
