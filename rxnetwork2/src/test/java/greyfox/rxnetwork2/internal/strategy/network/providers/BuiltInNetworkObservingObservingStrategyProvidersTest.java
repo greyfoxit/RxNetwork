@@ -21,6 +21,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import android.content.Context;
 import greyfox.rxnetwork2.BuildConfig;
+import greyfox.rxnetwork2.internal.strategy.ObservingStrategyProvider;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 import org.assertj.core.api.Condition;
@@ -40,7 +41,7 @@ import org.robolectric.annotation.Config;
 @SuppressWarnings("WeakerAccess")
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
-public class BuiltInNetworkObservingStrategyProvidersTest {
+public class BuiltInNetworkObservingObservingStrategyProvidersTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
     @Mock NetworkObservingStrategyProvider ANY_PROVIDER;
@@ -48,10 +49,10 @@ public class BuiltInNetworkObservingStrategyProvidersTest {
     Context context = RuntimeEnvironment.application;
 
     Collection<NetworkObservingStrategyProvider> sut
-            = BuiltInNetworkObservingStrategyProviders.get(context);
+            = new BuiltInNetworkObservingStrategyProviders(context).get();
 
     @Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaConstructor() {
+    public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
         new BuiltInNetworkObservingStrategyProviders();
     }
 
@@ -83,10 +84,10 @@ public class BuiltInNetworkObservingStrategyProvidersTest {
         sut.add(ANY_PROVIDER);
     }
 
-    static class CanProvide extends Condition<NetworkObservingStrategyProvider> {
+    static class CanProvide extends Condition<ObservingStrategyProvider> {
 
         @Override
-        public boolean matches(NetworkObservingStrategyProvider value) {
+        public boolean matches(ObservingStrategyProvider value) {
             return value.canProvide();
         }
     }

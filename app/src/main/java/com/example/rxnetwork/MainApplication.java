@@ -15,11 +15,15 @@
  */
 package com.example.rxnetwork;
 
+import static toothpick.registries.FactoryRegistryLocator.setRootRegistry;
+import static toothpick.registries.MemberInjectorRegistryLocator.setRootRegistry;
+
 import android.app.Application;
 import com.example.rxnetwork.internals.di.RxNetworkModule;
 import greyfox.rxnetwork2.RxNetwork;
 import toothpick.Scope;
 import toothpick.Toothpick;
+import toothpick.configuration.Configuration;
 
 /**
  * Entry point for the whole application.
@@ -36,6 +40,12 @@ public class MainApplication extends Application {
     }
 
     private void setupDi() {
+
+        // If not using the reflection free configuration, the next 3 lines can be omitted
+        Toothpick.setConfiguration(Configuration.forProduction().disableReflection());
+        setRootRegistry(new com.example.rxnetwork.MemberInjectorRegistry());
+        setRootRegistry(new com.example.rxnetwork.FactoryRegistry());
+
         Scope statusScope = Toothpick.openScope(RxNetwork.class);
         statusScope.installModules(new RxNetworkModule(this));
     }

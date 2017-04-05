@@ -60,7 +60,7 @@ public class MarshmallowNetworkObservingStrategyTest {
     @Rule public MockitoRule rule = MockitoJUnit.rule();
 
     Context context;
-    BuiltInNetworkObservingStrategy sut;
+    BaseNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
     @Mock PowerManager powerManager;
@@ -100,6 +100,7 @@ public class MarshmallowNetworkObservingStrategyTest {
     @Test
     public void shouldGetValue_whenIdleModeChanged_andDeviceIdled() {
         setUpDeviceIdleMode(true);
+        doReturn(false).when(powerManager).isIgnoringBatteryOptimizations(anyString());
 
         sut.observe().subscribeWith(testObserver);
         testObserver.assertSubscribed().assertEmpty();

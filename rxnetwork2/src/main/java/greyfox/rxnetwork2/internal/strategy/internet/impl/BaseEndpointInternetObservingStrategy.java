@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 /**
  * @author Radek Kozak
  */
-
 public abstract class BaseEndpointInternetObservingStrategy implements InternetObservingStrategy {
 
     abstract long delay();
@@ -22,7 +21,7 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
 
     abstract Logger logger();
 
-    Function<Long, Boolean> toConnectionState() {
+    private Function<Long, Boolean> toConnectionState() {
         return new Function<Long, Boolean>() {
             @Override
             public Boolean apply(Long tick) throws Exception {
@@ -47,6 +46,7 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
     /**
      * {@code BuiltInInternetObservingStrategy} builder static inner class.
      */
+    @SuppressWarnings("unchecked")
     public static abstract class Builder<T extends Builder> {
 
         static final int DEFAULT_DELAY_MS = 0;
@@ -145,7 +145,6 @@ public abstract class BaseEndpointInternetObservingStrategy implements InternetO
         public abstract InternetObservingStrategy build();
 
         protected final T self() {
-            //noinspection unchecked
             return (T) this;
         }
     }

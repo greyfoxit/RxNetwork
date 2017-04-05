@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  * @author Radek Kozak
  */
 @RequiresApi(LOLLIPOP)
-public class LollipopNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
+public class LollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
 
     private final ConnectivityManager manager;
     private NetworkCallback networkCallback;

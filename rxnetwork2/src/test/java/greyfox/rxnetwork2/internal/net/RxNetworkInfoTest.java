@@ -16,12 +16,14 @@
 package greyfox.rxnetwork2.internal.net;
 
 import static android.net.ConnectivityManager.TYPE_WIFI;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 import static android.net.NetworkInfo.DetailedState.CONNECTED;
+import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -32,7 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowNetwork;
 import org.robolectric.shadows.ShadowNetworkInfo;
 
 @SuppressWarnings("WeakerAccess, ConstantConditions")
@@ -41,12 +42,9 @@ import org.robolectric.shadows.ShadowNetworkInfo;
 @Config(constants = BuildConfig.class, sdk = LOLLIPOP, shadows = ShadowNetworkCapabilities.class)
 public class RxNetworkInfoTest {
 
-    static NetworkInfo NETWORK_INFO
-            = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_WIFI, 0, true, true);
-
-    static int NETWORK_ID = 100;
-    static Network NETWORK = ShadowNetwork.newInstance(NETWORK_ID);
-
+    NetworkInfo NETWORK_INFO = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_WIFI, 0, true, true);
+    NetworkCapabilities NETWORK_CAPABILITIES = ShadowNetworkCapabilities.newInstance(
+            NET_CAPABILITY_INTERNET, TRANSPORT_WIFI, 512, 2048, "ssid", 50);
     Object NOT_RXNETWORK_INFO_INSTANCE = new Object();
 
     @Test(expected = AssertionError.class)
@@ -97,6 +95,7 @@ public class RxNetworkInfoTest {
     }
 
     @Test
+    @Config(sdk = {KITKAT, LOLLIPOP})
     public void shouldBeEqual_whenCreatedFromSameDetailedBuilder() {
         RxNetworkInfo rxni = detailedRxNetworkInfoBuilder().build();
         RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilder().build();
@@ -105,6 +104,7 @@ public class RxNetworkInfoTest {
     }
 
     @Test
+    @Config(sdk = {KITKAT, LOLLIPOP})
     public void shouldBeEqual_whenCreatedFromSameDetailedBuilder_withNullsAndOpposites() {
         RxNetworkInfo rxni = detailedRxNetworkInfoBuilderWithNullsAndOpposites().build();
         RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilderWithNullsAndOpposites().build();
@@ -122,10 +122,12 @@ public class RxNetworkInfoTest {
 
     @Test
     public void shouldBeEqual_whenCreatedFromSameDetailedBuilder_withNetworkCapabilities() {
-        NetworkCapabilities nc = ShadowNetworkCapabilities.newInstance(1, 1, 1, 1, "spec", 1);
+        //NetworkCapabilities nc = buildNetworkCapabilities();
 
-        RxNetworkInfo rxni = detailedRxNetworkInfoBuilder().networkCapabilities(nc).build();
-        RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilder().networkCapabilities(nc).build();
+        RxNetworkInfo rxni = detailedRxNetworkInfoBuilder()
+                .networkCapabilities(NETWORK_CAPABILITIES).build();
+        RxNetworkInfo rxni2 = detailedRxNetworkInfoBuilder()
+                .networkCapabilities(NETWORK_CAPABILITIES).build();
 
         assertEqual(rxni, rxni2);
     }
@@ -154,7 +156,7 @@ public class RxNetworkInfoTest {
     private void assertEqual(@NonNull RxNetworkInfo rxni, @NonNull RxNetworkInfo rxni2) {
         assertThat(rxni).isNotNull();
         assertThat(rxni2).isNotNull();
-        assertThat(rxni).isEqualTo(rxni2);
+        assertThat(rxni).isEqualTo(rxni2).isEqualToComparingFieldByField(rxni2);
         assertThat(rxni.equals(rxni2)).isTrue();
         assertThat(rxni.hashCode()).isEqualTo(rxni2.hashCode());
         assertThat(rxni.toString()).isEqualTo(rxni2.toString());
@@ -183,5 +185,15 @@ public class RxNetworkInfoTest {
                 .failover(false).reason(null).roaming(false)
                 .state(null).subType(0).subTypeName(null)
                 .type(1).typeName(null);
+    }
+
+    private NetworkCapabilities buildNetworkCapabilities() {
+        int upBandwidth = 512;
+        int downBandwidth = 2048;
+        String ssid = "valid ssid";
+        int signalStrength = 50;
+
+        return ShadowNetworkCapabilities.newInstance(NET_CAPABILITY_INTERNET, TRANSPORT_WIFI,
+                upBandwidth, downBandwidth, ssid, signalStrength);
     }
 }

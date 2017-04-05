@@ -80,6 +80,18 @@ public class BuiltInInternetObservingStrategyTest {
     }
 
     @Test
+    public void internetConnectionShouldBeTrue()
+            throws IOException, InternetObservingStrategyException {
+
+        BuiltInInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
+        doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
+        doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
+
+        assertThat(sut.observe().blockingFirst()).isTrue();
+    }
+
+    @Test
     public void internetConnectionShouldBeTrue_whenValidServerResponse()
             throws InterruptedException, IOException {
 
@@ -90,8 +102,8 @@ public class BuiltInInternetObservingStrategyTest {
     }
 
     @Test
-    public void shouldLogError_whenProblemGettingResponseCode()
-            throws IOException, InternetObservingStrategyException {
+    public void shouldLogError_whenProblemGettingResponseCode() throws IOException,
+            InternetObservingStrategyException {
 
         BuiltInInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
         HttpURLConnection urlConnection = mock(HttpURLConnection.class);
@@ -104,8 +116,7 @@ public class BuiltInInternetObservingStrategyTest {
     }
 
     @Test
-    public void internetConnectionShouldBeFalse_whenInvalidServerResponse()
-            throws InterruptedException, IOException {
+    public void internetConnectionShouldBeFalse_whenInvalidServerResponse() throws IOException {
 
         setServerWithHttpStatusResponse(server, INVALID_SERVER_RESPONSE);
         InternetObservingStrategy sut = buildStrategy(server);

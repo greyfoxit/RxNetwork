@@ -10,7 +10,6 @@ import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
-import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -51,7 +50,7 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
     }
 
     @NonNull
-    public static InternetObservingStrategy create() {
+    public static SocketInternetObservingStrategy create() {
         return builder().build();
     }
 
@@ -109,8 +108,8 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
     /**
      * {@code SocketInternetObservingStrategy} builder static inner class.
      */
-    public static final class Builder extends
-            BaseEndpointInternetObservingStrategy.Builder<SocketInternetObservingStrategy.Builder> {
+    public static final class Builder extends BaseEndpointInternetObservingStrategy
+            .Builder<SocketInternetObservingStrategy.Builder> {
 
         private static final int DEFAULT_TIMEOUT_MS = 3000;
 

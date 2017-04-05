@@ -31,10 +31,8 @@ public class SocketInternetObservingStrategyTest {
     int TIMEOUT_MS = 200;
     int DELAY_MS = 100;
     int INTERVAL_MS = 200;
-
     String INVALID_HOST = "invalid.endpoint";
     String VALID_HOST = "localhost";
-
     MockWebServer server;
 
     @Before

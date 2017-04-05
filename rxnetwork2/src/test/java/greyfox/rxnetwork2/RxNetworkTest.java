@@ -29,7 +29,7 @@ import greyfox.rxnetwork2.internal.strategy.internet.impl.BuiltInInternetObservi
 import greyfox.rxnetwork2.internal.strategy.internet.impl.SocketInternetObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork2.internal.strategy.network.impl.BuiltInNetworkObservingStrategy;
+import greyfox.rxnetwork2.internal.strategy.network.impl.BaseNetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -48,7 +48,7 @@ public class RxNetworkTest {
     RxNetwork sut;
 
     @Mock Application application;
-    @Mock NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
+    @Mock greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
     @Mock NetworkObservingStrategyFactory CUSTOM_NETWORK_STRATEGY_FACTORY;
     @Mock InternetObservingStrategy CUSTOM_INTERNET_STRATEGY;
     @Mock Observable<RxNetworkInfo> VALID_NETWORK_OBSERVABLE;
@@ -77,7 +77,7 @@ public class RxNetworkTest {
     @Test
     public void shouldInitWithDefaultStrategies_andNoScheduler() {
         assertThat((sut.networkObservingStrategy())).isNotNull()
-                .isInstanceOf(BuiltInNetworkObservingStrategy.class);
+                .isInstanceOf(BaseNetworkObservingStrategy.class);
         assertThat((sut.internetObservingStrategy())).isNotNull()
                 .isInstanceOf(BuiltInInternetObservingStrategy.class);
         assertThat(sut.scheduler()).isNull();

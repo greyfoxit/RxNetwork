@@ -57,7 +57,7 @@ public class LollipopNetworkObservingStrategyTest {
 
     Context context;
 
-    BuiltInNetworkObservingStrategy sut;
+    BaseNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
     @Before

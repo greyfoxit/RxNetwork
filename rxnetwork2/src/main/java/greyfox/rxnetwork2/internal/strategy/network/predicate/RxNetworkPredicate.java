@@ -145,7 +145,7 @@ public final class RxNetworkPredicate {
 
         @VisibleForTesting(otherwise = PRIVATE)
         Capabilities() {
-            throw new AssertionError("No instances.");
+            throw new AssertionError("No instances");
         }
 
         public static Predicate<RxNetworkInfo> hasCapability(final int... capabilities) {

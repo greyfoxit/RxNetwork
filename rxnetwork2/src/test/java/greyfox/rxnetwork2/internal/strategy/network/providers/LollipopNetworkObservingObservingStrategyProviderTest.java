@@ -22,6 +22,7 @@ import static android.os.Build.VERSION_CODES.M;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.impl.LollipopNetworkObservingStrategy;
@@ -37,7 +38,7 @@ import org.robolectric.annotation.Config;
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
-public class LollipopNetworkObservingStrategyProviderTest {
+public class LollipopNetworkObservingObservingStrategyProviderTest {
 
     LollipopNetworkObservingStrategyProvider sut
             = new LollipopNetworkObservingStrategyProvider(RuntimeEnvironment.application);
@@ -65,7 +66,9 @@ public class LollipopNetworkObservingStrategyProviderTest {
         assertThat(sut.canProvide()).isFalse();
     }
 
+    @RequiresApi(LOLLIPOP)
     @Test
+    @Config(sdk = LOLLIPOP)
     public void shouldProvideConcreteStrategy() throws Exception {
         assertThat(sut.provide()).isNotNull().isInstanceOf(NetworkObservingStrategy.class)
                 .isExactlyInstanceOf(LollipopNetworkObservingStrategy.class);
