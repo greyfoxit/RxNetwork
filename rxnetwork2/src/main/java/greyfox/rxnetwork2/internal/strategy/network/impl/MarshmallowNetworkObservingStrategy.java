@@ -4,7 +4,6 @@ import static android.os.Build.VERSION_CODES.M;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +27,7 @@ import io.reactivex.subjects.PublishSubject;
  *
  * @author Radek Kozak
  */
-@TargetApi(M)
+@RequiresApi(M)
 public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObservingStrategy {
 
     private static final String TAG = MarshmallowNetworkObservingStrategy.class.getSimpleName();
@@ -44,7 +43,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
     @NonNull private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
 
     public MarshmallowNetworkObservingStrategy(@NonNull Context context) {
-        this.context = checkNotNull(context, "context == null");
+        this.context = checkNotNull(context, "context");
         manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -82,7 +81,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
         private final ObservableEmitter<RxNetworkInfo> upstream;
 
         DeviceIdleReceiver(@NonNull ObservableEmitter<RxNetworkInfo> upstream) {
-            this.upstream = checkNotNull(upstream, "upstream == null");
+            this.upstream = checkNotNull(upstream, "upstream");
         }
 
         @Override
@@ -110,7 +109,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
         public void subscribe(@NonNull final ObservableEmitter<RxNetworkInfo> upstream)
                 throws Exception {
 
-            checkNotNull(upstream, "upstream == null");
+            checkNotNull(upstream, "upstream");
             registerIdleModeReceiver(upstream);
             registerNetworkCallback(upstream);
             upstream.setCancellable(new StrategyCancellable());
@@ -133,7 +132,7 @@ public class MarshmallowNetworkObservingStrategy extends BuiltInNetworkObserving
         final ObservableEmitter<RxNetworkInfo> upstream;
 
         MarshmallowNetworkCallback(@NonNull ObservableEmitter<RxNetworkInfo> upstream) {
-            this.upstream = checkNotNull(upstream, "upstream == null");
+            this.upstream = checkNotNull(upstream, "upstream");
         }
 
         @Override

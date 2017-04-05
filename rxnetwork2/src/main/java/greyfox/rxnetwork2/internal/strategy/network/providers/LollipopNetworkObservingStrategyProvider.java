@@ -15,12 +15,15 @@
  */
 package greyfox.rxnetwork2.internal.strategy.network.providers;
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 import static greyfox.rxnetwork2.internal.os.Build.isAtLeastLollipop;
 import static greyfox.rxnetwork2.internal.os.Build.isLessThanMarshmallow;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork2.internal.strategy.network.impl.LollipopNetworkObservingStrategy;
 
@@ -34,7 +37,7 @@ final class LollipopNetworkObservingStrategyProvider implements NetworkObserving
     private final Context context;
 
     LollipopNetworkObservingStrategyProvider(@NonNull Context context) {
-        this.context = checkNotNull(context, "context == null");
+        this.context = checkNotNull(context, "context");
     }
 
     @Override
@@ -43,6 +46,7 @@ final class LollipopNetworkObservingStrategyProvider implements NetworkObserving
     }
 
     @Override
+    @RequiresApi(LOLLIPOP)
     public LollipopNetworkObservingStrategy provide() {
         return new LollipopNetworkObservingStrategy(context);
     }

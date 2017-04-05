@@ -45,7 +45,7 @@ public final class BuiltInStrategyFactory implements
     @VisibleForTesting(otherwise = PRIVATE)
     BuiltInStrategyFactory(@NonNull Collection
             <NetworkObservingStrategyProvider> strategyProviders) {
-        this.strategyProviders = checkNotNull(strategyProviders, "strategyProviders == null");
+        this.strategyProviders = checkNotNull(strategyProviders, "strategyProviders");
     }
 
     public static NetworkObservingStrategyFactory create(@NonNull Collection

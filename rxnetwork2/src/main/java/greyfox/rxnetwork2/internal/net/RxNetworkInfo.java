@@ -64,7 +64,7 @@ public class RxNetworkInfo {
 
     @VisibleForTesting(otherwise = PRIVATE)
     RxNetworkInfo(@NonNull Builder builder) {
-        checkNotNull(builder, "builder == null");
+        checkNotNull(builder, "builder");
         state = builder.state;
         detailedState = builder.detailedState;
         type = builder.type;
@@ -86,7 +86,7 @@ public class RxNetworkInfo {
     }
 
     public static RxNetworkInfo createFrom(@NonNull NetworkInfo networkInfo) {
-        checkNotNull(networkInfo, "networkInfo == null");
+        checkNotNull(networkInfo, "networkInfo");
         return builderFrom(networkInfo).build();
     }
 
@@ -95,7 +95,7 @@ public class RxNetworkInfo {
     }
 
     public static Builder builderFrom(@NonNull NetworkInfo networkInfo) {
-        checkNotNull(networkInfo, "networkInfo == null");
+        checkNotNull(networkInfo, "networkInfo");
 
         return new Builder().state(networkInfo.getState())
                 .detailedState(networkInfo.getDetailedState())

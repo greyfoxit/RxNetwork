@@ -45,7 +45,7 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
     @VisibleForTesting(otherwise = PRIVATE)
     @RestrictTo(LIBRARY_GROUP)
     private SocketInternetObservingStrategy(@NonNull Builder builder) {
-        checkNotNull(builder, "builder == null");
+        checkNotNull(builder, "builder");
 
         delay = builder.delay();
         timeout = builder.timeout();
@@ -63,12 +63,6 @@ public class SocketInternetObservingStrategy extends BaseEndpointInternetObservi
     public static Builder builder() {
         return new Builder();
     }
-
-/*    @Override
-    public Observable<Boolean> observe() {
-        return Observable.interval(delay, interval, TimeUnit.MILLISECONDS)
-                .map(toConnectionState()).distinctUntilChanged();
-    }*/
 
     @Override
     long delay() {

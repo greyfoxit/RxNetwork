@@ -44,7 +44,7 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
     @VisibleForTesting(otherwise = PRIVATE)
     @RestrictTo(LIBRARY_GROUP)
     BuiltInInternetObservingStrategy(@NonNull Builder builder) {
-        checkNotNull(builder, "builder == null");
+        checkNotNull(builder, "builder");
 
         delay = builder.delay();
         timeout = builder.timeout();
@@ -64,7 +64,7 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
     private HttpURLConnection buildConnection(@NonNull URL url)
             throws InternetObservingStrategyException {
 
-        checkNotNull(url, "url == null");
+        checkNotNull(url, "url");
 
         final HttpURLConnection urlConnection;
 
@@ -76,7 +76,7 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
             urlConnection.setUseCaches(false);
             urlConnection.getInputStream();
         } catch (IOException ioe) {
-            throw new InternetObservingStrategyException("Couldn't create valid connection " +
+            throw new InternetObservingStrategyException("Could not create valid connection " +
                     "from " + url.toString(), ioe);
         }
 

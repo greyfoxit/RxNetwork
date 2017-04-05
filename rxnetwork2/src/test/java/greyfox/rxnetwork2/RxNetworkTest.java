@@ -69,6 +69,11 @@ public class RxNetworkTest {
         new RxNetwork(null);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void shouldThrow_whenTryingToInitializeWithNullApplication() {
+        RxNetwork.builder().init(null);
+    }
+
     @Test
     public void shouldInitWithDefaultStrategies_andNoScheduler() {
         assertThat((sut.networkObservingStrategy())).isNotNull()

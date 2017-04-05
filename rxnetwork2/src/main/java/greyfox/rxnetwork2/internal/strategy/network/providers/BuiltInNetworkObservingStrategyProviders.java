@@ -21,7 +21,7 @@ public final class BuiltInNetworkObservingStrategyProviders {
 
     @VisibleForTesting(otherwise = PRIVATE)
     BuiltInNetworkObservingStrategyProviders() {
-        throw new AssertionError("No instances.");
+        throw new AssertionError("No instances");
     }
 
     /**
@@ -32,7 +32,7 @@ public final class BuiltInNetworkObservingStrategyProviders {
      * @return Collection of {@linkplain NetworkObservingStrategyProvider providers}
      */
     public static Collection<NetworkObservingStrategyProvider> get(@NonNull Context context) {
-        checkNotNull(context, "context == null");
+        checkNotNull(context, "context");
 
         Collection<NetworkObservingStrategyProvider> collection = new ArraySet<>();
         collection.add(new PreLollipopNetworkObservingStrategyProvider(context));

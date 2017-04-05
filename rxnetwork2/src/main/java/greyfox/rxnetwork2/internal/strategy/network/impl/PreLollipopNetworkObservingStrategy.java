@@ -46,7 +46,7 @@ public class PreLollipopNetworkObservingStrategy extends BuiltInNetworkObserving
     private BroadcastReceiver broadcastReceiver;
 
     public PreLollipopNetworkObservingStrategy(@NonNull Context context) {
-        this.context = checkNotNull(context, "context == null");
+        this.context = checkNotNull(context, "context");
     }
 
     @Override
