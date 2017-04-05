@@ -13,30 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.rxnetwork;
+package greyfox.rxnetwork2.internal.strategy.internet;
 
-import android.app.Application;
-import com.example.rxnetwork.internals.di.RxNetworkModule;
-import greyfox.rxnetwork2.RxNetwork;
-import toothpick.Scope;
-import toothpick.Toothpick;
+import io.reactivex.Observable;
 
 /**
- * Entry point for the whole application.
+ * Interface allowing to implement different strategies for monitoring real internet
+ * connectivity changes.
  *
  * @author Radek Kozak
  */
-public class MainApplication extends Application {
+public interface InternetObservingStrategy {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        setupDi();
-    }
-
-    private void setupDi() {
-        Scope statusScope = Toothpick.openScope(RxNetwork.class);
-        statusScope.installModules(new RxNetworkModule(this));
-    }
+    Observable<Boolean> observe();
 }

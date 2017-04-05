@@ -42,20 +42,20 @@ import android.support.annotation.VisibleForTesting;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class RxNetworkInfo {
 
-    private NetworkInfo.State state;
-    private NetworkInfo.DetailedState detailedState;
-    private int type;
-    private int subType;
-    private boolean available;
-    private boolean connectedOrConnecting;
-    private boolean connected;
-    private boolean failover;
-    private boolean roaming;
-    private String typeName;
-    private String subTypeName;
-    private String reason;
-    private String extraInfo;
-    private NetworkCapabilities networkCapabilities;
+    private final NetworkInfo.State state;
+    private final NetworkInfo.DetailedState detailedState;
+    private final int type;
+    private final int subType;
+    private final boolean available;
+    private final boolean connectedOrConnecting;
+    private final boolean connected;
+    private final boolean failover;
+    private final boolean roaming;
+    private final String typeName;
+    private final String subTypeName;
+    private final String reason;
+    private final String extraInfo;
+    private final NetworkCapabilities networkCapabilities;
 
     @VisibleForTesting(otherwise = PRIVATE)
     RxNetworkInfo() {
@@ -96,6 +96,7 @@ public class RxNetworkInfo {
 
     public static Builder builderFrom(@NonNull NetworkInfo networkInfo) {
         checkNotNull(networkInfo, "networkInfo == null");
+
         return new Builder().state(networkInfo.getState())
                 .detailedState(networkInfo.getDetailedState())
                 .type(networkInfo.getType())
@@ -111,9 +112,7 @@ public class RxNetworkInfo {
                 .extraInfo(networkInfo.getExtraInfo());
     }
 
-    /**
-     * @see NetworkInfo#getState()
-     */
+    /** @see NetworkInfo#getState() */
     public NetworkInfo.State getState() {
         return state;
     }
@@ -284,6 +283,7 @@ public class RxNetworkInfo {
 
         private static final int TYPE_UNKNOWN = -1;
         private static final String NAME_UNKNOWN = "unknown";
+
         private NetworkInfo.State state = NetworkInfo.State.UNKNOWN;
         private NetworkInfo.DetailedState detailedState = NetworkInfo.DetailedState.IDLE;
         private int type = TYPE_UNKNOWN;

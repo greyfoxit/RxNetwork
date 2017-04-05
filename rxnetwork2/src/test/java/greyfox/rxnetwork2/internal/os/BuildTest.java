@@ -21,7 +21,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import static greyfox.rxnetwork2.internal.os.Build.isAtLeastLollipop;
 import static greyfox.rxnetwork2.internal.os.Build.isAtLeastMarshmallow;

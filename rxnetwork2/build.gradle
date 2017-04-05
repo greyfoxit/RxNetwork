@@ -48,8 +48,9 @@ dependencies {
 
     testCompile deps.junit
     testCompile deps.robolectric
+    testCompile deps.mockwebserver
     testCompile deps.mockitocore
-    testCompile deps.assertJAndroid
+    testCompile deps.assertJ
 }
 
 task wrapper(type: Wrapper) {
