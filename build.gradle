@@ -35,7 +35,7 @@ ext.deps = [
         junit              : 'junit:junit:4.12',
         robolectric        : 'org.robolectric:robolectric:3.3.2',
         mockwebserver      : 'com.squareup.okhttp3:mockwebserver:3.6.0',
-        mockitocore        : 'org.mockito:mockito-core:2.7.6',
+        mockitoinline      : 'org.mockito:mockito-inline:2.7.6',
         assertJ            : 'org.assertj:assertj-core:2.6.0',
         butterknife        : 'com.jakewharton:butterknife:8.5.1',
         butterknifeCompiler: 'com.jakewharton:butterknife-compiler:8.5.1',

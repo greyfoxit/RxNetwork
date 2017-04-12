@@ -1,11 +1,19 @@
 package greyfox.rxnetwork2.helpers.robolectric.shadows;
 
+import static android.net.ConnectivityManager.DEFAULT_NETWORK_PREFERENCE;
+import static android.net.ConnectivityManager.TYPE_MOBILE;
+import static android.net.ConnectivityManager.TYPE_MOBILE_MMS;
+import static android.net.ConnectivityManager.TYPE_WIFI;
+import static android.net.NetworkInfo.DetailedState.CONNECTED;
+import static android.net.NetworkInfo.DetailedState.DISCONNECTED;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.M;
 
 import static org.robolectric.RuntimeEnvironment.getApiLevel;
 
+import android.annotation.SuppressLint;
 import android.net.ConnectivityManager;
+import android.net.ConnectivityManager.NetworkCallback;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
@@ -24,28 +32,29 @@ import org.robolectric.shadows.ShadowNetworkInfo;
 /**
  * Shadow for {@link android.net.ConnectivityManager}.
  */
+@SuppressWarnings("deprecation")
+@SuppressLint("UseSparseArrays")
 @Implements(ConnectivityManager.class)
 public class ShadowConnectivityManagerWithCallback {
 
     // Package-private for tests.
-    static final int NET_ID_WIFI = ConnectivityManager.TYPE_WIFI;
-    static final int NET_ID_MOBILE = ConnectivityManager.TYPE_MOBILE;
+    private static final int NET_ID_WIFI = TYPE_WIFI;
+    private static final int NET_ID_MOBILE = TYPE_MOBILE;
     private final Map<Integer, NetworkInfo> networkTypeToNetworkInfo = new HashMap<>();
     private final Map<Integer, Network> netIdToNetwork = new HashMap<>();
     private final Map<Integer, NetworkInfo> netIdToNetworkInfo = new HashMap<>();
     private NetworkInfo activeNetworkInfo;
     private boolean backgroundDataSetting;
-    private int networkPreference = ConnectivityManager.DEFAULT_NETWORK_PREFERENCE;
-    private HashSet<ConnectivityManager.NetworkCallback> networkCallbacks = new HashSet<>();
+    private int networkPreference = DEFAULT_NETWORK_PREFERENCE;
+    private HashSet<NetworkCallback> networkCallbacks = new HashSet<>();
 
     public ShadowConnectivityManagerWithCallback() {
-        NetworkInfo wifi = ShadowNetworkInfo.newInstance(NetworkInfo.DetailedState.DISCONNECTED,
-                ConnectivityManager.TYPE_WIFI, 0, true, false);
-        networkTypeToNetworkInfo.put(ConnectivityManager.TYPE_WIFI, wifi);
+        NetworkInfo wifi = ShadowNetworkInfo.newInstance(DISCONNECTED, TYPE_WIFI, 0, true, false);
+        networkTypeToNetworkInfo.put(TYPE_WIFI, wifi);
 
-        NetworkInfo mobile = ShadowNetworkInfo.newInstance(NetworkInfo.DetailedState.CONNECTED,
-                ConnectivityManager.TYPE_MOBILE, ConnectivityManager.TYPE_MOBILE_MMS, true, true);
-        networkTypeToNetworkInfo.put(ConnectivityManager.TYPE_MOBILE, mobile);
+        NetworkInfo mobile = ShadowNetworkInfo.newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS,
+                true, true);
+        networkTypeToNetworkInfo.put(TYPE_MOBILE, mobile);
 
         this.activeNetworkInfo = mobile;
 
@@ -57,13 +66,13 @@ public class ShadowConnectivityManagerWithCallback {
         }
     }
 
-    public Set<ConnectivityManager.NetworkCallback> getNetworkCallbacks() {
+    public Set<NetworkCallback> getNetworkCallbacks() {
         return networkCallbacks;
     }
 
     @Implementation(minSdk = LOLLIPOP)
     @RequiresApi(LOLLIPOP)
-    public void registerNetworkCallback(NetworkRequest request, ConnectivityManager.NetworkCallback networkCallback) {
+    public void registerNetworkCallback(NetworkRequest request, NetworkCallback networkCallback) {
         networkCallbacks.add(networkCallback);
         // simulate available connection
         networkCallback.onAvailable(getActiveNetwork());
@@ -71,7 +80,7 @@ public class ShadowConnectivityManagerWithCallback {
 
     @RequiresApi(LOLLIPOP)
     @Implementation(minSdk = LOLLIPOP)
-    public void unregisterNetworkCallback(ConnectivityManager.NetworkCallback networkCallback) {
+    public void unregisterNetworkCallback(NetworkCallback networkCallback) {
         if (networkCallback == null) {
             throw new IllegalArgumentException("Invalid NetworkCallback");
         }
@@ -114,7 +123,8 @@ public class ShadowConnectivityManagerWithCallback {
 
     @Implementation
     public NetworkInfo[] getAllNetworkInfo() {
-        return networkTypeToNetworkInfo.values().toArray(new NetworkInfo[networkTypeToNetworkInfo.size()]);
+        return networkTypeToNetworkInfo.values()
+                .toArray(new NetworkInfo[networkTypeToNetworkInfo.size()]);
     }
 
     @Implementation
@@ -163,7 +173,7 @@ public class ShadowConnectivityManagerWithCallback {
     @Implementation
     public boolean isActiveNetworkMetered() {
         if (activeNetworkInfo != null) {
-            return activeNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE;
+            return activeNetworkInfo.getType() == TYPE_MOBILE;
         } else {
             return false;
         }
