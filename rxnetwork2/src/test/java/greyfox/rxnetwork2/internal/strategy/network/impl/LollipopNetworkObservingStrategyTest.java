@@ -15,47 +15,54 @@
  */
 package greyfox.rxnetwork2.internal.strategy.network.impl;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.ConnectivityManager.NetworkCallback;
+import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
+import greyfox.rxnetwork2.helpers.robolectric.shadows.ShadowConnectivityManagerWithCallback;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 /**
  * @author Radek Kozak
  */
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+@RequiresApi(api = LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = LOLLIPOP)
+@Config(constants = BuildConfig.class, sdk = LOLLIPOP,
+        shadows = ShadowConnectivityManagerWithCallback.class)
 public class LollipopNetworkObservingStrategyTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
 
-    @Mock Context context;
-    @Mock ConnectivityManager connectivityManager;
+    Context context;
 
     BuiltInNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
     @Before
     public void setUp() {
-        when(context.getSystemService(CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
+        context = spy(RuntimeEnvironment.application.getApplicationContext());
         sut = spy(new LollipopNetworkObservingStrategy(context));
     }
 
@@ -68,7 +75,7 @@ public class LollipopNetworkObservingStrategyTest {
     public void shouldSubscribeCorrectly() {
         sut.observe().subscribeWith(testObserver);
 
-        testObserver.assertSubscribed().assertEmpty();
+        testObserver.assertSubscribed().assertValueCount(1);
     }
 
     @Test
@@ -78,6 +85,22 @@ public class LollipopNetworkObservingStrategyTest {
         testObserver.dispose();
 
         verify(sut).dispose();
+        testObserver.isDisposed();
+    }
+
+    @Test
+    public void shouldDisposeWithException_whenDisposed() {
+        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+        doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
+        doThrow(Exception.class).when(connectivityManager)
+                .unregisterNetworkCallback(any(NetworkCallback.class));
+        sut = spy(new LollipopNetworkObservingStrategy(context));
+
+        sut.observe().subscribeWith(testObserver).assertSubscribed();
+        testObserver.dispose();
+
+        verify(sut).dispose();
+        verify(sut).onError(anyString(), any(Exception.class));
         testObserver.isDisposed();
     }
 }

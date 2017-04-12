@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
 apply plugin: 'jacoco-android'
 apply plugin: 'checkstyle'
 
@@ -49,7 +50,7 @@ dependencies {
     testCompile deps.junit
     testCompile deps.robolectric
     testCompile deps.mockwebserver
-    testCompile deps.mockitocore
+    testCompile deps.mockitoinline
     testCompile deps.assertJ
 }
 

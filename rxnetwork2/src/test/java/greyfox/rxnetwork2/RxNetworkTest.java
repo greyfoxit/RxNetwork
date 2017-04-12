@@ -189,11 +189,31 @@ public class RxNetworkTest {
     }
 
     @Test
+    public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy_andScheduler() {
+        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(application);
+
+        sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
+                .defaultScheduler(CUSTOM_SCHEDULER).init(application);
+
+        sut.observe(CUSTOM_NETWORK_STRATEGY).test().assertSubscribed();
+    }
+
+    @Test
     public void shouldSubscribeCorrectly_withCustomInternetObservingStrategy() {
         CUSTOM_INTERNET_STRATEGY = SocketInternetObservingStrategy.create();
 
         sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
                 .init(application);
+
+        sut.observeReal(CUSTOM_INTERNET_STRATEGY).test().assertSubscribed();
+    }
+
+    @Test
+    public void shouldSubscribeCorrectly_withCustomInternetObservingStrategy_andScheduler() {
+        CUSTOM_INTERNET_STRATEGY = SocketInternetObservingStrategy.create();
+
+        sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
+                .defaultScheduler(CUSTOM_SCHEDULER).init(application);
 
         sut.observeReal(CUSTOM_INTERNET_STRATEGY).test().assertSubscribed();
     }

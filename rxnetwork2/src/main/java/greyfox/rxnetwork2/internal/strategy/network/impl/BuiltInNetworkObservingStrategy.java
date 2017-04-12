@@ -3,6 +3,8 @@ package greyfox.rxnetwork2.internal.strategy.network.impl;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Cancellable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Base class for network observing strategies.
@@ -12,6 +14,12 @@ import io.reactivex.functions.Cancellable;
 public abstract class BuiltInNetworkObservingStrategy implements NetworkObservingStrategy {
 
     abstract void dispose();
+
+    abstract Logger logger();
+
+    void onError(String message, Exception exception) {
+        logger().log(Level.WARNING, message + ": " + exception.getMessage());
+    }
 
     final class OnDisposeAction implements Action {
 

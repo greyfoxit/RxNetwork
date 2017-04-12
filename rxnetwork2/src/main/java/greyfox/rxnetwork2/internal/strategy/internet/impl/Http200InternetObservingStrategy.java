@@ -5,12 +5,11 @@ import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 import static java.util.logging.Logger.getLogger;
 
-import static greyfox.rxnetwork2.internal.strategy.internet.impl.Http200InternetObservingStrategy.Config.DEFAULT_ENDPOINT;
+import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
-import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.internet.error.InternetObservingStrategyException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -19,20 +18,24 @@ import java.util.logging.Logger;
 /**
  * @author Radek Kozak
  */
-
 public class Http200InternetObservingStrategy extends BuiltInInternetObservingStrategy {
 
     private static final Logger logger
             = getLogger(Http200InternetObservingStrategy.class.getSimpleName());
 
     @VisibleForTesting(otherwise = PRIVATE)
+    Http200InternetObservingStrategy() {
+        throw new AssertionError("Use static factory methods or Builder to create strategy");
+    }
+
+    @VisibleForTesting(otherwise = PRIVATE)
     @RestrictTo(LIBRARY_GROUP)
-    private Http200InternetObservingStrategy(@NonNull Builder builder) {
+    Http200InternetObservingStrategy(@NonNull Builder builder) {
         super(builder);
     }
 
     @NonNull
-    public static InternetObservingStrategy create() {
+    public static Http200InternetObservingStrategy create() {
         return builder().build();
     }
 
@@ -42,8 +45,10 @@ public class Http200InternetObservingStrategy extends BuiltInInternetObservingSt
     }
 
     @Override
-    protected boolean isConnected(@NonNull HttpURLConnection urlConnection)
+    public boolean isConnected(@NonNull HttpURLConnection urlConnection)
             throws InternetObservingStrategyException {
+
+        checkNotNull(urlConnection, "urlConnection");
 
         try {
             return urlConnection.getResponseCode() == 200;
@@ -58,6 +63,8 @@ public class Http200InternetObservingStrategy extends BuiltInInternetObservingSt
     public static final class Builder
             extends BuiltInInternetObservingStrategy.Builder {
 
+        private static final String DEFAULT_ENDPOINT = "http://www.google.cn/blank.html";
+
         public Builder() {
             this.endpoint(DEFAULT_ENDPOINT);
         }
@@ -71,13 +78,8 @@ public class Http200InternetObservingStrategy extends BuiltInInternetObservingSt
          */
         @NonNull
         @Override
-        public InternetObservingStrategy build() {
+        public Http200InternetObservingStrategy build() {
             return new Http200InternetObservingStrategy(this);
         }
-    }
-
-    public static final class Config {
-
-        static final String DEFAULT_ENDPOINT = "http://www.google.cn/blank.html";
     }
 }

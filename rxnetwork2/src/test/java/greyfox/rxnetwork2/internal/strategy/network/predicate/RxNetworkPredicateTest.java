@@ -41,7 +41,6 @@ import android.net.NetworkCapabilities;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork2.BuildConfig;
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork2.internal.os.Build;
 import io.reactivex.functions.Predicate;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,25 +51,20 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+@RequiresApi(api = android.os.Build.VERSION_CODES.LOLLIPOP)
 @SuppressWarnings("WeakerAccess")
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class)
+@Config(constants = BuildConfig.class, sdk = LOLLIPOP)
 public class RxNetworkPredicateTest {
 
-    static Predicate<RxNetworkInfo> VALID_STATES = hasState(CONNECTING, CONNECTED);
-    static Predicate<RxNetworkInfo> VALID_TYPES = hasType(TYPE_MOBILE, TYPE_WIFI);
-    static Predicate<RxNetworkInfo> VALID_TRANSPORT_TYPES;
-    static Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES;
-
-    static {
-        if (Build.isAtLeastLollipop()) {
-            VALID_TRANSPORT_TYPES = hasTransport(TRANSPORT_CELLULAR, TRANSPORT_WIFI);
-            VALID_NET_CAPABILITIES
-                    = hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
-        }
-    }
-
     @Rule public MockitoRule rule = MockitoJUnit.rule();
+
+    Predicate<RxNetworkInfo> VALID_STATES = hasState(CONNECTING, CONNECTED);
+    Predicate<RxNetworkInfo> VALID_TYPES = hasType(TYPE_MOBILE, TYPE_WIFI);
+    Predicate<RxNetworkInfo> VALID_TRANSPORT_TYPES
+            = hasTransport(TRANSPORT_CELLULAR, TRANSPORT_WIFI);
+    Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES
+            = hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
 
     @Mock RxNetworkInfo rxNetworkInfo;
     @Mock NetworkCapabilities networkCapabilities;

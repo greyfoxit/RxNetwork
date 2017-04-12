@@ -3,16 +3,13 @@ package greyfox.rxnetwork2.internal.strategy.internet.impl;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
-import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 
 import static greyfox.rxnetwork2.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork2.internal.strategy.internet.impl.BuiltInInternetObservingStrategy.Config.DEFAULT_ENDPOINT;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
-import greyfox.rxnetwork2.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.internet.error.InternetObservingStrategyException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -24,9 +21,6 @@ import java.util.logging.Logger;
  * @author Radek Kozak
  */
 public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObservingStrategy {
-
-    private static final Logger logger
-            = getLogger(BuiltInInternetObservingStrategy.class.getSimpleName());
 
     /** Canonical hostname. */
     @NonNull private final String endpoint;
@@ -54,14 +48,15 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
     }
 
     @NonNull
-    public static InternetObservingStrategy create() {
+    public static BuiltInInternetObservingStrategy create() {
         return builder().build();
     }
 
     @NonNull
     public static Builder builder() { return new Builder(); }
 
-    private HttpURLConnection buildConnection(@NonNull URL url)
+    @VisibleForTesting(otherwise = PRIVATE)
+    HttpURLConnection buildUrlConnection(@NonNull URL url)
             throws InternetObservingStrategyException {
 
         checkNotNull(url, "url");
@@ -70,11 +65,7 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
 
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setInstanceFollowRedirects(false);
-            urlConnection.setConnectTimeout(timeout);
-            urlConnection.setReadTimeout(timeout);
-            urlConnection.setUseCaches(false);
-            urlConnection.getInputStream();
+            setUpUrlConnectionForStrategy(urlConnection);
         } catch (IOException ioe) {
             throw new InternetObservingStrategyException("Could not create valid connection " +
                     "from " + url.toString(), ioe);
@@ -83,8 +74,22 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
         return urlConnection;
     }
 
-    protected boolean isConnected(@NonNull HttpURLConnection urlConnection)
+    private void setUpUrlConnectionForStrategy(@NonNull HttpURLConnection urlConnection)
+            throws IOException {
+
+        checkNotNull(urlConnection, "urlConnection");
+
+        urlConnection.setInstanceFollowRedirects(false);
+        urlConnection.setConnectTimeout(timeout);
+        urlConnection.setReadTimeout(timeout);
+        urlConnection.setUseCaches(false);
+        urlConnection.getInputStream();
+    }
+
+    public boolean isConnected(@NonNull HttpURLConnection urlConnection)
             throws InternetObservingStrategyException {
+
+        checkNotNull(urlConnection, "urlConnection");
 
         try {
             return urlConnection.getResponseCode() == 204;
@@ -104,15 +109,18 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
     }
 
     @Override
+    Logger logger() {
+        return getLogger(BuiltInInternetObservingStrategy.class.getSimpleName());
+    }
+
+    @Override
     protected boolean checkConnection() {
         HttpURLConnection urlConnection = null;
-        final URL url;
         try {
-            urlConnection = buildConnection(url());
+            urlConnection = buildUrlConnection(url());
             return isConnected(urlConnection);
         } catch (InternetObservingStrategyException iose) {
-            logger.log(WARNING, "Problem occurred while checking endpoint: " + iose.getMessage()
-                    + " : " + iose.getCause().getMessage());
+            onError("Problem occurred while checking endpoint", iose);
             return false;
         } finally {
             if (urlConnection != null) {
@@ -120,12 +128,6 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
             }
         }
     }
-
-    /*@Override
-    public Observable<Boolean> observe() {
-        return Observable.interval(delay, interval, TimeUnit.MILLISECONDS)
-                .map(toConnectionState()).distinctUntilChanged();
-    }*/
 
     /** Returns this URL as a {@link URL java.net.URL}. */
     public URL url() throws InternetObservingStrategyException {
@@ -140,9 +142,12 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
      * {@code BuiltInInternetObservingStrategy} builder static inner class.
      */
     public static class Builder extends
-            BaseEndpointInternetObservingStrategy.Builder<BuiltInInternetObservingStrategy.Builder> {
+            BaseEndpointInternetObservingStrategy.Builder<Builder> {
 
-        private int timeout = SocketInternetObservingStrategy.Config.DEFAULT_TIMEOUT_MS;
+        private static final String DEFAULT_ENDPOINT = "http://g.cn/generate_204";
+        private static final int DEFAULT_TIMEOUT_MS = 3000;
+
+        private int timeout = DEFAULT_TIMEOUT_MS;
 
         public Builder() {
             this.endpoint(DEFAULT_ENDPOINT);
@@ -161,9 +166,9 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
          * @return a reference to this Builder
          */
         @NonNull
-        public BaseEndpointInternetObservingStrategy.Builder timeout(int timeout) {
+        public Builder timeout(int timeout) {
             this.timeout = timeout;
-            return this;
+            return self();
         }
 
         /**
@@ -175,13 +180,8 @@ public class BuiltInInternetObservingStrategy extends BaseEndpointInternetObserv
          */
         @NonNull
         @Override
-        public InternetObservingStrategy build() {
+        public BuiltInInternetObservingStrategy build() {
             return new BuiltInInternetObservingStrategy(this);
         }
-    }
-
-    public static final class Config {
-
-        static final String DEFAULT_ENDPOINT = "http://g.cn/generate_204";
     }
 }
