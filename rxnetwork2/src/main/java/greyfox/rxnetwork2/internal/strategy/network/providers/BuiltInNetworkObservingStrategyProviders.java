@@ -8,6 +8,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.ArraySet;
+import greyfox.rxnetwork2.internal.strategy.ObservingStrategyProviders;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,24 +18,29 @@ import java.util.Collections;
  *
  * @author Radek Kozak
  */
-public final class BuiltInNetworkObservingStrategyProviders {
+public final class BuiltInNetworkObservingStrategyProviders implements
+        ObservingStrategyProviders<NetworkObservingStrategyProvider> {
+
+    private final Context context;
 
     @VisibleForTesting(otherwise = PRIVATE)
     BuiltInNetworkObservingStrategyProviders() {
-        throw new AssertionError("No instances");
+        throw new AssertionError("No instances.");
+    }
+
+    public BuiltInNetworkObservingStrategyProviders(@NonNull Context context) {
+        this.context = checkNotNull(context, "context == null");
     }
 
     /**
-     * Gets collection of unmodifiable {@link NetworkObservingStrategyProvider}'s.
-     *
-     * @param context {@link Context}
+     * Gets collection of unmodifiable {@link ObservingStrategyProviders}'s.
      *
      * @return Collection of {@linkplain NetworkObservingStrategyProvider providers}
      */
-    public static Collection<NetworkObservingStrategyProvider> get(@NonNull Context context) {
-        checkNotNull(context, "context");
-
+    @Override
+    public Collection<NetworkObservingStrategyProvider> get() {
         Collection<NetworkObservingStrategyProvider> collection = new ArraySet<>();
+
         collection.add(new PreLollipopNetworkObservingStrategyProvider(context));
         collection.add(new LollipopNetworkObservingStrategyProvider(context));
         collection.add(new MarshmallowNetworkObservingStrategyProvider(context));

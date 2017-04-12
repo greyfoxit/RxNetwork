@@ -41,5 +41,6 @@ ext.deps = [
         butterknifeCompiler: 'com.jakewharton:butterknife-compiler:8.5.1',
         constraintLayout   : 'com.android.support.constraint:constraint-layout:1.0.2',
         toothpickRuntime   : 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.5',
+        toothpickSmoothie  : 'com.github.stephanenicolas.toothpick:smoothie:1.0.5',
         toothpickCompiler  : 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.5'
 ]

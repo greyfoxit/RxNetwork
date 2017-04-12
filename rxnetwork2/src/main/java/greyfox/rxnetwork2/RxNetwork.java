@@ -31,7 +31,7 @@ import greyfox.rxnetwork2.internal.strategy.internet.impl.BuiltInInternetObservi
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
-import greyfox.rxnetwork2.internal.strategy.network.factory.BuiltInStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.network.factory.BuiltInNetworkObservingStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -39,7 +39,7 @@ import java.util.Collection;
 
 /**
  * RxNetwork is a class that listens to network connectivity changes in a reactive manner.
- * It uses default {@link BuiltInStrategyFactory factory} under the hood to
+ * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood to
  * provide concrete, api-level dependent {@link NetworkObservingStrategy strategy}
  * for observing network connectivity changes.
  * <p>
@@ -200,9 +200,10 @@ public final class RxNetwork {
 
             if (networkObservingStrategy == null) {
                 final Collection<NetworkObservingStrategyProvider> providers
-                        = BuiltInNetworkObservingStrategyProviders.get(application);
+                        = new BuiltInNetworkObservingStrategyProviders(application).get();
 
-                networkObservingStrategy = BuiltInStrategyFactory.create(providers).get();
+                networkObservingStrategy = BuiltInNetworkObservingStrategyFactory.create(providers)
+                        .get();
             }
 
             if (internetObservingStrategy == null) {

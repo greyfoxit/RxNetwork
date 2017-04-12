@@ -49,7 +49,7 @@ public class PreLollipopNetworkObservingStrategyTest {
 
     Context context;
 
-    BuiltInNetworkObservingStrategy sut;
+    BaseNetworkObservingStrategy sut;
     TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
     RxNetworkInfo VALID_RXNETWORK_INFO;

@@ -16,7 +16,7 @@
 package greyfox.rxnetwork2.internal.strategy.network;
 
 import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
-import io.reactivex.Observable;
+import greyfox.rxnetwork2.internal.strategy.ObservingStrategy;
 
 /**
  * Interface allowing to implement different strategies for monitoring network connectivity change.
@@ -24,7 +24,4 @@ import io.reactivex.Observable;
  *
  * @author Radek Kozak
  */
-public interface NetworkObservingStrategy {
-
-    Observable<RxNetworkInfo> observe();
-}
+public interface NetworkObservingStrategy extends ObservingStrategy<RxNetworkInfo> {}

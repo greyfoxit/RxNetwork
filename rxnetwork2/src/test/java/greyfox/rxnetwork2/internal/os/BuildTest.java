@@ -19,13 +19,11 @@ import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
-import static android.os.Build.VERSION_CODES.N;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import static greyfox.rxnetwork2.internal.os.Build.isAtLeastLollipop;
 import static greyfox.rxnetwork2.internal.os.Build.isAtLeastMarshmallow;
-import static greyfox.rxnetwork2.internal.os.Build.isAtLeastNougat;
 import static greyfox.rxnetwork2.internal.os.Build.isLessThanLollipop;
 import static greyfox.rxnetwork2.internal.os.Build.isLessThanMarshmallow;
 
@@ -54,12 +52,6 @@ public class BuildTest {
     @Config(sdk = M)
     public void shouldBe_atLeastMarshmallow() {
         assertThat(isAtLeastMarshmallow()).isTrue();
-    }
-
-    @Test
-    @Config(sdk = N)
-    public void shouldBe_atLeastNougat() {
-        assertThat(isAtLeastNougat()).isTrue();
     }
 
     @Test

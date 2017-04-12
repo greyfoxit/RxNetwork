@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  *
  * @author Radek Kozak
  */
-public abstract class BuiltInNetworkObservingStrategy implements NetworkObservingStrategy {
+public abstract class BaseNetworkObservingStrategy implements NetworkObservingStrategy {
 
     abstract void dispose();
 

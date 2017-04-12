@@ -17,7 +17,8 @@ import greyfox.rxnetwork2.internal.strategy.network.impl.MarshmallowNetworkObser
  *
  * @author Radek Kozak
  */
-final class MarshmallowNetworkObservingStrategyProvider implements NetworkObservingStrategyProvider {
+final class MarshmallowNetworkObservingStrategyProvider
+        implements NetworkObservingStrategyProvider {
 
     private final Context context;
 

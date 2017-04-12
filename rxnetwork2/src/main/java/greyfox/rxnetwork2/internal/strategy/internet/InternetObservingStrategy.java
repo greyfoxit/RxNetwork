@@ -15,7 +15,7 @@
  */
 package greyfox.rxnetwork2.internal.strategy.internet;
 
-import io.reactivex.Observable;
+import greyfox.rxnetwork2.internal.strategy.ObservingStrategy;
 
 /**
  * Interface allowing to implement different strategies for monitoring real internet
@@ -23,7 +23,4 @@ import io.reactivex.Observable;
  *
  * @author Radek Kozak
  */
-public interface InternetObservingStrategy {
-
-    Observable<Boolean> observe();
-}
+public interface InternetObservingStrategy extends ObservingStrategy<Boolean> {}

@@ -18,7 +18,7 @@ package greyfox.rxnetwork2.internal.strategy.network.factory;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import android.content.Context;
-import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyFactory;
+import greyfox.rxnetwork2.internal.strategy.ObservingStrategyFactory;
 import greyfox.rxnetwork2.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork2.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import java.util.Collection;
@@ -34,27 +34,29 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
 @RunWith(MockitoJUnitRunner.class)
-public class BuiltInStrategyFactoryTest {
+public class BuiltInNetworkObservingStrategyFactoryTest {
 
     static Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS = Collections.emptySet();
 
     @Mock Context context;
 
-    NetworkObservingStrategyFactory sut;
+    ObservingStrategyFactory sut;
 
     @Before
     public void setUp() {
-        sut = BuiltInStrategyFactory.create(BuiltInNetworkObservingStrategyProviders.get(context));
+        Collection<NetworkObservingStrategyProvider> providers
+                = new BuiltInNetworkObservingStrategyProviders(context).get();
+        sut = BuiltInNetworkObservingStrategyFactory.create(providers);
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingInstantiateWithNullProviders() {
-        new BuiltInStrategyFactory(null);
+        new BuiltInNetworkObservingStrategyFactory(null);
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToCreateWithNullProviders() {
-        BuiltInStrategyFactory.create(null);
+        BuiltInNetworkObservingStrategyFactory.create(null);
     }
 
     @Test
@@ -64,7 +66,7 @@ public class BuiltInStrategyFactoryTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenProvidersEmpty() throws Exception {
-        sut = BuiltInStrategyFactory.create(EMPTY_PROVIDERS);
+        sut = BuiltInNetworkObservingStrategyFactory.create(EMPTY_PROVIDERS);
 
         sut.get();
     }

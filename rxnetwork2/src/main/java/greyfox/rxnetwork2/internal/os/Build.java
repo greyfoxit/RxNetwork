@@ -18,7 +18,6 @@ package greyfox.rxnetwork2.internal.os;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.M;
-import static android.os.Build.VERSION_CODES.N;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 import android.support.annotation.VisibleForTesting;
@@ -43,10 +42,6 @@ public final class Build {
 
     public static boolean isAtLeastMarshmallow() {
         return SDK_INT >= M;
-    }
-
-    public static boolean isAtLeastNougat() {
-        return SDK_INT >= N;
     }
 
     public static boolean isLessThanLollipop() {
