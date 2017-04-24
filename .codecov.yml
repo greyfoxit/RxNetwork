@@ -11,16 +11,22 @@ coverage:
   round: down
   status:
     changes: false
-    patch: true
+    patch:
       default:
-        threshold: 20%
-    project:
-      default:
-        against: parent
         target: auto
         threshold: 20%
-        branches:
-          - master
+        base: auto
+        branches: null
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
+        only_pulls: false
+    project:
+      default:
+        target: auto
+        threshold: 20%
+        base: auto
+        branches: null
         if_no_uploads: error
         if_not_found: success
         if_ci_failed: error
