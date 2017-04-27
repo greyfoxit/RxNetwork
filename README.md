@@ -21,11 +21,11 @@ The library is a re-hash of popular [Reactive Network](https://github.com/pwittc
 lib but it uses distinctively different architectural approach while at the same time leaving 
 what was good in the original. 
 
-Initial idea was to bring original library up to speed so it was possible to use it with RxJava2. 
-Piotr - the original author was already in a process of making this possible but it was going 
-a little slow for our taste and looked like his *2x branch* was stuck a little in a stale mode. 
-We decided to fork it. First and foremost for our own use, but now we are releasing it into the 
-open, giving you the options. *Whichever approach you choose it's up to you* 
+Initial idea was to bring original library up to speed so it could be used with RxJava2. Piotr - 
+the original author was already in a process of making this possible but it was going a little slow 
+for our taste and looked like his *2x branch* was stuck a little in a stale mode. We decided to fork 
+it. First and foremost for our own use, but now we are releasing it into the open, giving you 
+the options. Whichever approach you choose it's up to you.
 
 ## Contents
 
@@ -71,62 +71,61 @@ API so we decided to get it out of our way when it's not truly needed. So for yo
 passing it even if your observing strategy doesn't require it. Read on the [usage](#usage) section 
 to see for yourself or look it up how it's done in the code.
 
-3. Most of the classes now use `Builder Pattern` for configuration so you could initialize only 
-what you truly need while giving you the fallback option of sensible defaults.   
+3. Most of the classes now use `Builder Pattern` for configuration **so you could initialize only 
+what you truly need**, while giving you the fallback option of sensible defaults.   
 
-4. `Application` context instead of `Activity` one. This one is mostly **due to memory leak** 
-in `WifiManager` as reported in issue [#43945](https://code.google.com/p/android/issues/detail?id=43945) 
-in Android issue tracker (and mentioned by Piotr as well). The problem, originally, was supposed to 
-occur only in Android 4.2, but many report it as still persistent on 5.1 devices and so on. 
-**We decided to nip the problem in the butt** and leave no door open. Hence our strong stand on this 
-change. Remember that this will only affect you when initializing RxNetwork library. No worries 
-though - you can still use it directly within activities/fragments if you decide to.
+4. **`Application` context everywhere**. This one is mostly **due to memory leak** as reported in 
+issue [#43945](https://code.google.com/p/android/issues/detail?id=43945) in Android issue tracker 
+(and mentioned by Piotr as well). The problem, originally, was supposed to occur only in 
+Android 4.2, but many report it as still persistent on 5.1 devices and so on. We decided to nip 
+the problem in the butt and leave no door open. Hence our strong stand on this change. Remember 
+that this will only affect you when initializing RxNetwork library in your application. No worries 
+though - you can still do it directly within activities/fragments if you decide to.
 
-5. For real internet access our default *internet observing strategy* implementation uses 
+5. For real internet access our default internet observing strategy implementation uses 
 `URLConnection` instead of socket-based approach proposed by original library. **It also takes care 
 of captive portals / walled-garden internet scenarios that was mentioned by many as problematic**.
 
     **Under the hood it uses Android team's own approach** (as seen in `android.net.wifi.WifiWatchdogStateMachine`) 
     but with more sensible endpoint, hence taking care of Great China Wall blocking all that is Google 
-    (*all that is evil* up there) At the time of writing this endpoint is: 
+    (or *all that is evil* up there) At the time of writing this endpoint is: 
     [http://connectivitycheck.gstatic.com/generate_204](http://connectivitycheck.gstatic.com/generate_204) 
     and it's supposed to be not blocked, but of course you are free to configure your own endpoint 
-    in case Big China Brother decides to block it.
+    in case Big Chinese Brother decides to block it.
  
-6. We decided to include couple of other already tested and ready to go *internet strategies* to 
-enhance your observing possibilities. Right now there are two of them (apart from built-in one that
-you can configure to your taste as well): [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
-and [`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
-(included here for the sake of original lib) Both our implementations use Builder Pattern now 
-giving you the cleaner interface to work with without polluting, multi-param methods.
+6. We also decided to include couple of other already tested and ready to go internet observing 
+strategies to enhance your observing possibilities. Right now there are two of them (apart from 
+built-in one that you can configure to your taste as well): [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
+and [`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
+(included here for the sake of original lib) Both our implementations use Builder Pattern giving 
+you the cleaner interface to work with without polluted, multi-param methods.
 
 7. Tests, tests, tests. And meaningful ones. Rx<sup>2</sup>Network was thoroughly tested so you 
-could (ideally) use it worry-free in your own projects from the get-go.
-
+could (hopefully) use it worry-free in your own projects from the get-go.
 
 ## Usage
 
 Download [the latest JAR][jar] or grab via Maven:
 ```xml
 <dependency>
-  <groupId>inc.greyfox.rxnetwork2</groupId>
+  <groupId>inc.greyfox.rxnetwork</groupId>
   <artifactId>rxnetwork</artifactId>
-  <version>0.0.1</version>
+  <version>0.1.0/version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'inc.greyfox.rxnetwork2:rxnetwork:0.0.1'
+compile 'inc.greyfox.rxnetwork:rxnetwork:0.1.0'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
-[jar]: https://search.maven.org/remote_content?g=inc.greyfox.rxnetwork2&a=rxnetwork&v=LATEST
+[jar]: https://search.maven.org/remote_content?g=inc.greyfox.rxnetwork&a=rxnetwork&v=LATEST
 [snap]: https://oss.sonatype.org/content/repositories/snapshots
 
 ## Rx<sup>2</sup>Network configuration
 
-[`RxNetwork`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/RxNetwork.java) 
+[`RxNetwork`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/RxNetwork.java) 
 is the main class via which you can subscribe to available observables. By default library tries to 
 give you sane defaults, but it allows for customization. You can read on that in 
 [Advanced configuration](#advanced-configuration) section.
@@ -137,11 +136,12 @@ In your `Application` class:
 
 ```java
 public class ExampleApplication extends Application {
-
-  @Override public void onCreate() {
-    super.onCreate();
+    
+    @Override public void onCreate() {
+        super.onCreate();
+        
         RxNetwork.init(this); // this is the line
-  }
+    }
 }
 ```
 
@@ -152,7 +152,7 @@ By default library, via its provider mechanism, will choose appropriate, Android
 strategy for observing network connectivity. This is for it could support both new and legacy 
 network monitoring strategies based on concrete version. 
 
-For observing real internet access RxNetwork defaults to [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
+For observing real internet access RxNetwork defaults to [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
 partially described earlier in *What's different*, section 5 and more in [Built-in internet observing strategies](#built-in-internet-observing-strategies) 
 
 **Ok, seems easy enough, but what is truly going on here?** 
@@ -167,18 +167,19 @@ as an entry point would seem to be a good place for that. You could simply use R
 ```java
 public class ExampleApplication extends Application {
 
-  @Override public void onCreate() {
-    super.onCreate();
+    @Override public void onCreate() {
+        super.onCreate();
+        
         RxNetwork.init(this).observe()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribeWith(new YourCustomObserver());
-  }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribeWith(new YourCustomObserver());
+    }
 }
 ```
 
-Or maybe you would like to take an instance (and you can have differently configured instances of 
-RxNetwork if you want to)
+Or maybe you would like to take an instance (you can have differently configured instances of 
+RxNetwork if you want)
 
 ```java
 RxNetwork rxnetwork = RxNetwork.init(this);
@@ -196,10 +197,11 @@ public class ExampleActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        
         rxNetwork.observe()
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribeOn(Schedulers.io())
-                 .subscribeWith(new YourCustomObserver());
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribeWith(new YourCustomObserver());
     }
 }
 ```
@@ -228,7 +230,7 @@ public class ExampleFragment extends Fragment {
 but we must say that we advise against it and strongly recommend DI approach - if not only for the
 sake of your testing (which we hope you do anyway) 
 
-**Too see exemplary application** (with DI, Retrolambda and all) **check out** `app` directory 
+Too see exemplary application (with DI, Retrolambda and all) **check out** `app` directory 
 in the repo.
 
 ### Advanced configuration
@@ -277,9 +279,9 @@ Right now you're probably wondering: *what are all those different classes ?* We
 asked. Simple. Just the couple of basic, self explanatory interfaces you need to implement in case 
 you'd like to use your own observing strategies. If you want you can have a look:
 
-- [`InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/network/NetworkObservingStrategy.java)
-- [`NetworkObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/network/NetworkObservingStrategyFactory.java)
-- [`NetworkObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/InternetObservingStrategy.java)
+- [`InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategy.java)
+- [`NetworkObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategyFactory.java)
+- [`NetworkObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/InternetObservingStrategy.java)
 
 but other than that, in most situations, you can forget it all and roll happily with defaults 
 without all the fuss.
@@ -290,7 +292,7 @@ Now, let's see what we can *really* do with this library. But first let's take a
 
 #### RxNetworkInfo
 
-[`RxNetworkInfo`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/net/RxNetworkInfo.java) 
+[`RxNetworkInfo`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/net/RxNetworkInfo.java) 
 is *the* class that you would use if you decide you want more than just basic information about 
 the network connection. This class is simply a wrapper around Android's original `NetworkInfo` 
 that you can use to extract all the original info. Starting from `Lollipop` (API >= 21) 
@@ -306,24 +308,25 @@ You can observe `RxNetworkInfo` with `observe` method. In your class this could 
 (...)
 
 rxNetwork.observe()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribeOn(Schedulers.io())
-         .subscribe(new Consumer<RxNetworkInfo>() {
-             @Override
-             public void accept(RxNetworkInfo networkInfo) throws Exception {
-                 // do sth with networkInfo like calling getState(), getType(), isConnected()
-                 // and so on (essentialy anything you'd normally call in NetworkInfo)
-             }
-         });
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribeOn(Schedulers.io())
+    .subscribe(new Consumer<RxNetworkInfo>() {
+        @Override
+        public void accept(RxNetworkInfo networkInfo) throws Exception {
+            // do sth with networkInfo like calling getState(), getType(), isConnected()
+            // and so on (essentialy anything you'd normally call in NetworkInfo)
+        }
+    }
+);
 ```
 
 or sth shorter like this:  
 
 ```java
 rxNetwork.observe()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribeOn(Schedulers.io())
-         .subscribeWith(new YourCustomObserver());
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribeOn(Schedulers.io())
+    .subscribeWith(new YourCustomObserver());
 ```
 
 **If you're using Retrolambda** like us, and decide to [set up default `Scheduler`](#default-scheduler) 
@@ -331,37 +334,38 @@ on RxNetwork **this could go down** to this:
 
 ```java
 rxNetwork.observe()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(networkInfo -> {
-            // do sth with networkInfo
-        });
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(networkInfo -> {
+        // do sth with networkInfo
+    }
+);
 ```
 
 for example:
 
 ```java
 rxNetwork.observe()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(networkInfo -> System.out.println("Connected: " + networkInfo.isConnected()));
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(networkInfo -> System.out.println("Connected: " + networkInfo.isConnected()));
 ```
 
 **We could go even further and prettier** with method references, let's say:
 
 ```java
 rxNetwork.observe()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(this::onNetworkInfo);
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(this::onNetworkInfo);
          
 void onNetworkInfo(RxNetworkInfo networkInfo) {
-   // do sth with networkInfo 
+    // do sth with networkInfo 
 }      
 ```
-The latest can be expanded to full RxJava2 `subscribe` of course:
+The latest can be expanded with regular RxJava2 `subscribe` to take care of errors of course:
 
 ```java
 rxNetwork.observe()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(this::onNetworkInfo, this::onError, this::onComplete);
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(this::onNetworkInfo, this::onError);
          
 (...)
 ```
@@ -379,11 +383,11 @@ method. Take a look:
 
 ```java
 rxNetwork.observeSimple()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(this::onConnectionInfo);
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(this::onConnectionInfo);
          
 void onConnectionInfo(Boolean isConnected) {
-   System.out.println("Network is " + (isConnected ? "connected" : "not connected")); 
+    System.out.println("Network is " + (isConnected ? "connected" : "not connected")); 
 }      
 ```
 
@@ -399,8 +403,8 @@ do that easily:
  
 ```java
 rxNetwork.observe(new YourCustomNetworkObservingStrategy())
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(...);
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(...);
 ``` 
 
 #### Filtering
@@ -418,7 +422,7 @@ import static android.net.NetworkInfo.State.DISCONNECTED;
 (...)
 
 rxNetwork.observe()
-    .observeOn(mainThread())
+    .observeOn(AndroidSchedulers.mainThread())
     .filter(hasType(TYPE_WIFI, TYPE_MOBILE))
     .filter(hasState(CONNECTED, DISCONNECTED))
     .subscribe(...)
@@ -428,13 +432,13 @@ For two types that would probably be mostly used: *wifi* and *mobile* we also pr
 shortcuts:
 
 ```java
-import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_MOBILE;
-import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_WIFI;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_MOBILE;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_WIFI;
 
 (...)
 
 rxNetwork.observe()
-    .observeOn(mainThread())
+    .observeOn(AndroidSchedulers.mainThread())
     .filter(IS_WIFI) // or filter(IS_MOBILE)
     .subscribe(...)
 ```
@@ -442,13 +446,13 @@ rxNetwork.observe()
 Same goes for the two most interested states:
 
 ```java
-import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.State.IS_CONNECTED;
-import static greyfox.rxnetwork2.internal.strategy.network.predicate.RxNetworkPredicate.State.IS_DISCONNECTED;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.State.IS_CONNECTED;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.State.IS_DISCONNECTED;
 
 (...)
 
 rxNetwork.observe()
-    .observeOn(mainThread())
+    .observeOn(AndroidSchedulers.mainThread())
     .filter(IS_CONNECTED) // or filter(IS_DISCONNECTED)
     .subscribe(...)
 ```
@@ -466,7 +470,7 @@ import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 (...)
 
 rxNetwork.observe()
-    .observeOn(mainThread())
+    .observeOn(AndroidSchedulers.mainThread())
     .filter(hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_TRUSTED))    
     .filter(hasTransport(TRANSPORT_WIFI, TRANSPORT_CELLULAR))
     .subscribe(...)
@@ -505,9 +509,9 @@ real Internet connection and `false` if not.
 
 ```java
 rxNetwork.observeReal()
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(connectedToInternet -> System.out.println("You are: " 
-            + (connectedToInternet ? "connected" : "not connected")));
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(connectedToInternet -> System.out.println("You are: " 
+        + (connectedToInternet ? "connected" : "not connected")));
 ``` 
 
 Of course similar as before you can use your own strategy. All you need to do is to simply implement
@@ -515,19 +519,19 @@ Of course similar as before you can use your own strategy. All you need to do is
 
 ```java
 rxNetwork.observeReal(new YourCustomInternetObservingStrategy())
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(...);
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(...);
 ``` 
 
 So, let's say for example, you want to use socket-based approach (maybe you want it to check your 
 own server or whatever). You can either do with your own strategy, as described above, or simply use 
-[`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
+[`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
 that is already provided for you in the library:
 
 ```java
 rxNetwork.observeReal(SocketInternetObservingStrategy.create())
-         .observeOn(AndroidSchedulers.mainThread())
-         .subscribe(...);
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe(...);
 ```
 
 Please check out the code if you're wondering about the defaults. If you're not happy with them, as 
@@ -543,8 +547,8 @@ rxNetwork.observeReal(internetObservingStrategy)
     .subscribe(...);
 ```
 
-The same goes for [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
-and even [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
+The same goes for [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
+and even [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
 that is used as the library's default under the hood.
 
 #### Built-in internet observing strategies
@@ -553,7 +557,7 @@ There are three, fully configurable, internet observing strategies that you can 
 that defaults are not for you. 
 
 - first one is the one used by the library under the hood and partially
-mentioned in the [Introduction](#introduction), namely [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java) 
+mentioned in the [Introduction](#introduction), namely [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java) 
 It does its bit by checking special endpoint configured for returning HTTP `204` status. Under the 
 hood it uses Android team's own approach (as seen in `android.net.wifi.WifiWatchdogStateMachine`) 
 but with more sensible endpoint, hence taking care of Great China Wall blocking all that is Google 
@@ -561,7 +565,7 @@ but with more sensible endpoint, hence taking care of Great China Wall blocking 
 and it's supposed to be not blocked, but of course you are free to configure your own endpoint 
 in case Big China Brother decides to block it as well.
 
-- next provided strategy is the [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
+- next provided strategy is the [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
 It's a variation on the previous theme that checks for HTTP `200` status code. By default it uses 
 [http://www.google.cn/blank.html](http://www.google.cn/blank.html) address mostly because it seems
 to be not blocked in China yet and because of it's zero-length response body (saving bandwidth) 
@@ -569,18 +573,18 @@ As always you can use the address of your own choice that conform to this mechan
 Apple seems to have similar one: [http://captive.apple.com](http://captive.apple.com) but it can 
 by any other that works
  
-- last one is the self-explanatory [`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork2/src/main/java/greyfox/rxnetwork2/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
+- last one is the self-explanatory [`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
 that tries to connect to the given endpoint via socket-based mechanism. Example usage is shown 
 already in [Observing real internet access](#observing-real-internet-access) section
 
 ## Examples
 
-**Too see exemplary application** (with DI, Retrolambda and all) **check out** `app` directory 
+Too see exemplary application (with DI, Retrolambda and all) **check out** `app` directory 
 in the repo.
 
 ## Tests
 
-Tests are available in `rxnetwork2/src/test/java/` directory and can be executed on JVM without any 
+Tests are available in `rxnetwork/src/test/java/` directory and can be executed on JVM without any 
 emulator or Android device from Android Studio or CLI with the following command:
 
 ```

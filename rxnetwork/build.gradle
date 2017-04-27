@@ -1,0 +1,64 @@
+apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
+apply plugin: 'jacoco-android'
+
+android {
+    compileSdkVersion conf.compileSdk
+    buildToolsVersion conf.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion conf.minSdk
+        targetSdkVersion conf.targetSdk
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled = true
+        }
+    }
+
+    testOptions.unitTests.all {
+        maxParallelForks = 1
+        forkEvery = 1
+        jacoco {
+            includeNoLocationClasses = true
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+        xmlReport false
+        htmlReport true
+        htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
+        xmlOutput file("$project.buildDir/reports/lint/lint-result.xml")
+    }
+}
+
+dependencies {
+    compile deps.appcompatv7
+    compile deps.supportAnnotations
+    compile deps.rxjava
+    compile deps.rxandroid
+
+    testCompile deps.junit
+    testCompile deps.robolectric
+    testCompile deps.mockwebserver
+    testCompile deps.mockitoinline
+    testCompile deps.assertj
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = conf.gradleVersion
+}
+
+jacocoAndroidUnitTestReport {
+    csv.enabled false
+    html.enabled true
+    xml.enabled true
+}
+
+apply from: rootProject.file('gradle/maven-push.gradle')

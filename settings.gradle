@@ -1,1 +1,1 @@
-include ':app', ':rxnetwork2'
+include ':app', ':rxnetwork'

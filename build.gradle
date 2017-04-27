@@ -15,9 +15,32 @@ allprojects {
     }
 }
 
+subprojects {
+    apply plugin: 'checkstyle'
+
+    checkstyle.toolVersion = '7.5'
+
+    task checkstyle(type: Checkstyle) {
+        configFile rootProject.file('checkstyle.xml')
+        source 'src/main/java'
+        ignoreFailures false
+        showViolations true
+        include '**/*.java'
+        exclude '**/gen/**'
+
+        classpath = files()
+    }
+
+    afterEvaluate {
+        check.dependsOn('checkstyle')
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+def supportLibraryVersion = '25.1.1'
 
 ext.conf = [
         minSdk           : 9,
@@ -28,19 +51,24 @@ ext.conf = [
 ]
 
 ext.deps = [
+        // Android
+        appcompatv7        : "com.android.support:appcompat-v7:$supportLibraryVersion",
+        supportAnnotations : "com.android.support:support-annotations:$supportLibraryVersion",
+        constraintLayout   : 'com.android.support.constraint:constraint-layout:1.0.2',
+
+        // Third Party
         rxjava             : 'io.reactivex.rxjava2:rxjava:2.0.5',
         rxandroid          : 'io.reactivex.rxjava2:rxandroid:2.0.1',
-        appcompatv7        : 'com.android.support:appcompat-v7:25.1.1',
-        supportannotations : 'com.android.support:support-annotations:25.1.1',
+        butterknife        : 'com.jakewharton:butterknife:8.5.1',
+        butterknifeCompiler: 'com.jakewharton:butterknife-compiler:8.5.1',
+        toothpickRuntime   : 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.5',
+        toothpickSmoothie  : 'com.github.stephanenicolas.toothpick:smoothie:1.0.5',
+        toothpickCompiler  : 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.5',
+
+        // Test dependencies
         junit              : 'junit:junit:4.12',
         robolectric        : 'org.robolectric:robolectric:3.3.2',
         mockwebserver      : 'com.squareup.okhttp3:mockwebserver:3.6.0',
         mockitoinline      : 'org.mockito:mockito-inline:2.7.6',
-        assertJ            : 'org.assertj:assertj-core:2.6.0',
-        butterknife        : 'com.jakewharton:butterknife:8.5.1',
-        butterknifeCompiler: 'com.jakewharton:butterknife-compiler:8.5.1',
-        constraintLayout   : 'com.android.support.constraint:constraint-layout:1.0.2',
-        toothpickRuntime   : 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.5',
-        toothpickSmoothie  : 'com.github.stephanenicolas.toothpick:smoothie:1.0.5',
-        toothpickCompiler  : 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.5'
+        assertj            : 'org.assertj:assertj-core:2.6.0',
 ]

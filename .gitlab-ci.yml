@@ -2,6 +2,20 @@ image: registry.gitlab.com/radekkozak/android-docker:latest
 
 before_script:
   - chmod +x ./gradlew
+  - chmod +x .scripts/deploy-website.sh
+  - git config --global user.name ${GITLAB_USER_NAME}
+  - git config --global user.email ${GITLAB_USER_EMAIL}
+
+  # run ssh-agent
+  - eval $(ssh-agent -s)
+
+  # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+  - echo "${SSH_PRIVATE_KEY}" | ssh-add -
+
+  # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
+  # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
 cache:
   paths:
@@ -12,25 +26,40 @@ stages:
   - build
   - test
   - reports
+  - gh-pages
 
 build:
   stage: build
   script:
-    - ./gradlew :rxnetwork2:clean :rxnetwork2:assembleDebug
+    - ./gradlew :rxnetwork:clean :rxnetwork:assembleDebug
+  except:
+      - gh-pages
   artifacts:
       paths:
-      - rxnetwork2/build/outputs/aar/
+      - rxnetwork/build/outputs/aar/
 
 unitTests:
   stage: test
   script:
-    - ./gradlew :rxnetwork2:jacocoTestDebugUnitTestReport
+    - ./gradlew :rxnetwork:jacocoTestDebugUnitTestReport
+  except:
+    - gh-pages
   artifacts:
       paths:
-      - rxnetwork2/build/reports/tests/
-      - rxnetwork2/build/reports/jacoco/
+      - rxnetwork/build/reports/tests/
+      - rxnetwork/build/reports/jacoco/
 
 codeCoverage:
   stage: reports
   script:
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_UPLOAD_TOKEN
+  except:
+      - gh-pages
+
+pages:
+  stage: gh-pages
+  script:
+    - "sh .scripts/deploy-website.sh"
+  only:
+    - master
+  when: on_success

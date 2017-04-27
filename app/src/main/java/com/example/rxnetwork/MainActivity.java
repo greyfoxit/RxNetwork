@@ -15,7 +15,13 @@
  */
 package com.example.rxnetwork;
 
+import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED;
+import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasCapability;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasTransport;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -28,8 +34,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import greyfox.rxnetwork2.RxNetwork;
-import greyfox.rxnetwork2.internal.net.RxNetworkInfo;
+import greyfox.rxnetwork.RxNetwork;
+import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -76,6 +82,7 @@ public class MainActivity extends Activity {
     protected Disposable rxNetworkSubscription() {
         return rxNetwork.observe()
                 .observeOn(mainThread())
+                //.filter(hasCapability(NET_CAPABILITY_NOT_METERED))
                 .subscribe(this::toastNetworkInfo, this::onError, this::onComplete);
     }
 
