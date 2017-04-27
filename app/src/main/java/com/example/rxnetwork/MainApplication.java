@@ -20,7 +20,7 @@ import static toothpick.registries.MemberInjectorRegistryLocator.setRootRegistry
 
 import android.app.Application;
 import com.example.rxnetwork.internals.di.RxNetworkModule;
-import greyfox.rxnetwork2.RxNetwork;
+import greyfox.rxnetwork.RxNetwork;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.configuration.Configuration;

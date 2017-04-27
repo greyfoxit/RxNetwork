@@ -5,7 +5,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "inc.greyfox.rxnetwork"
+        applicationId "it.greyfox.rxnetwork"
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
@@ -38,13 +38,13 @@ android {
 }
 
 dependencies {
-    compile project(':rxnetwork2')
+    compile project(':rxnetwork')
 
     compile deps.constraintLayout
     compile deps.butterknife
     compile deps.toothpickRuntime
     compile deps.toothpickSmoothie
-    compile deps.supportannotations
+    compile deps.supportAnnotations
 
     annotationProcessor deps.toothpickCompiler
     annotationProcessor deps.butterknifeCompiler
