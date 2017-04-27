@@ -15,7 +15,12 @@
  */
 package com.example.rxnetwork.internals.di;
 
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.net.NetworkRequest;
 import greyfox.rxnetwork.RxNetwork;
 import toothpick.config.Module;
 
@@ -26,7 +31,13 @@ import toothpick.config.Module;
  */
 public class RxNetworkModule extends Module {
 
+    @TargetApi(LOLLIPOP)
     public RxNetworkModule(Context context) {
-        bind(RxNetwork.class).toInstance(RxNetwork.init());
+        NetworkRequest request = new NetworkRequest.Builder()
+                .addTransportType(TRANSPORT_WIFI).build();
+
+        RxNetwork rxNetwork = RxNetwork.builder().defaultNetworkRequest(request).init(context);
+        bind(RxNetwork.class).toInstance(rxNetwork);
+        //bind(RxNetwork.class).toInstance(RxNetwork.init());
     }
 }

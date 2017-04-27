@@ -28,7 +28,7 @@ import static android.net.NetworkInfo.State.DISCONNECTED;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasCapability;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasTransport;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasTransportType;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.State.hasState;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_MOBILE;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_WIFI;
@@ -62,7 +62,7 @@ public class RxNetworkInfoPredicateTest {
     Predicate<RxNetworkInfo> VALID_STATES = hasState(CONNECTING, CONNECTED);
     Predicate<RxNetworkInfo> VALID_TYPES = hasType(TYPE_MOBILE, TYPE_WIFI);
     Predicate<RxNetworkInfo> VALID_TRANSPORT_TYPES
-            = hasTransport(TRANSPORT_CELLULAR, TRANSPORT_WIFI);
+            = hasTransportType(TRANSPORT_CELLULAR, TRANSPORT_WIFI);
     Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES
             = hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
 

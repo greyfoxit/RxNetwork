@@ -15,12 +15,15 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
+import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Context.POWER_SERVICE;
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -32,8 +35,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.PowerManager;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.BuildConfig;
 import greyfox.rxnetwork.helpers.robolectric.shadows.ShadowConnectivityManagerWithCallback;
@@ -66,6 +71,7 @@ public class MarshmallowNetworkObservingStrategyTest {
     @Mock PowerManager powerManager;
 
     RxNetworkInfo DEFAULT_RXNETWORK_INFO = RxNetworkInfo.create();
+    NetworkRequest NO_NETWORK_REQUEST = null;
 
     @Before
     public void setUp() {
@@ -76,6 +82,27 @@ public class MarshmallowNetworkObservingStrategyTest {
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithoutContext() {
         new MarshmallowNetworkObservingStrategy(null);
+    }
+
+    @Test()
+    public void shouldRegisterWithDefaultNetworkRequest() {
+        NetworkRequest DEFAULT_REQUEST = new NetworkRequest.Builder().build();
+        ConnectivityManager manager = setUpManagerWithNetworkRequest(NO_NETWORK_REQUEST);
+
+        sut.observe().subscribeWith(testObserver).assertSubscribed();
+
+        verify(manager).registerNetworkCallback(eq(DEFAULT_REQUEST), any(NetworkCallback.class));
+    }
+
+    @Test()
+    public void shouldRegisterWithCustomNetworkRequest() {
+        NetworkRequest CUSTOM_REQUEST = new NetworkRequest.Builder()
+                .addTransportType(TRANSPORT_WIFI).build();
+        ConnectivityManager manager = setUpManagerWithNetworkRequest(CUSTOM_REQUEST);
+
+        sut.observe().subscribeWith(testObserver).assertSubscribed();
+
+        verify(manager).registerNetworkCallback(eq(CUSTOM_REQUEST), any(NetworkCallback.class));
     }
 
     @Test
@@ -165,5 +192,17 @@ public class MarshmallowNetworkObservingStrategyTest {
         doReturn(isIdle).when(powerManager).isDeviceIdleMode();
         doReturn(powerManager).when(context).getSystemService(POWER_SERVICE);
         sut = spy(new MarshmallowNetworkObservingStrategy(context));
+    }
+
+    private ConnectivityManager setUpManagerWithNetworkRequest(@Nullable
+            NetworkRequest networkRequest) {
+
+        ConnectivityManager manager = mock(ConnectivityManager.class);
+        doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+
+        sut = spy(networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
+                : new MarshmallowNetworkObservingStrategy(context, networkRequest));
+
+        return manager;
     }
 }

@@ -20,6 +20,7 @@ import static android.support.annotation.VisibleForTesting.PRIVATE;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 import android.content.Context;
+import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.ArraySet;
@@ -29,7 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * RxNetwork's built-in providers of network observing strategies.
+ * RxNetwork's built-in providers for network observing strategies.
  *
  * @author Radek Kozak
  */
@@ -37,6 +38,7 @@ public final class BuiltInNetworkObservingStrategyProviders implements
         ObservingStrategyProviders<NetworkObservingStrategyProvider> {
 
     private final Context context;
+    private NetworkRequest networkRequest;
 
     @VisibleForTesting(otherwise = PRIVATE)
     BuiltInNetworkObservingStrategyProviders() {
@@ -45,6 +47,12 @@ public final class BuiltInNetworkObservingStrategyProviders implements
 
     public BuiltInNetworkObservingStrategyProviders(@NonNull Context context) {
         this.context = checkNotNull(context, "context == null");
+    }
+
+    public BuiltInNetworkObservingStrategyProviders(@NonNull Context context,
+            @NonNull NetworkRequest networkRequest) {
+        this(context);
+        this.networkRequest = checkNotNull(networkRequest, "networkRequest");
     }
 
     /**
@@ -57,8 +65,14 @@ public final class BuiltInNetworkObservingStrategyProviders implements
         Collection<NetworkObservingStrategyProvider> collection = new ArraySet<>();
 
         collection.add(new PreLollipopNetworkObservingStrategyProvider(context));
-        collection.add(new LollipopNetworkObservingStrategyProvider(context));
-        collection.add(new MarshmallowNetworkObservingStrategyProvider(context));
+
+        collection.add(networkRequest == null
+                ? new LollipopNetworkObservingStrategyProvider(context)
+                : new LollipopNetworkObservingStrategyProvider(context, networkRequest));
+
+        collection.add(networkRequest == null
+                ? new MarshmallowNetworkObservingStrategyProvider(context)
+                : new MarshmallowNetworkObservingStrategyProvider(context, networkRequest));
 
         return Collections.unmodifiableCollection(collection);
     }

@@ -58,7 +58,7 @@ public class PreLollipopNetworkObservingStrategyTest {
     public void setUp() {
         context = spy(RuntimeEnvironment.application.getApplicationContext());
         sut = spy(new PreLollipopNetworkObservingStrategy(context));
-        VALID_RXNETWORK_INFO = RxNetworkInfoHelper.getNetworkInfoFrom(context);
+        VALID_RXNETWORK_INFO = RxNetworkInfoHelper.getRxNetworkInfoFrom(context);
     }
 
     @Test(expected = NullPointerException.class)

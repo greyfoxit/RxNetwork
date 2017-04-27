@@ -23,10 +23,12 @@ import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_C
 
 import android.content.Context;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
+import greyfox.rxnetwork.internal.strategy.ObservingStrategyProviders;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
@@ -37,11 +39,10 @@ import greyfox.rxnetwork.internal.strategy.network.factory.BuiltInNetworkObservi
 import greyfox.rxnetwork.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import java.util.Collection;
 
 /**
  * RxNetwork is a class that listens to network connectivity changes in a reactive manner.
- * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood to along
+ * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood along
  * with provider mechanism to choose concrete, api-level dependent {@link NetworkObservingStrategy strategy}
  * for observing network connectivity changes.
  * <p>
@@ -71,6 +72,7 @@ public final class RxNetwork {
     @Nullable private final Scheduler scheduler;
     @NonNull private final NetworkObservingStrategy networkObservingStrategy;
     @NonNull private final InternetObservingStrategy internetObservingStrategy;
+    @Nullable private final NetworkRequest networkRequest;
 
     @VisibleForTesting(otherwise = PRIVATE)
     RxNetwork() {
@@ -83,6 +85,7 @@ public final class RxNetwork {
         this.scheduler = builder.scheduler;
         this.networkObservingStrategy = builder.networkObservingStrategy;
         this.internetObservingStrategy = builder.internetObservingStrategy;
+        this.networkRequest = builder.networkRequest;
     }
 
     @NonNull
@@ -109,6 +112,11 @@ public final class RxNetwork {
     @NonNull
     public InternetObservingStrategy internetObservingStrategy() {
         return this.internetObservingStrategy;
+    }
+
+    @Nullable
+    public NetworkRequest networkRequest() {
+        return this.networkRequest;
     }
 
     /**
@@ -177,6 +185,7 @@ public final class RxNetwork {
         private Scheduler scheduler;
         private NetworkObservingStrategy networkObservingStrategy;
         private InternetObservingStrategy internetObservingStrategy;
+        private NetworkRequest networkRequest;
 
         public Builder defaultScheduler(@NonNull Scheduler scheduler) {
             this.scheduler = checkNotNull(scheduler, "scheduler");
@@ -209,16 +218,17 @@ public final class RxNetwork {
             return this;
         }
 
+        public Builder defaultNetworkRequest(@NonNull NetworkRequest networkRequest) {
+            this.networkRequest = checkNotNull(networkRequest, "networkRequest");
+            return this;
+        }
+
         @NonNull
         public RxNetwork init(@NonNull Context context) {
             checkNotNull(context, "Cannot initialize RxNetwork with null context");
 
             if (networkObservingStrategy == null) {
-                final Collection<NetworkObservingStrategyProvider> providers
-                        = new BuiltInNetworkObservingStrategyProviders(context).get();
-
-                networkObservingStrategy = BuiltInNetworkObservingStrategyFactory
-                        .create(providers).get();
+                getNetworkObservingStrategy(context);
             }
 
             return init();
@@ -231,6 +241,16 @@ public final class RxNetwork {
             }
 
             return new RxNetwork(this);
+        }
+
+        private NetworkObservingStrategy getNetworkObservingStrategy(@NonNull Context context) {
+            final ObservingStrategyProviders<NetworkObservingStrategyProvider> providers
+                    = (networkRequest == null)
+                    ? new BuiltInNetworkObservingStrategyProviders(context)
+                    : new BuiltInNetworkObservingStrategyProviders(context, networkRequest);
+
+            return networkObservingStrategy = BuiltInNetworkObservingStrategyFactory
+                    .create(providers.get()).get();
         }
     }
 }

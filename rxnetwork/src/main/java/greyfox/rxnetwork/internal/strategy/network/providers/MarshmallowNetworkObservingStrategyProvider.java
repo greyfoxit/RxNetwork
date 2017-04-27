@@ -17,14 +17,13 @@ package greyfox.rxnetwork.internal.strategy.network.providers;
 
 import static android.os.Build.VERSION_CODES.M;
 
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static greyfox.rxnetwork.internal.os.Build.isAtLeastMarshmallow;
 
 import android.content.Context;
+import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork.internal.strategy.network.impl.MarshmallowNetworkObservingStrategy;
 
 /**
@@ -33,12 +32,16 @@ import greyfox.rxnetwork.internal.strategy.network.impl.MarshmallowNetworkObserv
  * @author Radek Kozak
  */
 final class MarshmallowNetworkObservingStrategyProvider
-        implements NetworkObservingStrategyProvider {
-
-    private final Context context;
+        extends Api21NetworkObservingStrategyProvider {
 
     MarshmallowNetworkObservingStrategyProvider(@NonNull Context context) {
-        this.context = checkNotNull(context, "context");
+        super(context);
+    }
+
+    MarshmallowNetworkObservingStrategyProvider(@NonNull Context context,
+            @NonNull NetworkRequest networkRequest) {
+
+        super(context, networkRequest);
     }
 
     @Override
@@ -49,6 +52,7 @@ final class MarshmallowNetworkObservingStrategyProvider
     @Override
     @RequiresApi(M)
     public NetworkObservingStrategy provide() {
-        return new MarshmallowNetworkObservingStrategy(context);
+        return networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
+                : new MarshmallowNetworkObservingStrategy(context, networkRequest);
     }
 }

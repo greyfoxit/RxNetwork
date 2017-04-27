@@ -80,7 +80,7 @@ public class PreLollipopNetworkObservingStrategy extends BaseNetworkObservingStr
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    emitter.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(context));
+                    emitter.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(context));
                 }
             };
             emitter.setCancellable(new StrategyCancellable());

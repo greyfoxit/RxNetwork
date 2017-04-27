@@ -15,7 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
-import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
@@ -26,6 +25,7 @@ import android.net.ConnectivityManager.NetworkCallback;
 import android.net.Network;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.net.RxNetworkInfoHelper;
@@ -43,11 +43,19 @@ import java.util.logging.Logger;
 public class LollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
 
     private final ConnectivityManager manager;
+    @Nullable private NetworkRequest networkRequest;
     private NetworkCallback networkCallback;
 
     public LollipopNetworkObservingStrategy(@NonNull Context context) {
         checkNotNull(context, "context");
         manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    public LollipopNetworkObservingStrategy(@NonNull Context context,
+            @NonNull NetworkRequest networkRequest) {
+
+        this(context);
+        this.networkRequest = checkNotNull(networkRequest, "network request");
     }
 
     @Override
@@ -56,7 +64,8 @@ public class LollipopNetworkObservingStrategy extends BaseNetworkObservingStrate
     }
 
     private void register() {
-        NetworkRequest request = new NetworkRequest.Builder().addTransportType(TRANSPORT_CELLULAR).build();
+        NetworkRequest request = networkRequest != null
+                ? networkRequest : new NetworkRequest.Builder().build();
         manager.registerNetworkCallback(request, networkCallback);
     }
 
@@ -81,12 +90,12 @@ public class LollipopNetworkObservingStrategy extends BaseNetworkObservingStrate
             networkCallback = new NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
-                    emitter.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
+                    emitter.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(network, manager));
                 }
 
                 @Override
                 public void onLost(Network network) {
-                    emitter.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, manager));
+                    emitter.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(network, manager));
                 }
             };
             emitter.setCancellable(new StrategyCancellable());

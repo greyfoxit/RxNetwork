@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.net.NetworkRequest;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
@@ -55,6 +56,7 @@ public class RxNetworkTest {
     @Mock InternetObservingStrategyFactory CUSTOM_INTERNET_STRATEGY_FACTORY;
     @Mock Observable<RxNetworkInfo> VALID_NETWORK_OBSERVABLE;
     @Mock Observable<Boolean> VALID_INTERNET_OBSERVABLE;
+    @Mock NetworkRequest CUSTOM_NETWORK_REQUEST;
 
     @Before
     public void setUp() throws Exception {
@@ -136,6 +138,14 @@ public class RxNetworkTest {
                 .init(context);
 
         assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(CUSTOM_INTERNET_STRATEGY);
+    }
+
+    @Test
+    public void shouldInitWithCustomNetworkRequest() {
+        sut = RxNetwork.builder().defaultNetworkRequest(CUSTOM_NETWORK_REQUEST)
+                .init(context);
+
+        assertThat(sut.networkRequest()).isNotNull().isEqualTo(CUSTOM_NETWORK_REQUEST);
     }
 
     @Test

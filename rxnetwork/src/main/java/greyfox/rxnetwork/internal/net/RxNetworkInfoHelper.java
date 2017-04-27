@@ -29,6 +29,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
 import java.util.logging.Logger;
@@ -38,12 +39,15 @@ import java.util.logging.Logger;
  *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
 public final class RxNetworkInfoHelper {
 
     private static final Logger logger = getLogger(RxNetworkInfoHelper.class.getSimpleName());
 
     @VisibleForTesting(otherwise = PRIVATE)
-    RxNetworkInfoHelper() {
+    RxNetworkInfoHelper()
+
+    {
         throw new AssertionError("No instances.");
     }
 
@@ -54,7 +58,7 @@ public final class RxNetworkInfoHelper {
      *
      * @return {@link RxNetworkInfo} instance
      */
-    public static RxNetworkInfo getNetworkInfoFrom(@NonNull final Context context) {
+    public static RxNetworkInfo getRxNetworkInfoFrom(@NonNull final Context context) {
         checkNotNull(context, "context");
 
         final ConnectivityManager manager = (ConnectivityManager) context
@@ -75,32 +79,51 @@ public final class RxNetworkInfoHelper {
      * @return {@link RxNetworkInfo} instance
      */
     @RequiresApi(LOLLIPOP)
-    public static RxNetworkInfo getNetworkInfoFrom(@NonNull Network network,
+    public static RxNetworkInfo getRxNetworkInfoFrom(@NonNull Network network,
             @NonNull ConnectivityManager connectivityManager) {
 
         checkNotNull(network, "network");
         checkNotNull(connectivityManager, "manager");
 
-        NetworkInfo networkInfo = null;
+        final NetworkInfo networkInfo = getNetworkInfo(network, connectivityManager);
+        final NetworkCapabilities networkCapabilities
+                = getNetworkCapabilities(network, connectivityManager);
+
+        return networkInfo != null ? RxNetworkInfo.builderFrom(networkInfo)
+                .networkCapabilities(networkCapabilities).build() : RxNetworkInfo.create();
+    }
+
+    @RequiresApi(LOLLIPOP)
+    @Nullable
+    private static NetworkCapabilities getNetworkCapabilities(@NonNull Network network,
+            @NonNull ConnectivityManager connectivityManager) {
+
         NetworkCapabilities networkCapabilities = null;
+
+        try {
+            networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+        } catch (Exception exc) {
+            logger.log(WARNING, "Could not retrieve network capabilities from provided network: "
+                    + exc.getMessage());
+        }
+
+        return networkCapabilities;
+    }
+
+    @RequiresApi(LOLLIPOP)
+    @Nullable
+    private static NetworkInfo getNetworkInfo(@NonNull Network network,
+            @NonNull ConnectivityManager connectivityManager) {
+
+        NetworkInfo networkInfo = null;
+
         try {
             networkInfo = connectivityManager.getNetworkInfo(network);
-            networkCapabilities = connectivityManager.getNetworkCapabilities(network);
-        } catch (Exception e) {
+        } catch (Exception exc) {
             logger.log(WARNING, "Could not retrieve network info from provided network: "
-                    + e.getMessage());
+                    + exc.getMessage());
         }
 
-        final RxNetworkInfo rxNetworkInfo;
-
-        if (networkInfo != null) {
-            RxNetworkInfo.Builder builder = RxNetworkInfo.builderFrom(networkInfo);
-            if (networkCapabilities != null) builder.networkCapabilities(networkCapabilities);
-            rxNetworkInfo = builder.build();
-        } else {
-            rxNetworkInfo = RxNetworkInfo.create();
-        }
-
-        return rxNetworkInfo;
+        return networkInfo;
     }
 }
