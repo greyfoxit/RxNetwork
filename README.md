@@ -31,7 +31,7 @@ the options. Whichever approach you choose it's up to you.
 
 - [What's different](#whats-different)
 - [Usage](#usage)
-- [Rx<sup>2</sup>Network configuration](#rx2network-configuration)
+- [Configuration](#configuration)
   - [Initialization](#initialization)
   - [Advanced configuration](#advanced-configuration)
     - [Default scheduler](#default-scheduler)
@@ -123,7 +123,7 @@ Snapshots of the development version are available in [Sonatype's `snapshots` re
 [jar]: https://search.maven.org/remote_content?g=inc.greyfox.rxnetwork&a=rxnetwork&v=LATEST
 [snap]: https://oss.sonatype.org/content/repositories/snapshots
 
-## Rx<sup>2</sup>Network configuration
+## Configuration
 
 [`RxNetwork`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/RxNetwork.java) 
 is the main class via which you can subscribe to available observables. By default library tries to 
