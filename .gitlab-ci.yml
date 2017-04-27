@@ -33,7 +33,7 @@ build:
   script:
     - ./gradlew :rxnetwork:clean :rxnetwork:assembleDebug
   except:
-      - gh-pages
+      - pages
   artifacts:
       paths:
       - rxnetwork/build/outputs/aar/
@@ -43,7 +43,7 @@ unitTests:
   script:
     - ./gradlew :rxnetwork:jacocoTestDebugUnitTestReport
   except:
-    - gh-pages
+    - pages
   artifacts:
       paths:
       - rxnetwork/build/reports/tests/
@@ -54,7 +54,7 @@ codeCoverage:
   script:
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_UPLOAD_TOKEN
   except:
-      - gh-pages
+      - pages
 
 pages:
   stage: gh-pages
