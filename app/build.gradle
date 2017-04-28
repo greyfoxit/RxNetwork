@@ -2,14 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion conf.compileSdk
+    buildToolsVersion conf.buildToolsVersion
     defaultConfig {
         applicationId "it.greyfox.rxnetwork"
-        minSdkVersion 9
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion conf.minSdk
+        targetSdkVersion conf.targetSdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {

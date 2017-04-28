@@ -41,12 +41,14 @@ task clean(type: Delete) {
 }
 
 def supportLibraryVersion = '25.1.1'
+def toothpickVersion = '1.0.5'
+def butterknifeVersion = '8.5.1'
 
 ext.conf = [
         minSdk           : 9,
         compileSdk       : 25,
         targetSdk        : 25,
-        buildToolsVersion: '25.0.2',
+        buildToolsVersion: '25.0.3',
         gradleVersion    : '3.3'
 ]
 
@@ -59,11 +61,11 @@ ext.deps = [
         // Third Party
         rxjava             : 'io.reactivex.rxjava2:rxjava:2.0.5',
         rxandroid          : 'io.reactivex.rxjava2:rxandroid:2.0.1',
-        butterknife        : 'com.jakewharton:butterknife:8.5.1',
-        butterknifeCompiler: 'com.jakewharton:butterknife-compiler:8.5.1',
-        toothpickRuntime   : 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.5',
-        toothpickSmoothie  : 'com.github.stephanenicolas.toothpick:smoothie:1.0.5',
-        toothpickCompiler  : 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.5',
+        butterknife        : "com.jakewharton:butterknife:$butterknifeVersion",
+        butterknifeCompiler: "com.jakewharton:butterknife-compiler:$butterknifeVersion",
+        toothpickRuntime   : "com.github.stephanenicolas.toothpick:toothpick-runtime:$toothpickVersion",
+        toothpickSmoothie  : "com.github.stephanenicolas.toothpick:smoothie:$toothpickVersion",
+        toothpickCompiler  : "com.github.stephanenicolas.toothpick:toothpick-compiler:$toothpickVersion",
 
         // Test dependencies
         junit              : 'junit:junit:4.12',

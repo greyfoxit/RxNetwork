@@ -14,8 +14,8 @@ application that supports **minSdk = 9** (`Android 2.3 Gingerbread` and up)
 ## Introduction
 
 Rx<sup>2</sup>Network library contains **easy-to-follow API** for observing network connectivity and
-real internet access to give you simple and unified way of getting always current connection status 
-for your projects.
+internet access to give you simple and unified way of getting always current connection status for 
+your projects.
 
 The library is a re-hash of popular [Reactive Network](https://github.com/pwittchen/ReactiveNetwork)
 lib but it uses distinctively different architectural approach while at the same time leaving 
