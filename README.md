@@ -210,7 +210,7 @@ public class ExampleActivity extends Activity {
 laying around in observing methods (or without the headache of dragging it along as a chaperon)
 *it can be anywhere* 
 
-The possibility though of simple inlining within any context-aware place still exists:
+The **possibility** though **of simple inlining** within any context-aware place **still exists**:
 
 ```java
 import android.support.v4.app.Fragment;
@@ -229,6 +229,14 @@ public class ExampleFragment extends Fragment {
 
 but we must say that we advise against it and strongly recommend DI approach - if not only for the
 sake of your testing (which we hope you do anyway) 
+
+**Lastly**, there is one more convenience: 
+
+**you can omit passing** `Context` entirely when initializing RxNetwork  **if you decide you'll be 
+using real internet access observing only or when providing your own network observing strategy 
+factory**. Just use an empty `RxNetwork.init()` and be done with it. Bare in mind though you won't 
+be able to use built-in network observing methods unless you pass network observing strategy ad-hoc 
+or via factory or initialize RxNetwork with proper `Context`
 
 Too see exemplary application (with DI, Retrolambda and all) **check out** `app` directory 
 in the repo.
@@ -251,16 +259,15 @@ subscription**. This will override provided default for that call while still le
 #### Custom strategies
 
 It is perfectly possible that for your observing needs you would want to use your own strategies
-as your defaults. For that you can use following builder methods:
+as your defaults. For that you can use following builder methods to set up RxNetwork library 
+for your own implementations:
 
 ```java
 RxNetwork.builder()
     .networkObservingStrategy(new YourCustomNetworkObservingStrategy())
     .internetObservingStrategy(new YourCustomInternetObservingStrategy())
     .init(this);
-```
-
-This will set up RxNetwork library for your own implementations that you will use later. 
+``` 
 
 #### Custom factory
 
@@ -371,8 +378,8 @@ rxNetwork.observe()
 ```
 
 This is just to give you idea of what's possible. From here forward we'll assume default `Scheduler` 
-has been already set and we'll be using lambdas and method references whenever possible just for 
-the sake of brevity.
+has been already set and we'll be using lambdas and method references whenever possible for the sake 
+of brevity.
 
 #### Simple observing
 
@@ -432,8 +439,8 @@ For two types that would probably be mostly used: *wifi* and *mobile* we also pr
 shortcuts:
 
 ```java
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_MOBILE;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_WIFI;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_MOBILE;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_WIFI;
 
 (...)
 
@@ -446,8 +453,8 @@ rxNetwork.observe()
 Same goes for the two most interested states:
 
 ```java
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.State.IS_CONNECTED;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.State.IS_DISCONNECTED;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.State.IS_CONNECTED;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.State.IS_DISCONNECTED;
 
 (...)
 

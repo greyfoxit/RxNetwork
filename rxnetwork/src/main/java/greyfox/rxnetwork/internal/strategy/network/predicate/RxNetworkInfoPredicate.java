@@ -38,10 +38,10 @@ import java.util.Arrays;
  */
 @SuppressWarnings("WeakerAccess")
 @RestrictTo(LIBRARY_GROUP)
-public final class RxNetworkPredicate {
+public final class RxNetworkInfoPredicate {
 
     @VisibleForTesting(otherwise = PRIVATE)
-    RxNetworkPredicate() {
+    RxNetworkInfoPredicate() {
         throw new AssertionError("No instances.");
     }
 

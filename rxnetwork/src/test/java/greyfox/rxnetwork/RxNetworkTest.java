@@ -22,7 +22,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.app.Application;
+import android.content.Context;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
@@ -47,7 +47,7 @@ public class RxNetworkTest {
     Scheduler CUSTOM_SCHEDULER = Schedulers.trampoline();
     RxNetwork sut;
 
-    @Mock Application application;
+    @Mock Context context;
     @Mock greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
     @Mock NetworkObservingStrategyFactory CUSTOM_NETWORK_STRATEGY_FACTORY;
     @Mock InternetObservingStrategy CUSTOM_INTERNET_STRATEGY;
@@ -56,7 +56,8 @@ public class RxNetworkTest {
 
     @Before
     public void setUp() throws Exception {
-        sut = RxNetwork.init(application);
+        doReturn(context).when(context).getApplicationContext();
+        sut = RxNetwork.init(context);
     }
 
     @Test(expected = AssertionError.class)
@@ -70,8 +71,17 @@ public class RxNetworkTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInitializeWithNullApplication() {
+    public void shouldThrow_whenTryingToInitializeWithNullContext() {
         RxNetwork.builder().init(null);
+    }
+
+    @Test
+    public void shouldInitWithInternetObservingStrategyOnly_whenInitializedWithoutContext() {
+        sut = RxNetwork.builder().init();
+
+        assertThat((sut.networkObservingStrategy())).isNull();
+        assertThat(sut.internetObservingStrategy()).isNotNull()
+                .isInstanceOf(BuiltInInternetObservingStrategy.class);
     }
 
     @Test
@@ -85,7 +95,7 @@ public class RxNetworkTest {
 
     @Test
     public void shouldInitWithCustomScheduler() {
-        sut = RxNetwork.builder().defaultScheduler(CUSTOM_SCHEDULER).init(application);
+        sut = RxNetwork.builder().defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
         assertThat(sut.scheduler()).isNotNull().isEqualTo(CUSTOM_SCHEDULER);
     }
@@ -95,7 +105,7 @@ public class RxNetworkTest {
         when(CUSTOM_NETWORK_STRATEGY_FACTORY.get()).thenReturn(CUSTOM_NETWORK_STRATEGY);
 
         sut = RxNetwork.builder().networkObservingStrategyFactory(CUSTOM_NETWORK_STRATEGY_FACTORY)
-                .init(application);
+                .init(context);
 
         assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(CUSTOM_NETWORK_STRATEGY);
     }
@@ -103,7 +113,7 @@ public class RxNetworkTest {
     @Test
     public void shouldInitWithCustomNetworkObservingStrategy() {
         sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
-                .init(application);
+                .init(context);
 
         assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(CUSTOM_NETWORK_STRATEGY);
     }
@@ -111,7 +121,7 @@ public class RxNetworkTest {
     @Test
     public void shouldInitWithCustomInternetObservingStrategy() {
         sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
-                .init(application);
+                .init(context);
 
         assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(CUSTOM_INTERNET_STRATEGY);
     }
@@ -180,20 +190,20 @@ public class RxNetworkTest {
 
     @Test
     public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy() {
-        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(application);
+        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(context);
 
         sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
-                .init(application);
+                .init(context);
 
         sut.observe(CUSTOM_NETWORK_STRATEGY).test().assertSubscribed();
     }
 
     @Test
     public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy_andScheduler() {
-        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(application);
+        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(context);
 
         sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
-                .defaultScheduler(CUSTOM_SCHEDULER).init(application);
+                .defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
         sut.observe(CUSTOM_NETWORK_STRATEGY).test().assertSubscribed();
     }
@@ -203,7 +213,7 @@ public class RxNetworkTest {
         CUSTOM_INTERNET_STRATEGY = SocketInternetObservingStrategy.create();
 
         sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
-                .init(application);
+                .init(context);
 
         sut.observeReal(CUSTOM_INTERNET_STRATEGY).test().assertSubscribed();
     }
@@ -213,7 +223,7 @@ public class RxNetworkTest {
         CUSTOM_INTERNET_STRATEGY = SocketInternetObservingStrategy.create();
 
         sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
-                .defaultScheduler(CUSTOM_SCHEDULER).init(application);
+                .defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
         sut.observeReal(CUSTOM_INTERNET_STRATEGY).test().assertSubscribed();
     }

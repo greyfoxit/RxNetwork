@@ -3,10 +3,6 @@ package greyfox.rxnetwork.internal.strategy.network.impl;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Context.POWER_SERVICE;
 import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
-import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED;
-import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_VPN;
-import static android.net.NetworkCapabilities.NET_CAPABILITY_WIFI_P2P;
-import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.os.Build.VERSION_CODES.M;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;

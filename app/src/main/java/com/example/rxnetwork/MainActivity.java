@@ -15,13 +15,7 @@
  */
 package com.example.rxnetwork;
 
-import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED;
-import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
-import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
-
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasCapability;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasTransport;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 

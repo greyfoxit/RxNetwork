@@ -26,7 +26,8 @@ import android.support.annotation.VisibleForTesting;
 /**
  * Static convenience methods that help a method or constructor check whether it was invoked
  * correctly (whether its <i>preconditions</i> have been met). In the case of {@code
- * checkNotNull}, an object reference which is expected to be non-null). When {@code false} (or
+ * checkNotNullWithMessage}, an object reference which is expected to be non-null). When {@code
+ * false} (or
  * {@code null}) is passed instead, the {@code Preconditions} method throws an unchecked exception,
  * which helps the calling method communicate to <i>its</i> caller that <i>that</i> caller has made
  * a mistake.
@@ -72,17 +73,34 @@ public final class Preconditions {
     /**
      * Ensures that an object reference passed as a parameter to the calling method is not null.
      *
-     * @param reference    an object reference
-     * @param errorMessage printf-style template for the exception message should the check fail
-     * @param errorArgs    arguments to be substituted into the message template. Arguments are
-     *                     converted to strings using String.valueOf(Object)
+     * @param reference an object reference
+     * @param message   exception message should the check fail
      *
      * @return the non-null reference that was validated
      *
      * @throws NullPointerException if {@code reference} is null
      */
-    public static <T> T checkNotNull(T reference, String errorMessage, Object... errorArgs) {
-        if (reference == null) throw new NullPointerException(format(errorMessage, errorArgs));
+    public static <T> T checkNotNullWithMessage(T reference, String message) {
+
+        if (reference == null) throw new NullPointerException(message);
+        return reference;
+    }
+
+    /**
+     * Ensures that an object reference passed as a parameter to the calling method is not null.
+     *
+     * @param reference     an object reference
+     * @param messageFormat exception message as described in
+     *                      <a href="../util/Formatter.html#syntax">format string</a>
+     * @param args          arguments referenced by the {@code messageFormat} specifiers
+     *
+     * @return the non-null reference that was validated
+     *
+     * @throws NullPointerException if {@code reference} is null
+     */
+    public static <T> T checkNotNullWithMessage(T reference, String messageFormat, Object... args) {
+
+        if (reference == null) throw new NullPointerException(format(messageFormat, args));
         return reference;
     }
 }

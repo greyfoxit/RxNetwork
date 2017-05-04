@@ -53,7 +53,7 @@ public class PreconditionsTest {
 
     @Test
     public void checkNotNull_withErrorMessageTemplate_shouldBeValid() {
-        String result = checkNotNull(NON_NULL_ARG, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
+        String result = Preconditions.checkNotNullWithMessage(NON_NULL_ARG, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
         assertThat(NON_NULL_ARG).isEqualTo(result);
     }
 
@@ -70,7 +70,7 @@ public class PreconditionsTest {
     @Test
     public void checkNotNull_shouldThrow_withCorrectErrorMessageFromTemplate() {
         try {
-            checkNotNull(null, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
+            Preconditions.checkNotNullWithMessage(null, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
             fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             assertThat(npe).hasMessage(ERROR_MESSAGE_RESULT);

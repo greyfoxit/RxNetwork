@@ -27,12 +27,12 @@ import static android.net.NetworkInfo.State.CONNECTING;
 import static android.net.NetworkInfo.State.DISCONNECTED;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasCapability;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Capabilities.hasTransport;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.State.hasState;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_MOBILE;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.IS_WIFI;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkPredicate.Type.hasType;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasCapability;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasTransport;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.State.hasState;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_MOBILE;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_WIFI;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.hasType;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -55,7 +55,7 @@ import org.robolectric.annotation.Config;
 @SuppressWarnings("WeakerAccess")
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = LOLLIPOP)
-public class RxNetworkPredicateTest {
+public class RxNetworkInfoPredicateTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
 
@@ -71,24 +71,24 @@ public class RxNetworkPredicateTest {
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiate() {
-        new RxNetworkPredicate();
+        new RxNetworkInfoPredicate();
     }
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateState() {
-        new RxNetworkPredicate.State();
+        new RxNetworkInfoPredicate.State();
     }
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateType() {
-        new RxNetworkPredicate.Type();
+        new RxNetworkInfoPredicate.Type();
     }
 
     @RequiresApi(api = LOLLIPOP)
     @Config(sdk = LOLLIPOP)
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateCapabilities() {
-        new RxNetworkPredicate.Capabilities();
+        new RxNetworkInfoPredicate.Capabilities();
     }
 
     @Test

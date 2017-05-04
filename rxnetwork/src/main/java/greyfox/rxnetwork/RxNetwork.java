@@ -18,9 +18,10 @@ package greyfox.rxnetwork;
 import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.common.base.Preconditions.checkNotNullWithMessage;
 import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
 
-import android.app.Application;
+import android.content.Context;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -84,9 +85,13 @@ public final class RxNetwork {
     }
 
     @NonNull
-    public static RxNetwork init(@NonNull Application application) {
-        checkNotNull(application, "Cannot initialize RxNetwork with null application");
-        return builder().init(application);
+    public static RxNetwork init(@NonNull Context context) {
+        return builder().init(context.getApplicationContext());
+    }
+
+    @NonNull
+    public static RxNetwork init() {
+        return builder().init();
     }
 
     @NonNull
@@ -126,7 +131,8 @@ public final class RxNetwork {
      */
     @NonNull
     public Observable<RxNetworkInfo> observe(@NonNull NetworkObservingStrategy strategy) {
-        checkNotNull(strategy, "strategy");
+        checkNotNullWithMessage(strategy, "Please provide network observing strategy or initialize"
+                + " RxNetwork with proper Context to use the default one");
         final Observable<RxNetworkInfo> observable = strategy.observe();
         if (scheduler != null) observable.subscribeOn(scheduler);
         return observable;
@@ -159,7 +165,7 @@ public final class RxNetwork {
      */
     @NonNull
     public Observable<Boolean> observeReal(@NonNull InternetObservingStrategy strategy) {
-        checkNotNull(strategy, "strategy");
+        checkNotNull(strategy, "internet observing strategy");
         final Observable<Boolean> observable = strategy.observe();
         if (scheduler != null) observable.subscribeOn(scheduler);
         return observable;
@@ -177,7 +183,7 @@ public final class RxNetwork {
         }
 
         public Builder networkObservingStrategy(@NonNull NetworkObservingStrategy strategy) {
-            networkObservingStrategy = checkNotNull(strategy, "strategy");
+            networkObservingStrategy = checkNotNull(strategy, "network observing strategy");
             return this;
         }
 
@@ -190,22 +196,27 @@ public final class RxNetwork {
         }
 
         public Builder internetObservingStrategy(@NonNull InternetObservingStrategy strategy) {
-            this.internetObservingStrategy = checkNotNull(strategy, "strategy");
+            this.internetObservingStrategy = checkNotNull(strategy, "internet observing strategy");
             return this;
         }
 
         @NonNull
-        public RxNetwork init(@NonNull Application application) {
-            checkNotNull(application, "Cannot initialize RxNetwork with null application");
+        public RxNetwork init(@NonNull Context context) {
+            checkNotNull(context, "Cannot initialize RxNetwork with null context");
 
             if (networkObservingStrategy == null) {
                 final Collection<NetworkObservingStrategyProvider> providers
-                        = new BuiltInNetworkObservingStrategyProviders(application).get();
+                        = new BuiltInNetworkObservingStrategyProviders(context).get();
 
-                networkObservingStrategy = BuiltInNetworkObservingStrategyFactory.create(providers)
-                        .get();
+                networkObservingStrategy = BuiltInNetworkObservingStrategyFactory
+                        .create(providers).get();
             }
 
+            return init();
+        }
+
+        @NonNull
+        public RxNetwork init() {
             if (internetObservingStrategy == null) {
                 internetObservingStrategy = BuiltInInternetObservingStrategy.create();
             }
