@@ -269,12 +269,14 @@ RxNetwork.builder()
     .init(this);
 ``` 
 
-#### Custom factory
+#### Custom factories
 
 Perhaps you may decide to tinker even more with initial configuration. Say you would like to use 
 your own factory that in turn would take care of picking up concrete strategy based on some 
 provision mechanism of your own (this is exactly what RxNetwork does under the hood). Well, good 
-news. With RxNetwork this is possible as well. Just do as below:
+news. With RxNetwork this is possible as well. Just do as below
+
+for network observing strategy:
 
 ```java
 RxNetwork.builder()
@@ -282,13 +284,22 @@ RxNetwork.builder()
     .init(this);
 ```
 
+and for the sake of code symmetry there is also one for internet observing strategy:
+
+```java
+RxNetwork.builder()
+    .internetObservingStrategyFactory(new YourCustomInternetObservingStrategyFactory())
+    .init(this);
+```
+
 Right now you're probably wondering: *what are all those different classes ?* Well, we're glad you 
 asked. Simple. Just the couple of basic, self explanatory interfaces you need to implement in case 
 you'd like to use your own observing strategies. If you want you can have a look:
 
-- [`InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategy.java)
-- [`NetworkObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategyFactory.java)
-- [`NetworkObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/InternetObservingStrategy.java)
+- [`NetworkObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategy.java)
+- [`NetworkObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategyFactory.java)
+- [`InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/InternetObservingStrategy.java)
+- [`InternetObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/InternetObservingStrategyFactory.java)
 
 but other than that, in most situations, you can forget it all and roll happily with defaults 
 without all the fuss.

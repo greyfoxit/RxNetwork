@@ -28,6 +28,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
+import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyFactory;
@@ -40,8 +41,8 @@ import java.util.Collection;
 
 /**
  * RxNetwork is a class that listens to network connectivity changes in a reactive manner.
- * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood to
- * provide concrete, api-level dependent {@link NetworkObservingStrategy strategy}
+ * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood to along
+ * with provider mechanism to choose concrete, api-level dependent {@link NetworkObservingStrategy strategy}
  * for observing network connectivity changes.
  * <p>
  * Custom factory can be used by simply implementing {@link NetworkObservingStrategyFactory}
@@ -190,13 +191,21 @@ public final class RxNetwork {
         public Builder networkObservingStrategyFactory(
                 @NonNull NetworkObservingStrategyFactory factory) {
 
-            checkNotNull(factory, "factory");
+            checkNotNull(factory, "network observing strategy factory");
             networkObservingStrategy = factory.get();
             return this;
         }
 
         public Builder internetObservingStrategy(@NonNull InternetObservingStrategy strategy) {
             this.internetObservingStrategy = checkNotNull(strategy, "internet observing strategy");
+            return this;
+        }
+
+        public Builder internetObservingStrategyFactory(
+                @NonNull InternetObservingStrategyFactory factory) {
+
+            checkNotNull(factory, "internet observing strategy factory");
+            internetObservingStrategy = factory.get();
             return this;
         }
 

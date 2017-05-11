@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
+import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.impl.SocketInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
@@ -48,9 +49,10 @@ public class RxNetworkTest {
     RxNetwork sut;
 
     @Mock Context context;
-    @Mock greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
+    @Mock NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
     @Mock NetworkObservingStrategyFactory CUSTOM_NETWORK_STRATEGY_FACTORY;
     @Mock InternetObservingStrategy CUSTOM_INTERNET_STRATEGY;
+    @Mock InternetObservingStrategyFactory CUSTOM_INTERNET_STRATEGY_FACTORY;
     @Mock Observable<RxNetworkInfo> VALID_NETWORK_OBSERVABLE;
     @Mock Observable<Boolean> VALID_INTERNET_OBSERVABLE;
 
@@ -77,7 +79,7 @@ public class RxNetworkTest {
 
     @Test
     public void shouldInitWithInternetObservingStrategyOnly_whenInitializedWithoutContext() {
-        sut = RxNetwork.builder().init();
+        sut = RxNetwork.init();
 
         assertThat((sut.networkObservingStrategy())).isNull();
         assertThat(sut.internetObservingStrategy()).isNotNull()
@@ -116,6 +118,16 @@ public class RxNetworkTest {
                 .init(context);
 
         assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(CUSTOM_NETWORK_STRATEGY);
+    }
+
+    @Test
+    public void shouldInitWithCustomInternetObservingStrategy_viaFactory() {
+        when(CUSTOM_INTERNET_STRATEGY_FACTORY.get()).thenReturn(CUSTOM_INTERNET_STRATEGY);
+
+        sut = RxNetwork.builder().internetObservingStrategyFactory(CUSTOM_INTERNET_STRATEGY_FACTORY)
+                .init(context);
+
+        assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(CUSTOM_INTERNET_STRATEGY);
     }
 
     @Test
