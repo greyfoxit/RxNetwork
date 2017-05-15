@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## version 0.0.1 <sup>*(2017-04-20)*</sup>
+## version 0.0.1 
 
-* First release of the library
+*2017-05-15*
+
+* Initial public release
+* Imported from Gitlab

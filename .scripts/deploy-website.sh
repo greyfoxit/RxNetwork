@@ -4,42 +4,50 @@
 #
 # @author @radekkozak https://github.com/radekkozak
 
-set -e +o pipefail
+set -euo pipefail
 
-SLUG="greyfox/rxnetwork"
+SLUG="radekkozak/RxNetwork"
 JDK="oraclejdk8"
 BRANCH="master"
 
+REPO=git@github.com:radekkozak/RxNetwork.git
 GROUP_ID="it.greyfox"
 ARTIFACT_ID="rxnetwork"
 
+TEMP_DIR=temp
+
 if [ "$TRAVIS_REPO_SLUG" != "$SLUG" ]; then
-  echo "Skipping snapshot deployment: wrong repository. Expected '$SLUG' but was '$TRAVIS_REPO_SLUG'."
+  echo "Skipping deployment: wrong repository. Expected '$SLUG' but was '$TRAVIS_REPO_SLUG'."
 elif [ "$TRAVIS_JDK_VERSION" != "$JDK" ]; then
-  echo "Skipping snapshot deployment: wrong JDK. Expected '$JDK' but was '$TRAVIS_JDK_VERSION'."
+  echo "Skipping deployment: wrong JDK. Expected '$JDK' but was '$TRAVIS_JDK_VERSION'."
 elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-  echo "Skipping snapshot deployment: was pull request."
+  echo "Skipping deployment: was pull request."
 elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
-  echo "Skipping snapshot deployment: wrong branch. Expected '$BRANCH' but was '$TRAVIS_BRANCH'."
+  echo "Skipping deployment: wrong branch. Expected '$BRANCH' but was '$TRAVIS_BRANCH'."
 else
   echo "Deploying website..."
 
   CUSTOM_LAYOUT='---\nlayout: default\n---\n'
   CUSTOM_TITLE='Documentation'
 
-  # Switch to gh-pages branch to sync it with master
-  git checkout gh-pages
+  git config --global user.email "travis@travis-ci.org"
+  git config --global user.name "Travis"
 
-  # Sync the README.md from master branch
-  git checkout master -- README.md
+  # Fetch and checkout gh-pages
+  git fetch origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
+  git checkout -b gh-pages origin/gh-pages
+
+  # Clean working directory before doing anything
+  git clean -f -d
 
   # Prepend jekyll layout header
   echo -e ${CUSTOM_LAYOUT} > index.md
 
   # Prepend custom title
-  echo -e ${CUSTOM_TITLE} >> index.md
+  echo -e '# '${CUSTOM_TITLE} >> index.md
 
-  # Sync README (without project name header)
+  # Sync README from master branch (without project name header)
+  git checkout master -- README.md
   tail -n +2 README.md >> index.md
   rm README.md
 
@@ -51,8 +59,10 @@ else
   git add -A
   if [[ `git status --porcelain` ]]; then
 	git commit -m "Website at $(date)"
-    git push origin gh-pages
+    git push -fq origin gh-pages
     echo "Website deployed!"
+  else
+    echo "Skipping deployment: no changes detected"
   fi
 
 fi

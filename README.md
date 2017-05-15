@@ -618,11 +618,12 @@ following:
 
 ## Contributing
     
-If you would like to contribute code you can do so by following [Contributing](https://github.com/radekkozak/RxNetwork/blob/master/CONTRIBUTING.md) guidelines.
+Please [see the guidelines for contributing](CONTRIBUTING.md) before creating pull requests.
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/radekkozak/RxNetwork/blob/master/CHANGELOG.md) file.
+This project adheres to [Semantic Versioning](http://semver.org/). All notable changes are 
+documented in [CHANGELOG](CHANGELOG.md) file.
 
 ## Credits
 
