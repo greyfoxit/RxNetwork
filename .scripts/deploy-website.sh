@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Deploy to project's github pages.
 #
 # @author @radekkozak https://github.com/radekkozak
+
+set -e +o pipefail
 
 SLUG="greyfox/rxnetwork"
 JDK="oraclejdk8"
@@ -10,8 +12,6 @@ BRANCH="master"
 
 GROUP_ID="it.greyfox"
 ARTIFACT_ID="rxnetwork"
-
-set -ev
 
 if [ "$TRAVIS_REPO_SLUG" != "$SLUG" ]; then
   echo "Skipping snapshot deployment: wrong repository. Expected '$SLUG' but was '$TRAVIS_REPO_SLUG'."
@@ -50,10 +50,9 @@ else
 
   git add -A
   if [[ `git status --porcelain` ]]; then
-		git commit -m "Website at $(date)"
+	git commit -m "Website at $(date)"
     git push origin gh-pages
-		
-		echo "Website deployed!"
+    echo "Website deployed!"
   fi
 
 fi
