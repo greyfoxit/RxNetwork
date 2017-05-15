@@ -1,9 +1,9 @@
-# Rx<sup>2</sup>Network
+# RxNetwork
 
-[![build status](https://gitlab.com/radekkozak/RxNetwork/badges/master/build.svg?private_token=sgmss6_R2JpJkvSsFXZf)](https://gitlab.com/radekkozak/RxNetwork/commits/master)
-[![codecov](https://codecov.io/gl/radekkozak/RxNetwork/branch/master/graph/badge.svg?token=o4xFCbBxrf)](https://codecov.io/gl/radekkozak/RxNetwork)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg)]()
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status][travis-shield]][travis-link]
+[![Codecov][codecov-shield]][codecov-link]
+[![Maven Release][maven-shield]][maven-link]
+[![License][license-shield]][license-link]
 
 Simple and easy to use Android library for observing **network connectivity** and **internet access** 
 in a Reactive Programming manner.
@@ -13,7 +13,7 @@ application that supports **minSdk = 9** (`Android 2.3 Gingerbread` and up)
 
 ## Introstruction suckion lipo
 
-Rx<sup>2</sup>Network library contains **easy-to-follow API** for observing network connectivity and
+RxNetwork library contains **easy-to-follow API** for observing network connectivity and
 internet access to give you simple and unified way of getting always current connection status for 
 your projects.
 
@@ -95,12 +95,12 @@ of captive portals / walled-garden internet scenarios that was mentioned by many
  
 6. We also decided to include couple of other already tested and ready to go internet observing 
 strategies to enhance your observing possibilities. Right now there are two of them (apart from 
-built-in one that you can configure to your taste as well): [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
-and [`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
+built-in one that you can configure to your taste as well): [`Http200InternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
+and [`SocketInternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
 (included here for the sake of original lib) Both our implementations use Builder Pattern giving 
 you the cleaner interface to work with without polluted, multi-param methods.
 
-7. Tests, tests, tests. And meaningful ones. Rx<sup>2</sup>Network was thoroughly tested so you 
+7. Tests, tests, tests. And meaningful ones. RxNetwork was thoroughly tested so you 
 could (hopefully) use it worry-free in your own projects from the get-go.
 
 ## Usage
@@ -108,14 +108,14 @@ could (hopefully) use it worry-free in your own projects from the get-go.
 Download [the latest JAR][jar] or grab via Maven:
 ```xml
 <dependency>
-  <groupId>inc.greyfox.rxnetwork</groupId>
+  <groupId>it.greyfox.rxnetwork</groupId>
   <artifactId>rxnetwork</artifactId>
   <version>0.1.0/version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'inc.greyfox.rxnetwork:rxnetwork:0.1.0'
+compile 'it.greyfox.rxnetwork:rxnetwork:0.1.0'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
@@ -125,7 +125,7 @@ Snapshots of the development version are available in [Sonatype's `snapshots` re
 
 ## Configuration
 
-[`RxNetwork`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/RxNetwork.java) 
+[`RxNetwork`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/RxNetwork.java) 
 is the main class via which you can subscribe to available observables. By default library tries to 
 give you sane defaults, but it allows for customization. You can read on that in 
 [Advanced configuration](#advanced-configuration) section.
@@ -152,7 +152,7 @@ By default library, via its provider mechanism, will choose appropriate, Android
 strategy for observing network connectivity. This is for it could support both new and legacy 
 network monitoring strategies based on concrete version. 
 
-For observing real internet access RxNetwork defaults to [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
+For observing real internet access RxNetwork defaults to [`BuiltInInternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
 partially described earlier in *What's different*, section 5 and more in [Built-in internet observing strategies](#built-in-internet-observing-strategies) 
 
 **Ok, seems easy enough, but what is truly going on here?** 
@@ -296,10 +296,10 @@ Right now you're probably wondering: *what are all those different classes ?* We
 asked. Simple. Just the couple of basic, self explanatory interfaces you need to implement in case 
 you'd like to use your own observing strategies. If you want you can have a look:
 
-- [`NetworkObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategy.java)
-- [`NetworkObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategyFactory.java)
-- [`InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/InternetObservingStrategy.java)
-- [`InternetObservingStrategyFactory`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/InternetObservingStrategyFactory.java)
+- [`NetworkObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategy.java)
+- [`NetworkObservingStrategyFactory`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/NetworkObservingStrategyFactory.java)
+- [`InternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/network/InternetObservingStrategy.java)
+- [`InternetObservingStrategyFactory`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/InternetObservingStrategyFactory.java)
 
 but other than that, in most situations, you can forget it all and roll happily with defaults 
 without all the fuss.
@@ -310,7 +310,7 @@ Now, let's see what we can *really* do with this library. But first let's take a
 
 #### RxNetworkInfo
 
-[`RxNetworkInfo`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/net/RxNetworkInfo.java) 
+[`RxNetworkInfo`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/net/RxNetworkInfo.java) 
 is *the* class that you would use if you decide you want more than just basic information about 
 the network connection. This class is simply a wrapper around Android's original `NetworkInfo` 
 that you can use to extract all the original info. Starting from `Lollipop` (API >= 21) 
@@ -427,7 +427,7 @@ rxNetwork.observe(new YourCustomNetworkObservingStrategy())
 
 #### Filtering
 
-With Rx<sup>2</sup>Network if you're only interested in particular kind of network information, 
+With RxNetwork if you're only interested in particular kind of network information, 
 **you can** use built-in filters to **react on a concrete state, states, type or types changes**. 
 This can be done with standard RxJava `filter(...)` method and may look something like this:
 
@@ -521,7 +521,7 @@ section below.
 
 #### Observing real
 
-As mentioned before: you can observe true Internet connectivity with Rx<sup>2</sup>Network. This is 
+As mentioned before: you can observe true Internet connectivity with RxNetwork. This is 
 done simply by using `observeReal()` method. This observable will simply return `true` if there is
 real Internet connection and `false` if not.
 
@@ -543,7 +543,7 @@ rxNetwork.observeReal(new YourCustomInternetObservingStrategy())
 
 So, let's say for example, you want to use socket-based approach (maybe you want it to check your 
 own server or whatever). You can either do with your own strategy, as described above, or simply use 
-[`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
+[`SocketInternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
 that is already provided for you in the library:
 
 ```java
@@ -565,8 +565,8 @@ rxNetwork.observeReal(internetObservingStrategy)
     .subscribe(...);
 ```
 
-The same goes for [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
-and even [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
+The same goes for [`Http200InternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
+and even [`BuiltInInternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java)
 that is used as the library's default under the hood.
 
 #### Built-in internet observing strategies
@@ -575,7 +575,7 @@ There are three, fully configurable, internet observing strategies that you can 
 that defaults are not for you. 
 
 - first one is the one used by the library under the hood and partially
-mentioned in the [Introduction](#introduction), namely [`BuiltInInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java) 
+mentioned in the [Introduction](#introduction), namely [`BuiltInInternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/BuiltInInternetObservingStrategy.java) 
 It does its bit by checking special endpoint configured for returning HTTP `204` status. Under the 
 hood it uses Android team's own approach (as seen in `android.net.wifi.WifiWatchdogStateMachine`) 
 but with more sensible endpoint, hence taking care of Great China Wall blocking all that is Google 
@@ -583,7 +583,7 @@ but with more sensible endpoint, hence taking care of Great China Wall blocking 
 and it's supposed to be not blocked, but of course you are free to configure your own endpoint 
 in case Big China Brother decides to block it as well.
 
-- next provided strategy is the [`Http200InternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
+- next provided strategy is the [`Http200InternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/Http200InternetObservingStrategy.java) 
 It's a variation on the previous theme that checks for HTTP `200` status code. By default it uses 
 [http://www.google.cn/blank.html](http://www.google.cn/blank.html) address mostly because it seems
 to be not blocked in China yet and because of it's zero-length response body (saving bandwidth) 
@@ -591,7 +591,7 @@ As always you can use the address of your own choice that conform to this mechan
 Apple seems to have similar one: [http://captive.apple.com](http://captive.apple.com) but it can 
 by any other that works
  
-- last one is the self-explanatory [`SocketInternetObservingStrategy`](https://gitlab.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
+- last one is the self-explanatory [`SocketInternetObservingStrategy`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/strategy/internet/impl/SocketInternetObservingStrategy.java) 
 that tries to connect to the given endpoint via socket-based mechanism. Example usage is shown 
 already in [Observing real internet access](#observing-real-internet-access) section
 
@@ -618,11 +618,11 @@ following:
 
 ## Contributing
     
-If you would like to contribute code you can do so by following [Contributing](https://gitlab.com/radekkozak/RxNetwork/blob/master/CONTRIBUTING.md) guidelines.
+If you would like to contribute code you can do so by following [Contributing](https://github.com/radekkozak/RxNetwork/blob/master/CONTRIBUTING.md) guidelines.
 
 ## Changelog
 
-See [CHANGELOG](https://gitlab.com/radekkozak/RxNetwork/blob/master/CHANGELOG.md) file.
+See [CHANGELOG](https://github.com/radekkozak/RxNetwork/blob/master/CHANGELOG.md) file.
 
 ## Credits
 
@@ -643,3 +643,14 @@ See [CHANGELOG](https://gitlab.com/radekkozak/RxNetwork/blob/master/CHANGELOG.md
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+<!-- references -->
+
+[travis-shield]: https://travis-ci.com/radekkozak/RxNetwork.svg?token=tSzBdxr6JfqHJLfDcUSS&branch=master
+[travis-link]: https://travis-ci.com/radekkozak/RxNetwork
+[codecov-shield]: https://codecov.io/gh/radekkozak/RxNetwork/branch/master/graph/badge.svg?token=dPBP8eA8CJ
+[codecov-link]: https://codecov.io/gh/radekkozak/RxNetwork
+[maven-shield]: https://img.shields.io/maven-central/v/it.greyfox.rxnetwork/rxnetwork.svg
+[maven-link]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22it.greyfox.rxnetwork%22%20AND%20a%3A%22rxnetwork%22
+[license-shield]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+[license-link]: https://opensource.org/licenses/Apache-2.0
