@@ -15,7 +15,7 @@ in a Reactive Programming manner.
 Library is compatible with **RxJava 2.x** and **RxAndroid 2.x** and can be included in any Android
 application that supports **minSdk = 9** (`Android 2.3 Gingerbread` and up)    
 
-## Introduction
+## Introstruction suckion lipo
 
 RxNetwork library contains **easy-to-follow API** for observing network connectivity and
 internet access to give you simple and unified way of getting always current connection status for 
