@@ -16,6 +16,7 @@
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 
 import static java.util.logging.Logger.getLogger;
 
@@ -26,7 +27,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork.internal.net.RxNetworkInfoHelper;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -80,7 +80,7 @@ public class PreLollipopNetworkObservingStrategy extends BaseNetworkObservingStr
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    emitter.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(context));
+                    emitter.onNext(getRxNetworkInfoFrom(context));
                 }
             };
             emitter.setCancellable(new StrategyCancellable());

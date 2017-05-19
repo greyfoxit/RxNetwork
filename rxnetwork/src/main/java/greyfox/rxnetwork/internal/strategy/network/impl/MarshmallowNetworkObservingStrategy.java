@@ -20,6 +20,7 @@ import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION_CODES.M;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 
 import static java.util.logging.Logger.getLogger;
 
@@ -34,7 +35,6 @@ import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork.internal.net.RxNetworkInfoHelper;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -121,7 +121,7 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
             if (isDeviceInIdleMode(context)) {
                 upstream.onNext(RxNetworkInfo.create());
             } else {
-                upstream.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(context));
+                upstream.onNext(getRxNetworkInfoFrom(context));
             }
         }
 
@@ -170,12 +170,12 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
 
         @Override
         public void onAvailable(Network network) {
-            upstream.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(network, connectivityManager));
+            upstream.onNext(getRxNetworkInfoFrom(network, connectivityManager));
         }
 
         @Override
         public void onLost(Network network) {
-            upstream.onNext(RxNetworkInfoHelper.getRxNetworkInfoFrom(network, connectivityManager));
+            upstream.onNext(getRxNetworkInfoFrom(network, connectivityManager));
         }
     }
 }

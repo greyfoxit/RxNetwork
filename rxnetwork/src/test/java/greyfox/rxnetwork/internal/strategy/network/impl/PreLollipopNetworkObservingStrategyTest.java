@@ -17,6 +17,8 @@ package greyfox.rxnetwork.internal.strategy.network.impl;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 
+import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -28,7 +30,6 @@ import android.content.Context;
 import android.content.Intent;
 import greyfox.rxnetwork.BuildConfig;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork.internal.net.RxNetworkInfoHelper;
 import io.reactivex.observers.TestObserver;
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,7 +59,7 @@ public class PreLollipopNetworkObservingStrategyTest {
     public void setUp() {
         context = spy(RuntimeEnvironment.application.getApplicationContext());
         sut = spy(new PreLollipopNetworkObservingStrategy(context));
-        VALID_RXNETWORK_INFO = RxNetworkInfoHelper.getRxNetworkInfoFrom(context);
+        VALID_RXNETWORK_INFO = getRxNetworkInfoFrom(context);
     }
 
     @Test(expected = NullPointerException.class)
