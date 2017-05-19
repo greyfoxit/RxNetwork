@@ -22,8 +22,6 @@ android {
     }
 
     testOptions.unitTests.all {
-        maxParallelForks = 1
-        forkEvery = 1
         jacoco {
             includeNoLocationClasses = true
         }
@@ -34,25 +32,20 @@ android {
         xmlReport false
         htmlReport true
         htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
-        xmlOutput file("$project.buildDir/reports/lint/lint-result.xml")
     }
 }
 
 dependencies {
-    compile deps.appcompatv7
-    compile deps.supportAnnotations
-    compile deps.rxjava
-    compile deps.rxandroid
+    implementation deps.appcompatv7
+    implementation deps.supportAnnotations
+    implementation deps.rxjava
+    implementation deps.rxandroid
 
-    testCompile deps.junit
-    testCompile deps.robolectric
-    testCompile deps.mockwebserver
-    testCompile deps.mockitoinline
-    testCompile deps.assertj
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = conf.gradleVersion
+    testImplementation deps.junit
+    testImplementation deps.robolectric
+    testImplementation deps.mockwebserver
+    testImplementation deps.mockitoinline
+    testImplementation deps.assertj
 }
 
 jacocoAndroidUnitTestReport {

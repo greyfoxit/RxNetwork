@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion conf.compileSdk
@@ -36,19 +35,14 @@ android {
 }
 
 dependencies {
-    compile project(':rxnetwork')
+    implementation project(':rxnetwork')
 
-    compile deps.constraintLayout
-    compile deps.butterknife
-    compile deps.toothpickRuntime
-    compile deps.toothpickSmoothie
-    compile deps.supportAnnotations
+    implementation deps.constraintLayout
+    implementation deps.butterknife
+    implementation deps.toothpickRuntime
+    implementation deps.toothpickSmoothie
+    implementation deps.supportAnnotations
 
     annotationProcessor deps.toothpickCompiler
     annotationProcessor deps.butterknifeCompiler
-}
-
-retrolambda {
-    defaultMethods true
-    incremental true
 }
