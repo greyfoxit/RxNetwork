@@ -16,14 +16,17 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
         debug {
-            testCoverageEnabled = true
+            minifyEnabled false
+            testCoverageEnabled true
         }
     }
 
     testOptions.unitTests.all {
         jacoco {
-            includeNoLocationClasses = true
+            version "0.7.9"
+            includeNoLocationClasses true
         }
     }
 
@@ -52,6 +55,10 @@ jacocoAndroidUnitTestReport {
     csv.enabled false
     html.enabled true
     xml.enabled true
+}
+
+jacoco {
+    toolVersion "0.7.9"
 }
 
 apply from: rootProject.file('gradle/maven-push.gradle')
