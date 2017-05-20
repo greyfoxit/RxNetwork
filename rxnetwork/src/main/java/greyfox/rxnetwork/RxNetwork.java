@@ -41,9 +41,9 @@ import java.util.Collection;
 
 /**
  * RxNetwork is a class that listens to network connectivity changes in a reactive manner.
- * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood to along
- * with provider mechanism to choose concrete, api-level dependent {@link NetworkObservingStrategy strategy}
- * for observing network connectivity changes.
+ * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood along with
+ * provider mechanism to choose concrete, api-level dependent
+ * {@link NetworkObservingStrategy strategy} for observing network connectivity changes.
  * <p>
  * Custom factory can be used by simply implementing {@link NetworkObservingStrategyFactory}
  * and registering it with {@linkplain RxNetwork}:
