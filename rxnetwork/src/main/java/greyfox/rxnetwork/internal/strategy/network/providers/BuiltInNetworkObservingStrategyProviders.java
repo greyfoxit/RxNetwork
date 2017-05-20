@@ -23,11 +23,11 @@ import android.content.Context;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.util.ArraySet;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategyProviders;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * RxNetwork's built-in providers for network observing strategies.
@@ -62,7 +62,7 @@ public final class BuiltInNetworkObservingStrategyProviders implements
      */
     @Override
     public Collection<NetworkObservingStrategyProvider> get() {
-        Collection<NetworkObservingStrategyProvider> collection = new ArraySet<>();
+        Collection<NetworkObservingStrategyProvider> collection = new HashSet<>();
 
         collection.add(new PreLollipopNetworkObservingStrategyProvider(context));
 
