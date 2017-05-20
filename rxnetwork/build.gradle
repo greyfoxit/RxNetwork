@@ -18,7 +18,6 @@ android {
         }
 
         debug {
-            minifyEnabled false
             testCoverageEnabled true
         }
     }
@@ -30,6 +29,11 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE.txt'
+    }
+
     lintOptions {
         abortOnError false
         xmlReport false
@@ -39,16 +43,15 @@ android {
 }
 
 dependencies {
-    implementation deps.appcompatv7
+    api deps.rxjava
+    api deps.rxandroid
     implementation deps.supportAnnotations
-    implementation deps.rxjava
-    implementation deps.rxandroid
 
     testImplementation deps.junit
+    testImplementation deps.assertj
     testImplementation deps.robolectric
     testImplementation deps.mockwebserver
     testImplementation deps.mockitoinline
-    testImplementation deps.assertj
 }
 
 jacocoAndroidUnitTestReport {
