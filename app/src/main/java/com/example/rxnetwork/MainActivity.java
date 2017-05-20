@@ -17,8 +17,6 @@ package com.example.rxnetwork;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
-import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Bundle;
@@ -75,7 +73,7 @@ public class MainActivity extends Activity {
     @TargetApi(LOLLIPOP)
     protected Disposable rxNetworkSubscription() {
         return rxNetwork.observe()
-                .observeOn(mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 //.filter(hasCapability(NET_CAPABILITY_NOT_METERED))
                 .subscribe(this::toastNetworkInfo, this::onError, this::onComplete);
     }

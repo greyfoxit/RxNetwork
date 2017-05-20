@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion conf.compileSdk
     buildToolsVersion conf.buildToolsVersion
+
     defaultConfig {
         applicationId "it.greyfox.rxnetwork"
         minSdkVersion conf.minSdk
@@ -16,32 +17,35 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-        incremental true
-    }
-
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        abortOnError false
+        disable 'InvalidPackage', 'InlinedApi'
     }
 }
 
 dependencies {
     implementation project(':rxnetwork')
 
+    implementation deps.appcompatv7
     implementation deps.constraintLayout
     implementation deps.butterknife
     implementation deps.toothpickRuntime
     implementation deps.toothpickSmoothie
-    implementation deps.supportAnnotations
 
     annotationProcessor deps.toothpickCompiler
     annotationProcessor deps.butterknifeCompiler
