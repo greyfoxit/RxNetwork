@@ -23,7 +23,7 @@ task jacocoTestReport(type: JacocoReport) {
     executionData = fileTree(dir: "$buildDir", includes: ["jacoco/testDebugUnitTest.exec"])
 
     reports {
-        xml.enabled = false
+        xml.enabled = true
         html.enabled = true
     }
 }
