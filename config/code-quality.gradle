@@ -1,0 +1,27 @@
+apply plugin: 'checkstyle'
+
+check.dependsOn 'checkstyle', 'lint'
+
+checkstyle.toolVersion = '7.5'
+
+task checkstyle(type: Checkstyle) {
+    group "verification"
+    description "Runs Checkstyle"
+    configFile file("${project.rootDir}/config/code-quality/checkstyle/checkstyle.xml")
+        source 'src/main/java'
+    ignoreFailures false
+    showViolations true
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+}
+
+android {
+    lintOptions {
+        abortOnError false
+        xmlReport false
+        htmlReport true
+        lintConfig file("${project.rootDir}/config/code-quality/lint/lint.xml")
+        htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
+    }
+}

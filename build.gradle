@@ -7,7 +7,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0-alpha1'
-        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
     }
 }
 
@@ -20,29 +19,9 @@ allprojects {
     }
 }
 
-subprojects {
-    apply plugin: 'checkstyle'
-
-    checkstyle.toolVersion = '7.5'
-
-    task checkstyle(type: Checkstyle) {
-        configFile rootProject.file('checkstyle.xml')
-        source 'src/main/java'
-        ignoreFailures false
-        showViolations true
-        include '**/*.java'
-        exclude '**/gen/**'
-
-        classpath = files()
-    }
-
-    afterEvaluate {
-        check.dependsOn('checkstyle')
-    }
-}
-
 task clean(type: Delete) {
-    delete rootProject.buildDir
+    group = "build"
+    delete "${project.buildDir}"
 }
 
 def supportLibraryVersion = '25.1.0'

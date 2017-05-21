@@ -1,6 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'jacoco'
-apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion conf.compileSdk
@@ -16,15 +14,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-
         debug {
-            testCoverageEnabled true
+            minifyEnabled false
         }
     }
 
     testOptions.unitTests.all {
         jacoco {
-            version "0.7.9"
             includeNoLocationClasses true
         }
     }
@@ -32,13 +28,6 @@ android {
     packagingOptions {
         exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE.txt'
-    }
-
-    lintOptions {
-        abortOnError false
-        xmlReport false
-        htmlReport true
-        htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
     }
 }
 
@@ -54,14 +43,6 @@ dependencies {
     testImplementation deps.mockitoinline
 }
 
-jacocoAndroidUnitTestReport {
-    csv.enabled false
-    html.enabled true
-    xml.enabled true
-}
-
-jacoco {
-    toolVersion "0.7.9"
-}
-
-apply from: rootProject.file('gradle/maven-push.gradle')
+apply from: rootProject.file('config/maven-push.gradle')
+apply from: rootProject.file('config/code-quality.gradle')
+apply from: rootProject.file('config/jacoco.gradle')
