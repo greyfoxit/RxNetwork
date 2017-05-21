@@ -19,22 +19,17 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-
         debug {
+            minifyEnabled false
         }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    lintOptions {
-        abortOnError false
-        disable 'InvalidPackage', 'InlinedApi'
     }
 }
 
@@ -50,3 +45,5 @@ dependencies {
     annotationProcessor deps.toothpickCompiler
     annotationProcessor deps.butterknifeCompiler
 }
+
+apply from: rootProject.file('config/code-quality.gradle')

@@ -38,7 +38,7 @@ before_script:
   - chmod ugo+x .scripts/deploy-website.sh
 
 script:
-  - ./gradlew :rxnetwork:clean :rxnetwork:assembleDebug :rxnetwork:jacocoTestDebugUnitTestReport
+  - ./gradlew rxnetwork:clean rxnetwork:assembleDebug rxnetwork:testDebugUnitTest rxnetwork:jacocoTestReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN

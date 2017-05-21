@@ -74,25 +74,20 @@ public class MainActivity extends Activity {
     protected Disposable rxNetworkSubscription() {
         return rxNetwork.observe()
                 .observeOn(AndroidSchedulers.mainThread())
-                //.filter(hasCapability(NET_CAPABILITY_NOT_METERED))
-                .subscribe(this::toastNetworkInfo, this::onError, this::onComplete);
+                .subscribe(this::toastNetworkInfo, this::onError);
     }
 
     @NonNull
     protected Disposable rxRealInternetAccessSubscription() {
         return rxNetwork.observeReal()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::toastInternetConnection, this::onError, this::onComplete);
+                .subscribe(this::toastInternetConnection, this::onError);
     }
 
     private void toastInternetConnection(Boolean connected) {
         final String message = "Internet access: " + connected;
         Log.d(TAG, message);
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void onComplete() {
-        Log.d(TAG, "onComplete invoked");
     }
 
     private void toastNetworkInfo(@NonNull RxNetworkInfo networkInfo) {
