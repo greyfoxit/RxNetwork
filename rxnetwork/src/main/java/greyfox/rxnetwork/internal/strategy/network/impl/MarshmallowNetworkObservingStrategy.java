@@ -17,7 +17,6 @@ package greyfox.rxnetwork.internal.strategy.network.impl;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Context.POWER_SERVICE;
-import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
 import static android.os.Build.VERSION_CODES.M;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
@@ -145,8 +144,7 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
 
         private void registerNetworkCallback(ObservableEmitter<RxNetworkInfo> upstream) {
             networkCallback = new MarshmallowNetworkCallback(upstream);
-            NetworkRequest request = new NetworkRequest.Builder().addCapability(NET_CAPABILITY_INTERNET).build();
-            //NetworkRequest request = new NetworkRequest.Builder().build();
+            NetworkRequest request = new NetworkRequest.Builder().build();
             connectivityManager.registerNetworkCallback(request, networkCallback);
         }
     }

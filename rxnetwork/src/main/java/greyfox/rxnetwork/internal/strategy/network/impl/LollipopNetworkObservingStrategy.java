@@ -15,7 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
-import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
@@ -56,7 +55,7 @@ public class LollipopNetworkObservingStrategy extends BaseNetworkObservingStrate
     }
 
     private void register() {
-        NetworkRequest request = new NetworkRequest.Builder().addTransportType(TRANSPORT_CELLULAR).build();
+        NetworkRequest request = new NetworkRequest.Builder().build();
         manager.registerNetworkCallback(request, networkCallback);
     }
 
