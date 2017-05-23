@@ -2,28 +2,25 @@
 #
 # Deploy to project's github pages.
 #
-# @author @radekkozak https://github.com/radekkozak
+# @author radekkozak
 
-set -euo pipefail
+set -eo pipefail
+
+CIRCLE_REPO_SLUG="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
 
 SLUG="radekkozak/RxNetwork"
-JDK="oraclejdk8"
 BRANCH="master"
 
 REPO=git@github.com:radekkozak/RxNetwork.git
 GROUP_ID="it.greyfox"
 ARTIFACT_ID="rxnetwork"
 
-TEMP_DIR=temp
-
-if [ "$TRAVIS_REPO_SLUG" != "$SLUG" ]; then
-  echo "Skipping deployment: wrong repository. Expected '$SLUG' but was '$TRAVIS_REPO_SLUG'."
-elif [ "$TRAVIS_JDK_VERSION" != "$JDK" ]; then
-  echo "Skipping deployment: wrong JDK. Expected '$JDK' but was '$TRAVIS_JDK_VERSION'."
-elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+if [ "$CIRCLE_REPO_SLUG" != "$SLUG" ]; then
+  echo "Skipping deployment: wrong repository. Expected '$SLUG' but was '$CIRCLE_REPO_SLUG'."
+elif [ "$CIRCLE_PULL_REQUEST" != "" ]; then
   echo "Skipping deployment: was pull request."
-elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
-  echo "Skipping deployment: wrong branch. Expected '$BRANCH' but was '$TRAVIS_BRANCH'."
+elif [ "$CIRCLE_BRANCH" != "$BRANCH" ]; then
+  echo "Skipping deployment: wrong branch. Expected '$BRANCH' but was '$CIRCLE_BRANCH'."
 else
   echo "Deploying website..."
 
