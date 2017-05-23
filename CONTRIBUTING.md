@@ -25,15 +25,14 @@ and work on a Pull Request.
 
 Before creating new Pull Request, please create a new issue and discuss the problem.
 If we agree that PR will be reasonable solution, then fork repository, create a separate branch
-and work on a feature or bug-fix on this branch. When you're done, make sure that project passes
-static code analysis verification with `./gradlew check` command. 
+and work on a feature or bug-fix on this branch.
+
+When submitting code please make every effort to follow existing conventions and style in order 
+to keep the code as readable as possible. Please also make sure your code compiles and passes
+static code analysis verification with `./gradlew check` command.
 
 When you performed more commits than one, squash them into one within a single PR. Make sure that 
 your commit message is descriptive enough. If not, then use `git commit --amend` command and change 
 it.
-
-When submitting code, please make every effort to follow existing conventions and style in order 
-to keep the code as readable as possible. Please also make sure your code compiles and passes
-static code analysis verification with `./gradlew check` command.
 
 ###### Original guidelines credits [@pwittchen](https://github.com/pwittchen) / Changes: [@radekkozak](https://github.com/radekkozak)
