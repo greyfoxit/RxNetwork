@@ -209,6 +209,15 @@ public class RxNetworkInfoPredicateTest {
     @RequiresApi(api = LOLLIPOP)
     @Config(sdk = LOLLIPOP)
     @Test
+    public void shouldBeFalse_whenUpstreamPredicateHasNoNetworkCapabilities() throws Exception {
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(null);
+
+        assertThat(VALID_UPSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
     public void shouldBeTrue_whenDownBandwidthSatisfied() throws Exception {
         when(networkCapabilities.getLinkDownstreamBandwidthKbps()).thenReturn(VALID_DOWN_BANDWIDTH);
         when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
@@ -222,6 +231,15 @@ public class RxNetworkInfoPredicateTest {
     public void shouldBeFalse_whenDownBandwidthNotSatisfied() throws Exception {
         when(networkCapabilities.getLinkDownstreamBandwidthKbps()).thenReturn(INVALID_DOWN_BANDWIDTH);
         when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
+
+        assertThat(VALID_DOWNSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeFalse_whenDownstreamPredicateHasNoNetworkCapabilities() throws Exception {
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(null);
 
         assertThat(VALID_DOWNSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
     }
