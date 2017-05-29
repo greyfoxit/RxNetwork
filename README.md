@@ -1,4 +1,4 @@
-# Rx<sup>2</sup>Network
+# RxNetwork
 
 [![Build Status][travis-shield]][travis-link]
 [![Codecov][codecov-shield]][codecov-link]
@@ -13,7 +13,7 @@ application that supports **minSdk = 9** (`Android 2.3 Gingerbread` and up)
 
 ## Introduction
 
-Rx<sup>2</sup>Network library contains **easy-to-follow API** for observing network connectivity and
+RxNetwork library contains **easy-to-follow API** for observing network connectivity and
 internet access to give you simple and unified way of getting always current connection status for 
 your projects.
 
@@ -109,14 +109,14 @@ could (hopefully) use it worry-free in your own projects from the get-go.
 Download [the latest JAR][jar] or grab via Maven:
 ```xml
 <dependency>
-  <groupId>inc.greyfox.rxnetwork</groupId>
+  <groupId>it.greyfox.rxnetwork</groupId>
   <artifactId>rxnetwork</artifactId>
   <version>0.1.0/version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'inc.greyfox.rxnetwork:rxnetwork:0.1.0'
+compile 'it.greyfox.rxnetwork:rxnetwork:0.1.0'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
@@ -535,14 +535,39 @@ make much sense for the library to filter by concrete capabilities). If you're i
 by that should definitely check out Android's source code for `NetworkCapabilities` class to see how 
 capabilities and transport types work.
 
-#### Things to consider
+There also two additional bandwidth-related predicates: `isSatisfiedByUpBandwidth` and `isSatisfiedByDownBandwidth` 
+
+```java
+
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByUpBandwidth;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByDownBandwidth;
+
+(...)
+
+private static final int UPSTREAM_BANDWIDTH = 1024 // in Kbps
+private static final int DOWNSTREAM_BANDWIDTH = 2048 // in Kbps
+
+rxNetwork.observe()
+    .observeOn(AndroidSchedulers.mainThread())
+    .filter(isSatisfiedByUpBandwidth(UPSTREAM_BANDWIDTH)    
+    .filter(isSatisfiedByDownBandwidth(DOWNSTREAM_BANDWIDTH))
+    .subscribe(...)
+```
+
+**Please, note:** bandwidth is never measured, but rather is inferred from technology type and 
+other link parameters. It is also by default in `Kbps` vis-à-vis original `getLinkUpstreamBandwidthKbps` 
+and `getLinkUpstreamBandwidthKbps` methods. Any calculations are up to you. When in doubt please 
+refer to [`NetworkCapabilities`](https://developer.android.com/reference/android/net/NetworkCapabilities.html) 
+class in Android API to get a grip.
+
+### Observing real internet access
 
 Although observing network connection gives you good approximation of what is going on with your 
-network, please bear in mind it doesn't actually guarantee there is a real working internet access. 
+network, you should bear in mind it doesn't actually guarantee there is a real working internet access. 
 Of course Android `NetworkInfo#isConnected()` method tries to handle cases like flaky mobile 
 networks, airplane mode, and restricted background data but ultimately it doesn't necessarily mean 
 there is actual network traffic going on. Standard solution using `ConnectivityManager` described 
-also in [android dev](https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html) 
+in [Android Dev](https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html) 
 **does not really check for real internet access, it just checks if a connection is established** 
 
 To put it in simple terms: **having a network connection doesn't mean you have true internet access**. 
@@ -552,17 +577,14 @@ would not allow you to go through to the internet. Similar situations might occu
 setups, connections to router that has no outside internet access, or with something banal and 
 prosaic like server hang-on. 
 
-If you are interested in how to tackle those situations and **if you want to be absolutely sure 
-that your observables provide you information about true internet accessibility**, please read 
-section below. 
+If you are interested in tackling those situations and **if you want to be absolutely sure 
+that your observables provide you information about internet accessibility** please read on. 
 
-### Observing real internet access
+#### Observing real access
 
-#### Observing real
-
-As mentioned before: you can observe true Internet connectivity with RxNetwork. This is 
-done simply by using `observeReal()` method. This observable will simply return `true` if there is
-real Internet connection and `false` if not.
+As you might've suspected: you can observe true Internet connectivity with RxNetwork. This is done 
+simply by using `observeReal()` method. This observable will simply return `true` if there is real 
+Internet connection and `false` if not.
 
 ```java
 rxNetwork.observeReal()

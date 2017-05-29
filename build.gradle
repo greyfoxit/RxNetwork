@@ -54,6 +54,6 @@ ext.deps = [
         junit              : 'junit:junit:4.12',
         robolectric        : 'org.robolectric:robolectric:3.3.2',
         mockwebserver      : 'com.squareup.okhttp3:mockwebserver:3.6.0',
-        mockitoinline      : 'org.mockito:mockito-inline:2.7.6',
+        mockitoinline      : 'org.mockito:mockito-inline:2.8.9',
         assertj            : 'org.assertj:assertj-core:2.6.0',
 ]

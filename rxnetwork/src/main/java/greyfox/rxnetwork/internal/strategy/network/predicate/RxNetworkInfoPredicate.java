@@ -184,5 +184,58 @@ public final class RxNetworkInfoPredicate {
                 }
             };
         }
+
+        /**
+         * Checks if given network satisfies minimum upstream bandwidth.
+         * <p>
+         * Please understand that upstream bandwidth is never measured, but rather is inferred
+         * from technology type and other link parameters as documented in
+         * {@link NetworkCapabilities#getLinkUpstreamBandwidthKbps()}
+         *
+         * @param upBandwidth estimated first hop upstream (device to network) bandwidth in Kbps
+         *
+         * @return {@code true} if upstream bandwidth is satisfied, {@code false} otherwise
+         *
+         * @see NetworkCapabilities#getLinkUpstreamBandwidthKbps
+         */
+        public static Predicate<RxNetworkInfo> isSatisfiedByUpBandwidth(final int upBandwidth) {
+            return new Predicate<RxNetworkInfo>() {
+                @Override
+                public boolean test(RxNetworkInfo networkInfo) throws Exception {
+                    final NetworkCapabilities networkCapabilities
+                            = networkInfo.getNetworkCapabilities();
+
+                    return networkCapabilities != null
+                            && networkCapabilities.getLinkUpstreamBandwidthKbps() >= upBandwidth;
+                }
+            };
+        }
+
+        /**
+         * Checks if given network satisfies minimum downstream bandwidth.
+         * <p>
+         * Please understand that downstream bandwidth is never measured, but rather is inferred
+         * from technology type and other link parameters as documented in
+         * {@link NetworkCapabilities#getLinkDownstreamBandwidthKbps()}
+         *
+         * @param downBandwidth estimated first hop downstream (device to network) bandwidth in
+         *                      Kbps
+         *
+         * @return {@code true} if downstream bandwidth is satisfied, {@code false} otherwise
+         *
+         * @see NetworkCapabilities#getLinkDownstreamBandwidthKbps
+         */
+        public static Predicate<RxNetworkInfo> isSatisfiedByDownBandwidth(final int downBandwidth) {
+            return new Predicate<RxNetworkInfo>() {
+                @Override
+                public boolean test(RxNetworkInfo networkInfo) throws Exception {
+                    final NetworkCapabilities networkCapabilities
+                            = networkInfo.getNetworkCapabilities();
+
+                    return networkCapabilities != null
+                            && networkCapabilities.getLinkDownstreamBandwidthKbps() >= downBandwidth;
+                }
+            };
+        }
     }
 }

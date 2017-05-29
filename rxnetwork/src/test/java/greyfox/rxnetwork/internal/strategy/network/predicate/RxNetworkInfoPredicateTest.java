@@ -29,6 +29,8 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasCapability;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasTransportType;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByDownBandwidth;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByUpBandwidth;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.State.hasState;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_MOBILE;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Type.IS_WIFI;
@@ -65,6 +67,15 @@ public class RxNetworkInfoPredicateTest {
             = hasTransportType(TRANSPORT_CELLULAR, TRANSPORT_WIFI);
     Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES
             = hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
+
+    int VALID_UP_BANDWIDTH = 2048;
+    int VALID_DOWN_BANDWIDTH = 512;
+
+    Predicate<RxNetworkInfo> VALID_UPSTREAM_PREDICATE = isSatisfiedByUpBandwidth(VALID_UP_BANDWIDTH);
+    Predicate<RxNetworkInfo> VALID_DOWNSTREAM_PREDICATE = isSatisfiedByDownBandwidth(VALID_DOWN_BANDWIDTH);
+
+    int INVALID_UP_BANDWIDTH = 2000;
+    int INVALID_DOWN_BANDWIDTH = 500;
 
     @Mock RxNetworkInfo rxNetworkInfo;
     @Mock NetworkCapabilities networkCapabilities;
@@ -173,5 +184,63 @@ public class RxNetworkInfoPredicateTest {
         when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
 
         assertThat(VALID_NET_CAPABILITIES.test(rxNetworkInfo)).isFalse();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeTrue_whenUpBandwidthSatisfied() throws Exception {
+        when(networkCapabilities.getLinkUpstreamBandwidthKbps()).thenReturn(VALID_UP_BANDWIDTH);
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
+
+        assertThat(VALID_UPSTREAM_PREDICATE.test(rxNetworkInfo)).isTrue();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeFalse_whenUpBandwidthNotSatisfied() throws Exception {
+        when(networkCapabilities.getLinkDownstreamBandwidthKbps()).thenReturn(INVALID_UP_BANDWIDTH);
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
+
+        assertThat(VALID_UPSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeFalse_whenUpstreamPredicateHasNoNetworkCapabilities() throws Exception {
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(null);
+
+        assertThat(VALID_UPSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeTrue_whenDownBandwidthSatisfied() throws Exception {
+        when(networkCapabilities.getLinkDownstreamBandwidthKbps()).thenReturn(VALID_DOWN_BANDWIDTH);
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
+
+        assertThat(VALID_DOWNSTREAM_PREDICATE.test(rxNetworkInfo)).isTrue();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeFalse_whenDownBandwidthNotSatisfied() throws Exception {
+        when(networkCapabilities.getLinkDownstreamBandwidthKbps()).thenReturn(INVALID_DOWN_BANDWIDTH);
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
+
+        assertThat(VALID_DOWNSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
+    }
+
+    @RequiresApi(api = LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
+    @Test
+    public void shouldBeFalse_whenDownstreamPredicateHasNoNetworkCapabilities() throws Exception {
+        when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(null);
+
+        assertThat(VALID_DOWNSTREAM_PREDICATE.test(rxNetworkInfo)).isFalse();
     }
 }
