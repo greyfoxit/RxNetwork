@@ -5,20 +5,19 @@
 # Adapted from https://coderwall.com/p/9b_lfq and
 # http://benlimmer.com/2013/12/26/automatically-publish-javadoc-to-gh-pages-with-travis-ci/
 
-set -euo pipefail
+set -eo pipefail
 
-SLUG="greyfox/rxnetwork"
-JDK="oraclejdk8"
+SLUG="greyfox/RxNetwork"
 BRANCH="master"
 
-if [ "$TRAVIS_REPO_SLUG" != "$SLUG" ]; then
-  echo "Skipping snapshot deployment: wrong repository. Expected '$SLUG' but was '$TRAVIS_REPO_SLUG'."
-elif [ "$TRAVIS_JDK_VERSION" != "$JDK" ]; then
-  echo "Skipping snapshot deployment: wrong JDK. Expected '$JDK' but was '$TRAVIS_JDK_VERSION'."
-elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+CIRCLE_REPO_SLUG="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+
+if [ "$CIRCLE_REPO_SLUG" != "$SLUG" ]; then
+  echo "Skipping snapshot deployment: wrong repository. Expected '$SLUG' but was '$CIRCLE_REPO_SLUG'."
+elif [ "$CIRCLE_PULL_REQUEST" != "" ]; then
   echo "Skipping snapshot deployment: was pull request."
-elif [ "$TRAVIS_BRANCH" != "$BRANCH" ]; then
-  echo "Skipping snapshot deployment: wrong branch. Expected '$BRANCH' but was '$TRAVIS_BRANCH'."
+elif [ "$CIRCLE_BRANCH" != "$BRANCH" ]; then
+  echo "Skipping snapshot deployment: wrong branch. Expected '$BRANCH' but was '$CIRCLE_BRANCH'."
 else
   echo "Deploying snapshot..."
   ./gradlew uploadArchives

@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: greyfoxit/alpine-android
+
+    environment:
+      _JAVA_OPTIONS: "-Xmx1024m"
+
+    working_directory: /rxnetwork
+
+    branches:
+      ignore:
+        - gh-pages
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: rxnetwork-{{ checksum "build.gradle" }}-{{ checksum "rxnetwork/build.gradle" }}-{{ checksum "app/build.gradle" }}-{{ checksum "circle.yml" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+
+      - run:
+          name: Assemble
+          command: ./gradlew clean assembleDebug -x signArchives -PdisablePreDex
+
+      - run:
+          name: Test
+          command: ./gradlew testDebugUnitTest -PdisablePreDex
+
+      - run:
+          name: Reports
+          command: ./gradlew jacocoTestReport
+
+      - run:
+          name: Codecov
+          command: .scripts/deploy-codecov.sh
+
+      - run:
+          name: Website
+          command: .scripts/deploy-website.sh
+
+      - save_cache:
+          key: rxnetwork-{{ checksum "build.gradle" }}-{{ checksum "rxnetwork/build.gradle" }}-{{ checksum "app/build.gradle" }}-{{ checksum "circle.yml" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          paths:
+            - "~/.gradle"
+            - "~/.m2"
+
+      - store_artifacts:
+          path: rxnetwork/build/outputs/aar
+          destination: aar
+
+      - store_artifacts:
+          path: rxnetwork/build/reports/tests
+          destination: tests
+
+      - store_artifacts:
+          path: rxnetwork/build/reports/jacoco
+          destination: coverage
