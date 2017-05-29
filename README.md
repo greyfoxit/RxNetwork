@@ -475,7 +475,7 @@ rxNetwork.observe()
     .subscribe(...)
 ```
 
-**Starting from** Android`API >= 21` there are two other types of filters available for you: `hasTransport`
+**Starting from** Android`API >= 21` there are other types of filters available for you: `hasTransport`
 and `hasCapability`. These are related to new `NetworkCapabilities` class in *Lollipop*. 
 Usage is similar, for example:
 
@@ -494,16 +494,39 @@ rxNetwork.observe()
     .subscribe(...)
 ```
 
-**Please, remember:** those filters are viable and has effect only **from Lollipop and up**.
+and two additional bandwidth-related: `isSatisfiedByUpBandwidth` and `isSatisfiedByDownBandwidth` 
 
-#### Things to consider
+```java
+
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByUpBandwidth;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByDownBandwidth;
+
+(...)
+
+private static final int UPSTREAM_BANDWIDTH = 1024 // in Kbps
+private static final int DOWNSTREAM_BANDWIDTH = 2048 // in Kbps
+
+rxNetwork.observe()
+    .observeOn(AndroidSchedulers.mainThread())
+    .filter(isSatisfiedByUpBandwidth(UPSTREAM_BANDWIDTH)    
+    .filter(isSatisfiedByDownBandwidth(DOWNSTREAM_BANDWIDTH))
+    .subscribe(...)
+```
+
+**Please, note:** bandwidth is never measured, but rather is inferred from technology type and 
+other link parameters. It is also by default in `Kbps` vis-à-vis original `getLinkUpstreamBandwidthKbps` 
+and `getLinkUpstreamBandwidthKbps` methods. Any calculations are up to you. When in doubt please 
+refer to [`NetworkCapabilities`](https://developer.android.com/reference/android/net/NetworkCapabilities.html) 
+class in Android API to get a grip.
+
+### Observing real internet access
 
 Although observing network connection gives you good approximation of what is going on with your 
-network, please bear in mind it doesn't actually guarantee there is a real working internet access. 
+network, you should bear in mind it doesn't actually guarantee there is a real working internet access. 
 Of course Android `NetworkInfo#isConnected()` method tries to handle cases like flaky mobile 
 networks, airplane mode, and restricted background data but ultimately it doesn't necessarily mean 
 there is actual network traffic going on. Standard solution using `ConnectivityManager` described 
-also in [android dev](https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html) 
+in [Android Dev](https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html) 
 **does not really check for real internet access, it just checks if a connection is established** 
 
 To put it in simple terms: **having a network connection doesn't mean you have true internet access**. 
@@ -513,17 +536,14 @@ would not allow you to go through to the internet. Similar situations might occu
 setups, connections to router that has no outside internet access, or with something banal and 
 prosaic like server hang-on. 
 
-If you are interested in how to tackle those situations and **if you want to be absolutely sure 
-that your observables provide you information about true internet accessibility**, please read 
-section below. 
+If you are interested in tackling those situations and **if you want to be absolutely sure 
+that your observables provide you information about internet accessibility** please read on. 
 
-### Observing real internet access
+#### Observing real access
 
-#### Observing real
-
-As mentioned before: you can observe true Internet connectivity with RxNetwork. This is 
-done simply by using `observeReal()` method. This observable will simply return `true` if there is
-real Internet connection and `false` if not.
+As you might've suspected: you can observe true Internet connectivity with RxNetwork. This is done 
+simply by using `observeReal()` method. This observable will simply return `true` if there is real 
+Internet connection and `false` if not.
 
 ```java
 rxNetwork.observeReal()
