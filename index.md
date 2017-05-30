@@ -15,7 +15,7 @@ in a Reactive Programming manner.
 Library is compatible with **RxJava 2.x** and **RxAndroid 2.x** and can be included in any Android
 application that supports **minSdk = 9** (`Android 2.3 Gingerbread` and up)    
 
-## Introstruction suckion lipo
+## Introduction
 
 RxNetwork library contains **easy-to-follow API** for observing network connectivity and
 internet access to give you simple and unified way of getting always current connection status for 
@@ -46,6 +46,7 @@ the options. Whichever approach you choose it's up to you.
   - [Observing](#observing)
   - [Simple observing](#simple-observing)
   - [Observing with custom strategy](#observing-with-custom-strategy)
+  - [Observing with NetworkCapabilities](#observing-with-networkcapabilities)
   - [Filtering](#filtering)
   - [Things to consider](#things-to-consider)
 - [Observing real internet access](#observing-real-internet-access)
@@ -317,7 +318,7 @@ Now, let's see what we can *really* do with this library. But first let's take a
 [`RxNetworkInfo`](https://github.com/radekkozak/RxNetwork/blob/master/rxnetwork/src/main/java/greyfox/rxnetwork/internal/net/RxNetworkInfo.java) 
 is *the* class that you would use if you decide you want more than just basic information about 
 the network connection. This class is simply a wrapper around Android's original `NetworkInfo` 
-that you can use to extract all the original info. Starting from `Lollipop` (API >= 21) 
+that you can use to extract all the original info. Starting from *Lollipop* (`API 21+`) 
 it also provides additional `NetworkCapabilities` information.
 
 #### Observing
@@ -429,6 +430,39 @@ rxNetwork.observe(new YourCustomNetworkObservingStrategy())
     .subscribe(...);
 ``` 
 
+#### Observing with NetworkCapabilities
+
+Starting from *Lollipop* (`API 21+`) there is new mechanism in Android for observing network changes 
+based on new [NetworkCallback](#https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback.html).
+There is also a new [NetworkCapabilities](#https://developer.android.com/reference/android/net/NetworkCapabilities.html)
+class that represents the capabilities of a network and [NetworkRequest](#https://developer.android.com/reference/android/net/NetworkRequest.html)
+that is used to request a network via [`ConnectivityManager#registerNetworkCallback`](#https://developer.android.com/reference/android/net/ConnectivityManager.html#registerNetworkCallback(android.net.NetworkRequest,%20android.net.ConnectivityManager.NetworkCallback))
+
+**RxNetwork takes advantage of this new mechanism when trying to observe network changes**. Under 
+the hood it uses default `NetworkRequest` which in turn uses default `NetworkCapabilities` to 
+observe "wanted" network. As always you can filter what kind of network you want to observe on 
+(see [NetworkCapabilities related filtering](#networkcapabilities-related-filtering) section). If 
+you'll be relying on library's default this would mostly make sense in regard to `transportType` 
+filter but if you want to dive in more when deciding more about the network you want to observer 
+you can provide your own `NetworkRequest` instance to RxNetwork, for example:
+
+```java
+NetworkRequest request = new NetworkRequest.Builder()
+                .addTransportType(TRANSPORT_WIFI)
+                .addTransportType(TRANSPORT_CELLULAR)
+                .addCapability(NET_CAPABILITY_INTERNET)
+                .addCapability(NET_CAPABILITY_NOT_VPN)
+                .build();
+
+RxNetwork rxNetwork = RxNetwork.builder().defaultNetworkRequest(request).init(context);
+
+// proceed with observing as you normally would
+```
+
+As you can see Android's `NetworkRequest.Builder` lets you configure multiple transport types and
+similarily multiple capabilities, but **please read official documentation to know exactly how this
+all works** and how those options differ from each other.
+
 #### Filtering
 
 With RxNetwork if you're only interested in particular kind of network information, 
@@ -479,26 +513,33 @@ rxNetwork.observe()
     .subscribe(...)
 ```
 
-**Starting from** Android`API >= 21` there are other types of filters available for you: `hasTransport`
-and `hasCapability`. These are related to new `NetworkCapabilities` class in *Lollipop*. 
-Usage is similar, for example:
+**NetworkCapabilities related filtering**
+
+There is new type of filter available for you when observing network on Android `API 21+`, namely 
+`hasTransport`. This one is related to new `NetworkCapabilities`. Usage is similar to what you 
+already know:
 
 ```java
-import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
-import static android.net.NetworkCapabilities.NET_CAPABILITY_TRUSTED;
 import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
+import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasTransportType;
 
 (...)
 
 rxNetwork.observe()
     .observeOn(AndroidSchedulers.mainThread())
-    .filter(hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_TRUSTED))    
-    .filter(hasTransport(TRANSPORT_WIFI, TRANSPORT_CELLULAR))
+    .filter(hasTransportType(TRANSPORT_WIFI, TRANSPORT_CELLULAR))
     .subscribe(...)
 ```
 
-and two additional bandwidth-related: `isSatisfiedByUpBandwidth` and `isSatisfiedByDownBandwidth` 
+As you see multiple transports may be applied when searching for a network to satisfy a request. In 
+the example above this would cause either a Wi-Fi network or an Cellular network to be selected. 
+This is logically different than `NetworkCapabilities.NET_CAPABILITY_*` (which is why it doesn't 
+make much sense for the library to filter by concrete capabilities). If you're in doubt what we mean
+by that should definitely check out Android's source code for `NetworkCapabilities` class to see how 
+capabilities and transport types work.
+
+There also two additional bandwidth-related predicates: `isSatisfiedByUpBandwidth` and `isSatisfiedByDownBandwidth` 
 
 ```java
 
