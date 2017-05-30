@@ -11,5 +11,5 @@ REMOTE_RUN_BRANCH="remote-run"
 if [[ "$CIRCLE_BRANCH" =~ "$REMOTE_RUN_BRANCH" ]]; then
   echo "Skipping code coverage deployment: on a 'remote-run' branch."
 else
-  bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN;
+  bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN};
 fi

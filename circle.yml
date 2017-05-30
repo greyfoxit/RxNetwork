@@ -33,7 +33,7 @@ jobs:
 
       - run:
           name: Codecov
-          command: .scripts/deploy-codecov.sh
+          command: .scripts/deploy-codecov.sh || exit 0
 
       - run:
           name: Website

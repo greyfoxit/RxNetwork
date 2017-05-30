@@ -24,24 +24,24 @@ elif [ "$CIRCLE_BRANCH" != "$BRANCH" ]; then
 else
   echo "Deploying website..."
 
+  DIR=temp
+
+  # Clone the current repo into temp folder
+  git clone $REPO $DIR && cd $DIR
+
+  git checkout -t origin/gh-pages
+
   CUSTOM_LAYOUT='---\nlayout: default\n---\n'
   CUSTOM_TITLE='Documentation'
 
   git config --global user.email "bot@greyfox.it"
   git config --global user.name "Greyfox Bot"
 
-  # Fetch and checkout gh-pages
-  git fetch origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
-  git checkout -b gh-pages origin/gh-pages
-
-  # Clean working directory before doing anything
-  git clean -f -d
-
   # Prepend jekyll layout header
-  echo -e ${CUSTOM_LAYOUT} > index.md
+  echo -e $CUSTOM_LAYOUT > index.md
 
-  # Prepend custom title
-  echo -e '# '${CUSTOM_TITLE} >> index.md
+  # Append custom title
+  echo -e '# '$CUSTOM_TITLE >> index.md
 
   # Sync README from master branch (without project name header)
   git checkout master -- README.md
@@ -49,17 +49,33 @@ else
   rm README.md
 
   # Download the latest javadoc
-  #curl -L "http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=$GROUP_ID&a=$ARTIFACT_ID&v=LATEST&c=javadoc" > javadoc.zip
-  #unzip javadoc.zip -d javadoc
-  #rm javadoc.zip
+  curl -L "http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=$GROUP_ID&a=$ARTIFACT_ID&v=LATEST&c=javadoc" > javadoc.zip
+  mkdir -p javadoc
 
-  git add -A
+  JAVADOC_RESULT="$(unzip -o javadoc.zip -d javadoc 2>&1 > /dev/null)"
+
+  if [[ $JAVADOC_RESULT == "" ]]; then
+	echo "Javadoc extracted"
+  else
+	echo "Skipping Javadoc: $JAVADOC_RESULT"
+  fi
+
+  rm javadoc.zip
+
+  # Stage files
+  git add -A .
+
+  # Commit if needed
   if [[ `git status --porcelain` ]]; then
 	git commit -m "Website at $(date)"
-    git push -fq origin gh-pages
+    git push origin gh-pages
     echo "Website deployed!"
   else
     echo "Skipping deployment: no changes detected"
   fi
+
+  # Clean up
+  cd ..
+  rm -rf $DIR
 
 fi
