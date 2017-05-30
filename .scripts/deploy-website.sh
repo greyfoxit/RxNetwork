@@ -27,8 +27,8 @@ else
   CUSTOM_LAYOUT='---\nlayout: default\n---\n'
   CUSTOM_TITLE='Documentation'
 
-  git config --global user.email "travis@travis-ci.org"
-  git config --global user.name "Travis"
+  git config --global user.email "bot@greyfox.it"
+  git config --global user.name "Greyfox Bot"
 
   # Fetch and checkout gh-pages
   git fetch origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
