@@ -167,7 +167,7 @@ public final class RxNetworkInfoPredicate {
             };
         }
 
-        public static Predicate<RxNetworkInfo> hasTransport(final int... transportTypes) {
+        public static Predicate<RxNetworkInfo> hasTransportType(final int... transportTypes) {
             return new Predicate<RxNetworkInfo>() {
                 @Override
                 public boolean test(RxNetworkInfo networkInfo) throws Exception {

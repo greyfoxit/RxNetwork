@@ -20,6 +20,7 @@ import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION_CODES.M;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 
 import static java.util.logging.Logger.getLogger;
 
@@ -34,7 +35,6 @@ import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork.internal.net.RxNetworkInfoHelper;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -59,11 +59,19 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
     @NonNull private final PowerManager powerManager;
     @NonNull private final Context context;
     @NonNull private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
+    private NetworkRequest networkRequest;
 
     public MarshmallowNetworkObservingStrategy(@NonNull Context context) {
         this.context = checkNotNull(context, "context");
         connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
+    }
+
+    public MarshmallowNetworkObservingStrategy(@NonNull Context context,
+            @NonNull NetworkRequest networkRequest) {
+
+        this(context);
+        this.networkRequest = checkNotNull(networkRequest, "network request");
     }
 
     @Override
@@ -113,7 +121,7 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
             if (isDeviceInIdleMode(context)) {
                 upstream.onNext(RxNetworkInfo.create());
             } else {
-                upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(context));
+                upstream.onNext(getRxNetworkInfoFrom(context));
             }
         }
 
@@ -144,7 +152,10 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
 
         private void registerNetworkCallback(ObservableEmitter<RxNetworkInfo> upstream) {
             networkCallback = new MarshmallowNetworkCallback(upstream);
-            NetworkRequest request = new NetworkRequest.Builder().build();
+
+            NetworkRequest request = networkRequest != null
+                    ? networkRequest : new NetworkRequest.Builder().build();
+
             connectivityManager.registerNetworkCallback(request, networkCallback);
         }
     }
@@ -159,12 +170,12 @@ public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStr
 
         @Override
         public void onAvailable(Network network) {
-            upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, connectivityManager));
+            upstream.onNext(getRxNetworkInfoFrom(network, connectivityManager));
         }
 
         @Override
         public void onLost(Network network) {
-            upstream.onNext(RxNetworkInfoHelper.getNetworkInfoFrom(network, connectivityManager));
+            upstream.onNext(getRxNetworkInfoFrom(network, connectivityManager));
         }
     }
 }
