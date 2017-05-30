@@ -26,16 +26,21 @@ else
 
   DIR=temp
 
+  # Delete any existing temporary website clone
+  rm -rf $DIR
+
   # Clone the current repo into temp folder
   git clone $REPO $DIR && cd $DIR
 
+  # Checkout and track gh-pages branch
   git checkout -t origin/gh-pages
+
+  # Register auto committer
+  git config --global user.email "bot@greyfox.it"
+  git config --global user.name "Greyfox Bot"
 
   CUSTOM_LAYOUT='---\nlayout: default\n---\n'
   CUSTOM_TITLE='Documentation'
-
-  git config --global user.email "bot@greyfox.it"
-  git config --global user.name "Greyfox Bot"
 
   # Prepend jekyll layout header
   echo -e $CUSTOM_LAYOUT > index.md
@@ -52,17 +57,18 @@ else
   curl -L "http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=$GROUP_ID&a=$ARTIFACT_ID&v=LATEST&c=javadoc" > javadoc.zip
   mkdir -p javadoc
 
-  JAVADOC_RESULT="$(unzip -o javadoc.zip -d javadoc 2>&1 > /dev/null)"
+  # Store error without exiting prematurely ( we want to know what's going on )
+  JAVADOC_RESULT="$(unzip -o javadoc.zip -d javadoc 2>&1 > /dev/null || true)"
 
   if [[ $JAVADOC_RESULT == "" ]]; then
-	echo "Javadoc extracted"
+	echo "Javadoc extracted successfully"
   else
 	echo "Skipping Javadoc: $JAVADOC_RESULT"
   fi
 
   rm javadoc.zip
 
-  # Stage files
+  # Stage all changes
   git add -A .
 
   # Commit if needed
@@ -76,6 +82,6 @@ else
 
   # Clean up
   cd ..
-  rm -rf $DIR
+  rm -rf ${DIR}
 
 fi
