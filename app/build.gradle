@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion conf.compileSdk
-    buildToolsVersion conf.buildToolsVersion
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
-        applicationId "it.greyfox.rxnetwork"
-        minSdkVersion conf.minSdk
-        targetSdkVersion conf.targetSdk
+        applicationId "com.example.rxnetwork"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
