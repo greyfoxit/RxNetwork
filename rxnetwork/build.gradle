@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion conf.compileSdk
-    buildToolsVersion conf.buildToolsVersion
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
-        minSdkVersion conf.minSdk
-        targetSdkVersion conf.targetSdk
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
     }
 
     buildTypes {
