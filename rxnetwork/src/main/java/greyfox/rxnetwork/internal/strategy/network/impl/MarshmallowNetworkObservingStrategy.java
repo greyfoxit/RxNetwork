@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * @author Radek Kozak
  */
 @RequiresApi(M)
-public class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStrategy {
+public final class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStrategy {
 
     private static final IntentFilter IDLE_MODE_CHANGED
             = new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);

@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * @author Radek Kozak
  */
 @SuppressWarnings("WeakerAccess")
-public class PreLollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
+public final class PreLollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
 
     private static final IntentFilter CONNECTIVITY_INTENT_FILTER
             = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);

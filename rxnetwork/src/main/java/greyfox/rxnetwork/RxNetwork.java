@@ -31,7 +31,7 @@ import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategyProviders;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
-import greyfox.rxnetwork.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
+import greyfox.rxnetwork.internal.strategy.internet.impl.WalledGardenInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
@@ -228,7 +228,7 @@ public final class RxNetwork {
             checkNotNull(context, "Cannot initialize RxNetwork with null context");
 
             if (networkObservingStrategy == null) {
-                getNetworkObservingStrategy(context);
+                networkObservingStrategy = getNetworkObservingStrategy(context);
             }
 
             return init();
@@ -237,7 +237,7 @@ public final class RxNetwork {
         @NonNull
         public RxNetwork init() {
             if (internetObservingStrategy == null) {
-                internetObservingStrategy = BuiltInInternetObservingStrategy.create();
+                internetObservingStrategy = WalledGardenInternetObservingStrategy.create();
             }
 
             return new RxNetwork(this);

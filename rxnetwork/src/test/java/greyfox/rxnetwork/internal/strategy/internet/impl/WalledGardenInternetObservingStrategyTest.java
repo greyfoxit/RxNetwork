@@ -1,21 +1,7 @@
-/*
- * Copyright (C) 2017 Greyfox, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static greyfox.rxnetwork.internal.strategy.internet.impl.WalledGardenInternetObservingStrategy.builder;
+
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -32,49 +18,33 @@ import greyfox.rxnetwork.internal.strategy.internet.error.InternetObservingStrat
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
-public class BuiltInInternetObservingStrategyTest {
+/**
+ * @author Radek Kozak
+ */
+@SuppressWarnings("ConstantConditions")
+public class WalledGardenInternetObservingStrategyTest
+        extends EndpointInternetObservingStrategyTest {
 
-    private static final BuiltInInternetObservingStrategy.Builder NULL_BUILDER = null;
-    private static final String INVALID_HOST = "htt:/invalid.endpoint";
+    private static final WalledGardenInternetObservingStrategy.Builder NULL_BUILDER = null;
 
-    // built-in strategy uses HTTP Status-Code 204: No Content to validate connection
+    // WalledGardenInternetStrategy uses HTTP Status-Code 204: No Content to validate connection
     private static final int VALID_SERVER_RESPONSE = HTTP_NO_CONTENT;
-    private static final int INVALID_SERVER_RESPONSE = HTTP_INTERNAL_ERROR;
-    private static final int VALID_TIMEOUT_MS = 100;
-
-    MockWebServer server;
-
-    @Before
-    public void setUp() throws Exception {
-        server = new MockWebServer();
-        server.start();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        server.shutdown();
-    }
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
-        new BuiltInInternetObservingStrategy();
+        new WalledGardenInternetObservingStrategy();
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new BuiltInInternetObservingStrategy(NULL_BUILDER);
+        new WalledGardenInternetObservingStrategy(NULL_BUILDER);
     }
 
     @Test
     public void shouldSubscribeCorrectly_whenCreatedFromDefaultFactory() {
-        InternetObservingStrategy sut = BuiltInInternetObservingStrategy.create();
+        InternetObservingStrategy sut = WalledGardenInternetObservingStrategy.create();
 
         sut.observe().test().assertSubscribed();
     }
@@ -88,7 +58,7 @@ public class BuiltInInternetObservingStrategyTest {
 
     @Test
     public void shouldThrow_whenTryingToObserveInvalidEndpoint() {
-        InternetObservingStrategy sut = BuiltInInternetObservingStrategy.builder()
+        InternetObservingStrategy sut = builder()
                 .endpoint(INVALID_HOST).build();
 
         assertThat(sut.observe().blockingFirst()).isFalse();
@@ -98,7 +68,7 @@ public class BuiltInInternetObservingStrategyTest {
     public void internetConnectionShouldBeTrue()
             throws IOException, InternetObservingStrategyException {
 
-        BuiltInInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+        WalledGardenInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
         HttpURLConnection urlConnection = mock(HttpURLConnection.class);
         doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
         doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
@@ -110,8 +80,8 @@ public class BuiltInInternetObservingStrategyTest {
     public void internetConnectionShouldBeTrue_whenValidServerResponse()
             throws InterruptedException, IOException {
 
-        setServerWithHttpStatusResponse(server, VALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy(server);
+        setServerWithHttpStatusResponse(VALID_SERVER_RESPONSE);
+        InternetObservingStrategy sut = buildStrategy();
 
         assertThat(sut.observe().blockingFirst()).isTrue();
     }
@@ -120,7 +90,7 @@ public class BuiltInInternetObservingStrategyTest {
     public void shouldLogError_whenProblemGettingResponseCode() throws IOException,
             InternetObservingStrategyException {
 
-        BuiltInInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+        WalledGardenInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
         HttpURLConnection urlConnection = mock(HttpURLConnection.class);
         doThrow(IOException.class).when(urlConnection).getResponseCode();
 
@@ -133,23 +103,19 @@ public class BuiltInInternetObservingStrategyTest {
     @Test
     public void internetConnectionShouldBeFalse_whenInvalidServerResponse() throws IOException {
 
-        setServerWithHttpStatusResponse(server, INVALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy(server);
+        setServerWithHttpStatusResponse(INVALID_SERVER_RESPONSE);
+        InternetObservingStrategy sut = buildStrategy();
 
         assertThat(sut.observe().blockingFirst()).isFalse();
     }
 
-    private void setServerWithHttpStatusResponse(MockWebServer server, int httpStatusCode) {
-        server.enqueue(new MockResponse().setResponseCode(httpStatusCode));
+    private WalledGardenInternetObservingStrategy.Builder detailedStrategyBuilder() {
+        return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
+                .endpoint(VALID_ENDPOINT);
     }
 
-    private InternetObservingStrategy buildStrategy(MockWebServer server) {
-        String testEndpoint = server.url("/").toString();
-        return BuiltInInternetObservingStrategy.builder().endpoint(testEndpoint).build();
-    }
-
-    private BuiltInInternetObservingStrategy.Builder detailedStrategyBuilder() {
-        return BuiltInInternetObservingStrategy.builder().timeout(VALID_TIMEOUT_MS);
+    @Override
+    protected EndpointInternetObservingStrategy.Builder strategyBuilder() {
+        return builder();
     }
 }
-

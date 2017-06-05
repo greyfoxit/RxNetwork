@@ -19,8 +19,8 @@ import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvi
 abstract class Api21NetworkObservingStrategyProvider
         implements NetworkObservingStrategyProvider {
 
-    final Context context;
-    NetworkRequest networkRequest;
+    protected final Context context;
+    protected NetworkRequest networkRequest;
 
     Api21NetworkObservingStrategyProvider(@NonNull Context context) {
         this.context = checkNotNull(context, "context");

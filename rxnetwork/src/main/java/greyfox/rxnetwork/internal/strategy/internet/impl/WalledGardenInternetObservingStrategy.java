@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2017 Greyfox, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
@@ -32,25 +17,29 @@ import java.util.logging.Logger;
 /**
  * @author Radek Kozak
  */
-public final class Http200InternetObservingStrategy extends UrlConnectionInternetObservingStrategy {
+
+public final class WalledGardenInternetObservingStrategy
+        extends UrlConnectionInternetObservingStrategy {
 
     @VisibleForTesting()
-    Http200InternetObservingStrategy() {
+    WalledGardenInternetObservingStrategy() {
         throw new AssertionError("Use static factory methods or Builder to create strategy");
     }
 
     @VisibleForTesting()
     @RestrictTo(LIBRARY_GROUP)
-    Http200InternetObservingStrategy(@NonNull Builder builder) {
+    WalledGardenInternetObservingStrategy(@NonNull Builder builder) {
         super(builder);
     }
 
     @NonNull
-    public static Http200InternetObservingStrategy create() { return builder().build(); }
+    public static WalledGardenInternetObservingStrategy create() {
+        return builder().build();
+    }
 
     @NonNull
     public static Builder builder() {
-        return new Builder();
+        return new WalledGardenInternetObservingStrategy.Builder();
     }
 
     @Override
@@ -60,7 +49,7 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
         checkNotNull(urlConnection, "urlConnection");
 
         try {
-            return urlConnection.getResponseCode() == 200;
+            return urlConnection.getResponseCode() == 204;
         } catch (IOException ioe) {
             throw new InternetObservingStrategyException("Unable to check internet access", ioe);
         }
@@ -68,16 +57,13 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
 
     @Override
     Logger logger() {
-        return getLogger(Http200InternetObservingStrategy.class.getSimpleName());
+        return getLogger(WalledGardenInternetObservingStrategy.class.getSimpleName());
     }
 
-    /**
-     * {@code Http200InternetObservingStrategy} builder static inner class.
-     */
     public static final class Builder extends UrlConnectionInternetObservingStrategy.Builder
-            <Http200InternetObservingStrategy, Http200InternetObservingStrategy.Builder> {
+            <WalledGardenInternetObservingStrategy, WalledGardenInternetObservingStrategy.Builder> {
 
-        private static final String DEFAULT_ENDPOINT = "http://www.g.cn/blank.html";
+        private static final String DEFAULT_ENDPOINT = "http://g.cn/generate_204";
         private static final int DEFAULT_TIMEOUT_MS = 3000;
 
         public Builder() {
@@ -86,16 +72,16 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
         }
 
         /**
-         * Returns a {@code Http200InternetObservingStrategy} built from the parameters
+         * Returns a {@code WalledGardenInternetObservingStrategy} built from the parameters
          * previously set.
          *
-         * @return a {@code Http200InternetObservingStrategy} built with parameters
-         * of this {@code Http200InternetObservingStrategy.Builder}
+         * @return a {@code WalledGardenInternetObservingStrategy} built with parameters
+         * of this {@code WalledGardenInternetObservingStrategy.Builder}
          */
         @NonNull
         @Override
-        public Http200InternetObservingStrategy build() {
-            return new Http200InternetObservingStrategy(this);
+        public WalledGardenInternetObservingStrategy build() {
+            return new WalledGardenInternetObservingStrategy(this);
         }
     }
 }

@@ -15,22 +15,22 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static greyfox.rxnetwork.internal.strategy.internet.impl.Http200InternetObservingStrategy.builder;
+
 import static java.net.HttpURLConnection.HTTP_OK;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.error.InternetObservingStrategyException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.After;
-import org.junit.Before;
+import java.net.URL;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -38,27 +38,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 /**
  * @author Radek Kozak
  */
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+@SuppressWarnings({"ConstantConditions"})
 @RunWith(MockitoJUnitRunner.class)
-public class Http200InternetObservingStrategyTest {
+public class Http200InternetObservingStrategyTest extends EndpointInternetObservingStrategyTest {
 
-    static final String INVALID_HOST = "htt:/invalid.endpoint";
+    private static final Http200InternetObservingStrategy.Builder NULL_BUILDER = null;
 
-    static final int VALID_SERVER_RESPONSE = HTTP_OK;
-    static final int INVALID_SERVER_RESPONSE = HTTP_INTERNAL_ERROR;
-
-    MockWebServer server;
-
-    @Before
-    public void setUp() throws Exception {
-        server = new MockWebServer();
-        server.start();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        server.shutdown();
-    }
+    // Http200InternetObservingStrategy uses HTTP Status-Code 200: OK to validate connection
+    private static final int VALID_SERVER_RESPONSE = HTTP_OK;
 
     @Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
@@ -67,7 +54,7 @@ public class Http200InternetObservingStrategyTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new Http200InternetObservingStrategy(null);
+        new Http200InternetObservingStrategy(NULL_BUILDER);
     }
 
     @Test
@@ -81,18 +68,17 @@ public class Http200InternetObservingStrategyTest {
     public void internetConnectionShouldBeTrue()
             throws InternetObservingStrategyException, IOException {
 
-        Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
-        HttpURLConnection urlConnection = spy((HttpURLConnection) server.url("/").url()
-                .openConnection());
+        Http200InternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
         doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
-        sut.isConnected(urlConnection);
+        doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
 
         assertThat(sut.observe().blockingFirst()).isTrue();
     }
 
     @Test
     public void internetConnectionShouldBeFalse_whenTryingToObserveInvalidEndpoint() {
-        InternetObservingStrategy sut = Http200InternetObservingStrategy.builder()
+        InternetObservingStrategy sut = builder()
                 .endpoint(INVALID_HOST).build();
 
         assertThat(sut.observe().blockingFirst()).isFalse();
@@ -115,8 +101,8 @@ public class Http200InternetObservingStrategyTest {
     public void internetConnectionShouldBeTrue_whenValidServerResponse()
             throws InterruptedException, IOException {
 
-        setServerWithHttpStatusResponse(server, VALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy(server);
+        setServerWithHttpStatusResponse(VALID_SERVER_RESPONSE);
+        InternetObservingStrategy sut = buildStrategy();
 
         assertThat(sut.observe().blockingFirst()).isTrue();
     }
@@ -125,18 +111,19 @@ public class Http200InternetObservingStrategyTest {
     public void internetConnectionShouldBeFalse_whenInvalidServerResponse()
             throws InterruptedException, IOException {
 
-        setServerWithHttpStatusResponse(server, INVALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy(server);
+        setServerWithHttpStatusResponse(INVALID_SERVER_RESPONSE);
+        InternetObservingStrategy sut = buildStrategy();
 
         assertThat(sut.observe().blockingFirst()).isFalse();
     }
 
-    private void setServerWithHttpStatusResponse(MockWebServer server, int httpStatusCode) {
-        server.enqueue(new MockResponse().setResponseCode(httpStatusCode));
+    private Http200InternetObservingStrategy.Builder detailedStrategyBuilder() {
+        return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
+                .endpoint(VALID_ENDPOINT);
     }
 
-    private BuiltInInternetObservingStrategy buildStrategy(MockWebServer server) {
-        String testEndpoint = server.url("/").toString();
-        return Http200InternetObservingStrategy.builder().endpoint(testEndpoint).build();
+    @Override
+    protected EndpointInternetObservingStrategy.Builder strategyBuilder() {
+        return builder();
     }
 }

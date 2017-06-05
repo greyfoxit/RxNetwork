@@ -16,7 +16,6 @@
 package greyfox.rxnetwork.common.base;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 import static java.lang.String.format;
 
@@ -37,7 +36,7 @@ import android.support.annotation.VisibleForTesting;
 @RestrictTo(LIBRARY_GROUP)
 public final class Preconditions {
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     Preconditions() {
         throw new AssertionError("No instances");
     }
