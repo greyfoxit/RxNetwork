@@ -2,7 +2,7 @@ apply plugin: 'checkstyle'
 
 check.dependsOn 'checkstyle', 'lint'
 
-checkstyle.toolVersion = '7.5'
+checkstyle.toolVersion = '7.7'
 
 task checkstyle(type: Checkstyle) {
     group "verification"
