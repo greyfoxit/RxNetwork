@@ -15,14 +15,13 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-
-import static java.util.logging.Logger.getLogger;
-
 import android.support.annotation.NonNull;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.logging.Logger;
+
+import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static java.util.logging.Logger.getLogger;
 
 /**
  * Defines endpoint-based internet observing strategy.
@@ -38,69 +37,74 @@ import java.util.logging.Logger;
  */
 abstract class EndpointInternetObservingStrategy extends BaseInternetObservingStrategy {
 
-    int timeout;
-    String endpoint;
+  int timeout;
+  String endpoint;
 
-    EndpointInternetObservingStrategy() {}
+  EndpointInternetObservingStrategy() {
+  }
 
-    EndpointInternetObservingStrategy(@NonNull Builder builder) {
-        super(builder);
+  EndpointInternetObservingStrategy(@NonNull Builder builder) {
+    super(builder);
 
-        timeout = builder.timeout;
-        endpoint = builder.endpoint;
-    }
+    timeout = builder.timeout;
+    endpoint = builder.endpoint;
+  }
 
-    /** The API base timeout. */
-    public int timeout() {
-        return timeout;
-    }
+  /** The API base timeout. */
+  public int timeout() {
+    return timeout;
+  }
 
-    /** The API base endpoint. */
-    public String endpoint() {
-        return endpoint;
-    }
+  /** The API base endpoint. */
+  public String endpoint() {
+    return endpoint;
+  }
 
-    @Override
-    Logger logger() {
-        return getLogger(EndpointInternetObservingStrategy.class.getSimpleName());
+  @Override
+  Logger logger() {
+    return getLogger(EndpointInternetObservingStrategy.class.getSimpleName());
+  }
+
+  // @formatter:off
+
+  /**
+   * {@code EndpointInternetObservingStrategy} builder static inner class.
+   */
+  public abstract static class Builder<S extends EndpointInternetObservingStrategy,
+      B extends EndpointInternetObservingStrategy.Builder<S, B>>
+      extends BaseInternetObservingStrategy.Builder<S, B> {
+
+    // @formatter:on
+
+    private int timeout;
+    private String endpoint;
+
+    /**
+     * Sets the {@code timeout} and returns a reference to this Builder so that the methods can
+     * be chained together.
+     *
+     * @param timeout the {@code timeout} to set
+     *
+     * @return a reference to this Builder
+     */
+    @NonNull
+    public B timeout(int timeout) {
+      this.timeout = timeout;
+      return self();
     }
 
     /**
-     * {@code EndpointInternetObservingStrategy} builder static inner class.
+     * Sets the {@code endpoint} and returns a reference to this Builder so that the methods can
+     * be chained together.
+     *
+     * @param endpoint the {@code endpoint} to set
+     *
+     * @return a reference to this Builder
      */
-    public abstract static class Builder<S extends EndpointInternetObservingStrategy, B extends
-            EndpointInternetObservingStrategy.Builder<S, B>> extends
-            BaseInternetObservingStrategy.Builder<S, B> {
-
-        private int timeout;
-        private String endpoint;
-
-        /**
-         * Sets the {@code timeout} and returns a reference to this Builder so that the methods can
-         * be chained together.
-         *
-         * @param timeout the {@code timeout} to set
-         *
-         * @return a reference to this Builder
-         */
-        @NonNull
-        public B timeout(int timeout) {
-            this.timeout = timeout;
-            return self();
-        }
-
-        /**
-         * Sets the {@code endpoint} and returns a reference to this Builder so that the methods can
-         * be chained together.
-         *
-         * @param endpoint the {@code endpoint} to set
-         *
-         * @return a reference to this Builder
-         */
-        @NonNull
-        public B endpoint(@NonNull String endpoint) {
-            this.endpoint = checkNotNull(endpoint, "endpoint");
-            return self();
-        }
+    @NonNull
+    public B endpoint(@NonNull String endpoint) {
+      this.endpoint = checkNotNull(endpoint, "endpoint");
+      return self();
     }
+  }
 }

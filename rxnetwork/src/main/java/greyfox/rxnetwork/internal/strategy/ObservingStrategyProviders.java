@@ -23,5 +23,5 @@ import java.util.Collection;
 
 public interface ObservingStrategyProviders<T extends ObservingStrategyProvider> {
 
-    Collection<T> get();
+  Collection<T> get();
 }

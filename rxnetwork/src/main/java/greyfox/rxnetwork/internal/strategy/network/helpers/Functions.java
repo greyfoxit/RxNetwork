@@ -15,14 +15,14 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.helpers;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
-
 import android.net.NetworkInfo;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import io.reactivex.functions.Function;
+
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
+import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 /**
  * Predefined collection of {@link RxNetworkInfo} related functions that can be used for mapping
@@ -33,22 +33,22 @@ import io.reactivex.functions.Function;
 @RestrictTo(LIBRARY_GROUP)
 public final class Functions {
 
-    public static final Function<RxNetworkInfo, Boolean> TO_CONNECTION_STATE = toConnectionState();
+  public static final Function<RxNetworkInfo, Boolean> TO_CONNECTION_STATE = toConnectionState();
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    Functions() {
-        throw new AssertionError("No instances.");
-    }
+  @VisibleForTesting(otherwise = PRIVATE)
+  Functions() {
+    throw new AssertionError("No instances.");
+  }
 
-    /**
-     * Maps {@link NetworkInfo network} to its {@link Boolean connection state}.
-     */
-    private static Function<RxNetworkInfo, Boolean> toConnectionState() {
-        return new Function<RxNetworkInfo, Boolean>() {
-            @Override
-            public Boolean apply(RxNetworkInfo networkInfo) throws Exception {
-                return networkInfo != null && networkInfo.isConnected();
-            }
-        };
-    }
+  /**
+   * Maps {@link NetworkInfo network} to its {@link Boolean connection state}.
+   */
+  private static Function<RxNetworkInfo, Boolean> toConnectionState() {
+    return new Function<RxNetworkInfo, Boolean>() {
+      @Override
+      public Boolean apply(RxNetworkInfo networkInfo) throws Exception {
+        return networkInfo != null && networkInfo.isConnected();
+      }
+    };
+  }
 }

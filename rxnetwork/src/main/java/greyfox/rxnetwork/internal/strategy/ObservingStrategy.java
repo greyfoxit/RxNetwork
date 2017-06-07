@@ -22,5 +22,5 @@ import io.reactivex.Observable;
  */
 public interface ObservingStrategy<T> {
 
-    Observable<T> observe();
+  Observable<T> observe();
 }

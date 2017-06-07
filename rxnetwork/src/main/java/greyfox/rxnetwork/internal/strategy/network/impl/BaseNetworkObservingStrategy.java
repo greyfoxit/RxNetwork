@@ -28,27 +28,27 @@ import java.util.logging.Logger;
  */
 abstract class BaseNetworkObservingStrategy implements NetworkObservingStrategy {
 
-    abstract void dispose();
+  abstract void dispose();
 
-    abstract Logger logger();
+  abstract Logger logger();
 
-    void onError(String message, Exception exception) {
-        logger().log(Level.WARNING, message + ": " + exception.getMessage());
+  void onError(String message, Exception exception) {
+    logger().log(Level.WARNING, message + ": " + exception.getMessage());
+  }
+
+  final class OnDisposeAction implements Action {
+
+    @Override
+    public void run() throws Exception {
+      dispose();
     }
+  }
 
-    final class OnDisposeAction implements Action {
+  final class StrategyCancellable implements Cancellable {
 
-        @Override
-        public void run() throws Exception {
-            dispose();
-        }
+    @Override
+    public void cancel() throws Exception {
+      dispose();
     }
-
-    final class StrategyCancellable implements Cancellable {
-
-        @Override
-        public void cancel() throws Exception {
-            dispose();
-        }
-    }
+  }
 }

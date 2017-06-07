@@ -15,14 +15,14 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.providers;
 
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork.internal.os.Build.isLessThanLollipop;
-
 import android.content.Context;
 import android.support.annotation.NonNull;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
+
+import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.internal.os.Build.isLessThanLollipop;
 
 /**
  * Provides network observing strategy implementation for pre-Lollipop devices.
@@ -30,21 +30,21 @@ import greyfox.rxnetwork.internal.strategy.network.impl.PreLollipopNetworkObserv
  * @author Radek Kozak
  */
 final class PreLollipopNetworkObservingStrategyProvider
-        implements NetworkObservingStrategyProvider {
+    implements NetworkObservingStrategyProvider {
 
-    private final Context context;
+  private final Context context;
 
-    PreLollipopNetworkObservingStrategyProvider(@NonNull Context context) {
-        this.context = checkNotNull(context, "context");
-    }
+  PreLollipopNetworkObservingStrategyProvider(@NonNull Context context) {
+    this.context = checkNotNull(context, "context");
+  }
 
-    @Override
-    public boolean canProvide() {
-        return isLessThanLollipop();
-    }
+  @Override
+  public boolean canProvide() {
+    return isLessThanLollipop();
+  }
 
-    @Override
-    public NetworkObservingStrategy provide() {
-        return new PreLollipopNetworkObservingStrategy(context);
-    }
+  @Override
+  public NetworkObservingStrategy provide() {
+    return new PreLollipopNetworkObservingStrategy(context);
+  }
 }

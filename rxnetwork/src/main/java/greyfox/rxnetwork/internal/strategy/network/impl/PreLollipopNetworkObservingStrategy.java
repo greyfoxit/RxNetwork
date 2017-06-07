@@ -15,11 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
-
-import static java.util.logging.Logger.getLogger;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,59 +27,62 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import java.util.logging.Logger;
 
+import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
+import static java.util.logging.Logger.getLogger;
+
 /**
  * RxNetworkInfo observing strategy for pre-Lollipop Android devices (API &lt; 21).
  *
  * @author Radek Kozak
  */
-@SuppressWarnings("WeakerAccess")
 public final class PreLollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
 
-    private static final IntentFilter CONNECTIVITY_INTENT_FILTER
-            = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+  private static final IntentFilter CONNECTIVITY_INTENT_FILTER = new IntentFilter(
+      ConnectivityManager.CONNECTIVITY_ACTION);
 
-    @NonNull private final Context context;
-    private BroadcastReceiver broadcastReceiver;
+  @NonNull private final Context context;
+  private BroadcastReceiver broadcastReceiver;
 
-    public PreLollipopNetworkObservingStrategy(@NonNull Context context) {
-        this.context = checkNotNull(context, "context");
+  public PreLollipopNetworkObservingStrategy(@NonNull Context context) {
+    this.context = checkNotNull(context, "context");
+  }
+
+  @Override
+  public Observable<RxNetworkInfo> observe() {
+    return Observable.create(new PreLollipopOnSubscribe()).distinctUntilChanged();
+  }
+
+  private void register() {
+    context.registerReceiver(broadcastReceiver, CONNECTIVITY_INTENT_FILTER);
+  }
+
+  @Override
+  void dispose() {
+    try {
+      context.unregisterReceiver(broadcastReceiver);
+    } catch (Exception exc) {
+      onError("Could not unregister broadcast receiver", exc);
     }
+  }
+
+  @Override
+  Logger logger() {
+    return getLogger(PreLollipopNetworkObservingStrategy.class.getSimpleName());
+  }
+
+  private final class PreLollipopOnSubscribe implements ObservableOnSubscribe<RxNetworkInfo> {
 
     @Override
-    public Observable<RxNetworkInfo> observe() {
-        return Observable.create(new PreLollipopOnSubscribe()).distinctUntilChanged();
-    }
-
-    private void register() {
-        context.registerReceiver(broadcastReceiver, CONNECTIVITY_INTENT_FILTER);
-    }
-
-    @Override
-    void dispose() {
-        try {
-            context.unregisterReceiver(broadcastReceiver);
-        } catch (Exception exc) {
-            onError("Could not unregister broadcast receiver", exc);
-        }
-    }
-
-    @Override
-    Logger logger() {
-        return getLogger(PreLollipopNetworkObservingStrategy.class.getSimpleName());
-    }
-
-    private final class PreLollipopOnSubscribe implements ObservableOnSubscribe<RxNetworkInfo> {
-
+    public void subscribe(final ObservableEmitter<RxNetworkInfo> emitter) throws Exception {
+      broadcastReceiver = new BroadcastReceiver() {
         @Override
-        public void subscribe(final ObservableEmitter<RxNetworkInfo> emitter) throws Exception {
-            broadcastReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    emitter.onNext(getRxNetworkInfoFrom(context));
-                }
-            };
-            emitter.setCancellable(new StrategyCancellable());
-            register();
+        public void onReceive(Context context, Intent intent) {
+          emitter.onNext(getRxNetworkInfoFrom(context));
         }
+      };
+      emitter.setCancellable(new StrategyCancellable());
+      register();
     }
+  }
 }

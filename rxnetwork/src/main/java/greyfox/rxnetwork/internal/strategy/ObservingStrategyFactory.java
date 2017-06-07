@@ -21,5 +21,5 @@ package greyfox.rxnetwork.internal.strategy;
 
 public interface ObservingStrategyFactory<T extends ObservingStrategy> {
 
-    T get();
+  T get();
 }

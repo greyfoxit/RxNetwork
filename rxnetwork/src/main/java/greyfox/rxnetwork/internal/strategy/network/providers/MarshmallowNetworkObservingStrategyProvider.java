@@ -15,10 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.providers;
 
-import static android.os.Build.VERSION_CODES.M;
-
-import static greyfox.rxnetwork.internal.os.Build.isAtLeastMarshmallow;
-
 import android.content.Context;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
@@ -26,33 +22,37 @@ import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.impl.MarshmallowNetworkObservingStrategy;
 
+import static android.os.Build.VERSION_CODES.M;
+import static greyfox.rxnetwork.internal.os.Build.isAtLeastMarshmallow;
+
 /**
  * Provides network observing strategy implementation for Marshmallow devices.
  *
  * @author Radek Kozak
  */
 final class MarshmallowNetworkObservingStrategyProvider
-        extends Api21NetworkObservingStrategyProvider {
+    extends Api21NetworkObservingStrategyProvider {
 
-    MarshmallowNetworkObservingStrategyProvider(@NonNull Context context) {
-        super(context);
-    }
+  MarshmallowNetworkObservingStrategyProvider(@NonNull Context context) {
+    super(context);
+  }
 
-    MarshmallowNetworkObservingStrategyProvider(@NonNull Context context,
-            @NonNull NetworkRequest networkRequest) {
+  MarshmallowNetworkObservingStrategyProvider(@NonNull Context context,
+      @NonNull NetworkRequest networkRequest) {
 
-        super(context, networkRequest);
-    }
+    super(context, networkRequest);
+  }
 
-    @Override
-    public boolean canProvide() {
-        return isAtLeastMarshmallow();
-    }
+  @Override
+  public boolean canProvide() {
+    return isAtLeastMarshmallow();
+  }
 
-    @Override
-    @RequiresApi(M)
-    public NetworkObservingStrategy provide() {
-        return networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
-                : new MarshmallowNetworkObservingStrategy(context, networkRequest);
-    }
+  @Override
+  @RequiresApi(M)
+  public NetworkObservingStrategy provide() {
+    return networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
+                                  : new MarshmallowNetworkObservingStrategy(context,
+                                      networkRequest);
+  }
 }

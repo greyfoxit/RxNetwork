@@ -1,49 +1,49 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+  compileSdkVersion versions.compileSdk
+  buildToolsVersion versions.buildTools
 
-    defaultConfig {
-        applicationId "com.example.rxnetwork"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  defaultConfig {
+    applicationId "com.example.rxnetwork"
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.targetSdk
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [toothpick_registry_package_name: 'com.example.rxnetwork']
-            }
-        }
+    javaCompileOptions {
+      annotationProcessorOptions {
+        arguments = [toothpick_registry_package_name: 'com.example.rxnetwork']
+      }
     }
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            minifyEnabled false
-        }
+  buildTypes {
+    release {
+      minifyEnabled true
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
+    debug {
+      minifyEnabled false
+    }
+  }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
 }
 
 dependencies {
-    implementation project(':rxnetwork')
+  implementation project(':rxnetwork')
 
-    implementation deps.appcompatv7
-    implementation deps.constraintLayout
-    implementation deps.butterknife
-    implementation deps.toothpickRuntime
-    implementation deps.toothpickSmoothie
+  implementation deps.appcompatv7
+  implementation deps.constraintLayout
+  implementation deps.butterknife
+  implementation deps.toothpickRuntime
+  implementation deps.toothpickSmoothie
 
-    annotationProcessor deps.toothpickCompiler
-    annotationProcessor deps.butterknifeCompiler
+  annotationProcessor deps.toothpickCompiler
+  annotationProcessor deps.butterknifeCompiler
 }
 
 apply from: rootProject.file('config/code-quality.gradle')
