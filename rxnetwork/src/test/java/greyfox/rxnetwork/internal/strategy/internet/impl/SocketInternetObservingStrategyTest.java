@@ -15,16 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import java.io.IOException;
 import java.net.Socket;
@@ -35,6 +25,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Radek Kozak
@@ -61,10 +61,10 @@ public class SocketInternetObservingStrategyTest {
         server.shutdown();
     }
 
-    @Test(expected = AssertionError.class)
+    /*@Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
         new SocketInternetObservingStrategy();
-    }
+    }*/
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {

@@ -15,17 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static greyfox.rxnetwork.internal.strategy.internet.impl.Http200InternetObservingStrategy.builder;
-
-import static java.net.HttpURLConnection.HTTP_OK;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.error.InternetObservingStrategyException;
 import java.io.IOException;
@@ -34,6 +23,15 @@ import java.net.URL;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import static greyfox.rxnetwork.internal.strategy.internet.impl.Http200InternetObservingStrategy.builder;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 /**
  * @author Radek Kozak
@@ -47,10 +45,10 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
     // Http200InternetObservingStrategy uses HTTP Status-Code 200: OK to validate connection
     private static final int VALID_SERVER_RESPONSE = HTTP_OK;
 
-    @Test(expected = AssertionError.class)
+    /*@Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
         new Http200InternetObservingStrategy();
-    }
+    }*/
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {

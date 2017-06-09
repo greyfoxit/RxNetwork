@@ -18,10 +18,8 @@ package greyfox.rxnetwork.internal.strategy.internet.impl;
 import android.support.annotation.NonNull;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-import static java.util.logging.Logger.getLogger;
 
 /**
  * Defines endpoint-based internet observing strategy.
@@ -37,11 +35,8 @@ import static java.util.logging.Logger.getLogger;
  */
 abstract class EndpointInternetObservingStrategy extends BaseInternetObservingStrategy {
 
-  int timeout;
-  String endpoint;
-
-  EndpointInternetObservingStrategy() {
-  }
+  private int timeout;
+  private String endpoint;
 
   EndpointInternetObservingStrategy(@NonNull Builder builder) {
     super(builder);
@@ -51,18 +46,13 @@ abstract class EndpointInternetObservingStrategy extends BaseInternetObservingSt
   }
 
   /** The API base timeout. */
-  public int timeout() {
+  int timeout() {
     return timeout;
   }
 
   /** The API base endpoint. */
-  public String endpoint() {
+  String endpoint() {
     return endpoint;
-  }
-
-  @Override
-  Logger logger() {
-    return getLogger(EndpointInternetObservingStrategy.class.getSimpleName());
   }
 
   // @formatter:off
@@ -70,7 +60,7 @@ abstract class EndpointInternetObservingStrategy extends BaseInternetObservingSt
   /**
    * {@code EndpointInternetObservingStrategy} builder static inner class.
    */
-  public abstract static class Builder<S extends EndpointInternetObservingStrategy,
+  abstract static class Builder<S extends EndpointInternetObservingStrategy,
       B extends EndpointInternetObservingStrategy.Builder<S, B>>
       extends BaseInternetObservingStrategy.Builder<S, B> {
 
@@ -78,6 +68,10 @@ abstract class EndpointInternetObservingStrategy extends BaseInternetObservingSt
 
     private int timeout;
     private String endpoint;
+
+    protected Builder() {
+      super();
+    }
 
     /**
      * Sets the {@code timeout} and returns a reference to this Builder so that the methods can

@@ -16,6 +16,7 @@
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
@@ -42,25 +43,6 @@ abstract class BaseInternetObservingStrategy implements InternetObservingStrateg
     interval = builder.interval;
   }
 
-  BaseInternetObservingStrategy() {
-  }
-
-  /**
-   * The API base delay (in {@code ms})
-   * used for observing with {@link Observable#interval}.
-   */
-  public long delay() {
-    return delay;
-  }
-
-  /**
-   * The API base interval (in {@code ms})
-   * used for observing with {@link Observable#interval}.
-   */
-  public long interval() {
-    return interval;
-  }
-
   abstract Logger logger();
 
   private Function<Long, Boolean> toConnectionState() {
@@ -72,7 +54,9 @@ abstract class BaseInternetObservingStrategy implements InternetObservingStrateg
     };
   }
 
+  /** Base observing implementation for all internet observing stategies. */
   @Override
+  @RestrictTo(RestrictTo.Scope.SUBCLASSES)
   public Observable<Boolean> observe() {
     return Observable.interval(delay, interval, TimeUnit.MILLISECONDS).map(toConnectionState())
                      .distinctUntilChanged();
@@ -89,7 +73,7 @@ abstract class BaseInternetObservingStrategy implements InternetObservingStrateg
   // @formatter:off
 
   @SuppressWarnings("unchecked")
-  public abstract static class Builder<S extends BaseInternetObservingStrategy,
+  abstract static class Builder<S extends BaseInternetObservingStrategy,
       B extends Builder<S, B>> {
 
     // @formatter:on

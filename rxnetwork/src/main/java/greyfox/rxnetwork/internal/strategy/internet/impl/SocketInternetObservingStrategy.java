@@ -16,7 +16,6 @@
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,8 +23,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Logger;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -36,13 +33,7 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
   /** Either default 80 or a user-specified port. In range [1..65535]. */
   private final int port;
 
-  @VisibleForTesting(otherwise = PRIVATE)
-  SocketInternetObservingStrategy() {
-    throw new AssertionError("Use static factory methods or Builder to create strategy");
-  }
-
-  @VisibleForTesting(otherwise = PRIVATE)
-  @RestrictTo(LIBRARY_GROUP)
+  @VisibleForTesting
   SocketInternetObservingStrategy(@NonNull Builder builder) {
     super(builder);
     port = builder.port;
@@ -64,11 +55,11 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
   }
 
   @Override
-  protected boolean checkConnection() {
+  boolean checkConnection() {
     boolean isConnected;
     Socket socket = null;
     try {
-      socket = connectSocketTo(new InetSocketAddress(endpoint, port), timeout);
+      socket = connectSocketTo(new InetSocketAddress(endpoint(), port), timeout());
       isConnected = isSocketConnected(socket);
     } catch (IOException ioe) {
       onError("Problem occurred while checking endpoint", ioe);
@@ -117,8 +108,9 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
 
     private int port = DEFAULT_PORT;
 
-    public Builder() {
-      super.endpoint(DEFAULT_ENDPOINT);
+    Builder() {
+      super();
+      endpoint(DEFAULT_ENDPOINT);
     }
 
     @NonNull

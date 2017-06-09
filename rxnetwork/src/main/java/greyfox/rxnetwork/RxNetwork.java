@@ -79,10 +79,11 @@ public final class RxNetwork {
   @VisibleForTesting
   RxNetwork(@NonNull Builder builder) {
     checkNotNull(builder, "builder");
-    this.scheduler = builder.scheduler;
-    this.networkObservingStrategy = builder.networkObservingStrategy;
-    this.internetObservingStrategy = builder.internetObservingStrategy;
-    this.networkRequest = builder.networkRequest;
+
+    scheduler = builder.scheduler;
+    networkObservingStrategy = builder.networkObservingStrategy;
+    internetObservingStrategy = builder.internetObservingStrategy;
+    networkRequest = builder.networkRequest;
   }
 
   @NonNull
@@ -101,22 +102,26 @@ public final class RxNetwork {
   }
 
   @Nullable
-  public Scheduler scheduler() {
+  @VisibleForTesting
+  Scheduler scheduler() {
     return this.scheduler;
   }
 
   @NonNull
-  public NetworkObservingStrategy networkObservingStrategy() {
+  @VisibleForTesting
+  NetworkObservingStrategy networkObservingStrategy() {
     return this.networkObservingStrategy;
   }
 
   @NonNull
-  public InternetObservingStrategy internetObservingStrategy() {
+  @VisibleForTesting
+  InternetObservingStrategy internetObservingStrategy() {
     return this.internetObservingStrategy;
   }
 
   @Nullable
-  public NetworkRequest networkRequest() {
+  @VisibleForTesting
+  NetworkRequest networkRequest() {
     return this.networkRequest;
   }
 
@@ -200,6 +205,9 @@ public final class RxNetwork {
     private NetworkObservingStrategy networkObservingStrategy;
     private InternetObservingStrategy internetObservingStrategy;
     private NetworkRequest networkRequest;
+
+    Builder() {
+    }
 
     public Builder defaultScheduler(@NonNull Scheduler scheduler) {
       this.scheduler = checkNotNull(scheduler, "scheduler");

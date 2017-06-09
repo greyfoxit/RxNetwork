@@ -1,9 +1,14 @@
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
+import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
+import greyfox.rxnetwork.internal.strategy.internet.error.InternetObservingStrategyException;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.junit.Test;
+
 import static greyfox.rxnetwork.internal.strategy.internet.impl.WalledGardenInternetObservingStrategy.builder;
-
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
-
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -12,13 +17,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
-import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
-import greyfox.rxnetwork.internal.strategy.internet.error.InternetObservingStrategyException;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import org.junit.Test;
 
 /**
  * @author Radek Kozak
@@ -32,10 +30,10 @@ public class WalledGardenInternetObservingStrategyTest
     // WalledGardenInternetStrategy uses HTTP Status-Code 204: No Content to validate connection
     private static final int VALID_SERVER_RESPONSE = HTTP_NO_CONTENT;
 
-    @Test(expected = AssertionError.class)
+    /*@Test(expected = AssertionError.class)
     public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
         new WalledGardenInternetObservingStrategy();
-    }
+    }*/
 
     @Test(expected = NullPointerException.class)
     public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {

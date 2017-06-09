@@ -28,18 +28,13 @@ import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 /**
  * @author Radek Kozak
  */
-
-public abstract class UrlConnectionInternetObservingStrategy
-    extends EndpointInternetObservingStrategy {
-
-  UrlConnectionInternetObservingStrategy() {
-  }
+abstract class UrlConnectionInternetObservingStrategy extends EndpointInternetObservingStrategy {
 
   UrlConnectionInternetObservingStrategy(@NonNull Builder builder) {
     super(builder);
   }
 
-  @VisibleForTesting()
+  @VisibleForTesting
   HttpURLConnection buildUrlConnection(@NonNull URL url) throws InternetObservingStrategyException {
 
     checkNotNull(url, "url");
@@ -68,14 +63,14 @@ public abstract class UrlConnectionInternetObservingStrategy
     checkNotNull(urlConnection, "urlConnection");
 
     urlConnection.setInstanceFollowRedirects(false);
-    urlConnection.setConnectTimeout(timeout);
-    urlConnection.setReadTimeout(timeout);
+    urlConnection.setConnectTimeout(timeout());
+    urlConnection.setReadTimeout(timeout());
     urlConnection.setUseCaches(false);
     urlConnection.getInputStream();
   }
 
   @Override
-  protected boolean checkConnection() {
+  boolean checkConnection() {
     HttpURLConnection urlConnection = null;
     try {
       urlConnection = buildUrlConnection(url());
@@ -93,7 +88,7 @@ public abstract class UrlConnectionInternetObservingStrategy
   /** Returns this URL as a {@link URL java.net.URL}. */
   private URL url() throws InternetObservingStrategyException {
     try {
-      return new URL(endpoint);
+      return new URL(endpoint());
     } catch (MalformedURLException mue) {
       throw new InternetObservingStrategyException("Couldn't create valid endpoint", mue);
     }
@@ -107,10 +102,14 @@ public abstract class UrlConnectionInternetObservingStrategy
   /**
    * {@code EndpointInternetObservingStrategy} builder static inner class.
    */
-  public abstract static class Builder<S extends UrlConnectionInternetObservingStrategy,
+  abstract static class Builder<S extends UrlConnectionInternetObservingStrategy,
       B extends UrlConnectionInternetObservingStrategy.Builder<S, B>>
       extends EndpointInternetObservingStrategy.Builder<S, B> {
 
     // @formatter:on
+
+    protected Builder() {
+      super();
+    }
   }
 }

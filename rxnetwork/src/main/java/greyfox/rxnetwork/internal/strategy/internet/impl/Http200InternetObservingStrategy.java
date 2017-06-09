@@ -16,14 +16,11 @@
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.internal.strategy.internet.error.InternetObservingStrategyException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.logging.Logger;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static java.util.logging.Logger.getLogger;
 
@@ -32,13 +29,6 @@ import static java.util.logging.Logger.getLogger;
  */
 public final class Http200InternetObservingStrategy extends UrlConnectionInternetObservingStrategy {
 
-  @VisibleForTesting()
-  Http200InternetObservingStrategy() {
-    throw new AssertionError("Use static factory methods or Builder to create strategy");
-  }
-
-  @VisibleForTesting()
-  @RestrictTo(LIBRARY_GROUP)
   Http200InternetObservingStrategy(@NonNull Builder builder) {
     super(builder);
   }
@@ -85,9 +75,10 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
     private static final String DEFAULT_ENDPOINT = "http://www.g.cn/blank.html";
     private static final int DEFAULT_TIMEOUT_MS = 3000;
 
-    public Builder() {
-      super.endpoint(DEFAULT_ENDPOINT);
-      super.timeout(DEFAULT_TIMEOUT_MS);
+    Builder() {
+      super();
+      endpoint(DEFAULT_ENDPOINT);
+      timeout(DEFAULT_TIMEOUT_MS);
     }
 
     /**
