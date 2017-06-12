@@ -15,8 +15,6 @@
  */
 package com.example.rxnetwork;
 
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Bundle;
@@ -34,71 +32,73 @@ import io.reactivex.disposables.Disposable;
 import javax.inject.Inject;
 import toothpick.Toothpick;
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+
 @SuppressWarnings("NullableProblems")
 public class MainActivity extends Activity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+  private static final String TAG = MainActivity.class.getSimpleName();
 
-    @Inject @NonNull public RxNetwork rxNetwork;
-    @BindView(R.id.networkInfo) TextView netInfo;
+  @Inject
+  @NonNull
+  public RxNetwork rxNetwork;
+  @BindView(R.id.networkInfo) TextView netInfo;
 
-    private CompositeDisposable subscriptions;
+  private CompositeDisposable subscriptions;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Toothpick.inject(this, Toothpick.openScopes(RxNetwork.class, this));
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    Toothpick.inject(this, Toothpick.openScopes(RxNetwork.class, this));
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
 
-        ButterKnife.bind(this);
+    ButterKnife.bind(this);
 
-        subscriptions = new CompositeDisposable();
-    }
+    subscriptions = new CompositeDisposable();
+  }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        subscriptions.add(rxNetworkSubscription());
-        //subscriptions.add(rxRealInternetAccessSubscription());
-    }
+  @Override
+  protected void onResume() {
+    super.onResume();
+    subscriptions.add(rxNetworkSubscription());
+    subscriptions.add(rxRealInternetAccessSubscription());
+  }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        subscriptions.clear();
-    }
+  @Override
+  protected void onPause() {
+    super.onPause();
+    subscriptions.clear();
+  }
 
-    @NonNull
-    @TargetApi(LOLLIPOP)
-    protected Disposable rxNetworkSubscription() {
-        return rxNetwork.observe()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::toastNetworkInfo, this::onError);
-    }
+  @NonNull
+  @TargetApi(LOLLIPOP)
+  protected Disposable rxNetworkSubscription() {
+    return rxNetwork.observe().observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::toastNetworkInfo, this::onError);
+  }
 
-    @NonNull
-    protected Disposable rxRealInternetAccessSubscription() {
-        return rxNetwork.observeReal()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::toastInternetConnection, this::onError);
-    }
+  @NonNull
+  protected Disposable rxRealInternetAccessSubscription() {
+    return rxNetwork.observeReal().observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::toastInternetConnection, this::onError);
+  }
 
-    private void toastInternetConnection(Boolean connected) {
-        final String message = "Internet access: " + connected;
-        Log.d(TAG, message);
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-    }
+  private void toastInternetConnection(Boolean connected) {
+    final String message = "Internet access: " + connected;
+    Log.d(TAG, message);
+    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+  }
 
-    private void toastNetworkInfo(@NonNull RxNetworkInfo networkInfo) {
-        final String message = "Network connected: " + networkInfo.isConnected();
-        netInfo.setText(message);
+  private void toastNetworkInfo(@NonNull RxNetworkInfo networkInfo) {
+    final String message = "Network connected: " + networkInfo.isConnected();
+    netInfo.setText(message);
 
-        Log.d(TAG, "toastNetworkInfo: " + message);
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-    }
+    Log.d(TAG, "toastNetworkInfo: " + message);
+    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+  }
 
-    private void onError(@NonNull Throwable throwable) {
-        Log.d(TAG, "onError: " + throwable.getMessage());
-    }
+  private void onError(@NonNull Throwable throwable) {
+    Log.d(TAG, "onError: " + throwable.getMessage());
+  }
 }

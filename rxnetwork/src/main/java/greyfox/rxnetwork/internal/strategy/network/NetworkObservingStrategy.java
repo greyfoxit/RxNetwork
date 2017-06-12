@@ -24,4 +24,6 @@ import greyfox.rxnetwork.internal.strategy.ObservingStrategy;
  *
  * @author Radek Kozak
  */
-public interface NetworkObservingStrategy extends ObservingStrategy<RxNetworkInfo> {}
+public interface NetworkObservingStrategy extends ObservingStrategy<RxNetworkInfo> {
+
+}

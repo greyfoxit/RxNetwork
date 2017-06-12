@@ -15,12 +15,11 @@
  */
 package greyfox.rxnetwork.internal.os;
 
+import android.support.annotation.VisibleForTesting;
+
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.M;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
-
-import android.support.annotation.VisibleForTesting;
 
 /**
  * This class contains platform version checking methods for testing
@@ -31,25 +30,25 @@ import android.support.annotation.VisibleForTesting;
 @SuppressWarnings("WeakerAccess")
 public final class Build {
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    Build() {
-        throw new AssertionError("No instances.");
-    }
+  @VisibleForTesting
+  Build() {
+    throw new AssertionError("No instances.");
+  }
 
-    public static boolean isAtLeastLollipop() {
-        return SDK_INT >= LOLLIPOP;
-    }
+  public static boolean isAtLeastLollipop() {
+    return SDK_INT >= LOLLIPOP;
+  }
 
-    public static boolean isAtLeastMarshmallow() {
-        return SDK_INT >= M;
-    }
+  public static boolean isAtLeastMarshmallow() {
+    return SDK_INT >= M;
+  }
 
-    public static boolean isLessThanLollipop() {
-        return SDK_INT < LOLLIPOP;
-    }
+  public static boolean isLessThanLollipop() {
+    return SDK_INT < LOLLIPOP;
+  }
 
-    public static boolean isLessThanMarshmallow() {
-        return SDK_INT < M;
-    }
+  public static boolean isLessThanMarshmallow() {
+    return SDK_INT < M;
+  }
 }
 

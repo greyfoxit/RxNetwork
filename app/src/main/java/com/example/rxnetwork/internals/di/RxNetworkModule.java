@@ -26,7 +26,7 @@ import toothpick.config.Module;
  */
 public class RxNetworkModule extends Module {
 
-    public RxNetworkModule(Context context) {
-        bind(RxNetwork.class).toInstance(RxNetwork.init(context));
-    }
+  public RxNetworkModule(Context context) {
+    bind(RxNetwork.class).toInstance(RxNetwork.init(context));
+  }
 }

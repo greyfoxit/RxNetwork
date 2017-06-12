@@ -23,19 +23,19 @@ import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 
 public interface ObservingStrategyProvider<T extends ObservingStrategy> {
 
-    /**
-     * Implement this method to determine under what condition your provider can {@link #provide()}
-     * concrete {@link NetworkObservingStrategy}.
-     *
-     * @return {@code true} if concrete {@link NetworkObservingStrategy} can be provided
-     * for given criteria, {@code false} if not
-     */
-    boolean canProvide();
+  /**
+   * Implement this method to determine under what condition your provider can {@link #provide()}
+   * concrete {@link NetworkObservingStrategy}.
+   *
+   * @return {@code true} if concrete {@link NetworkObservingStrategy} can be provided
+   * for given criteria, {@code false} if not
+   */
+  boolean canProvide();
 
-    /**
-     * Implement this to return concrete {@link NetworkObservingStrategy}.
-     *
-     * @return {@link NetworkObservingStrategy}
-     */
-    T provide();
+  /**
+   * Implement this to return concrete {@link NetworkObservingStrategy}.
+   *
+   * @return {@link NetworkObservingStrategy}
+   */
+  T provide();
 }

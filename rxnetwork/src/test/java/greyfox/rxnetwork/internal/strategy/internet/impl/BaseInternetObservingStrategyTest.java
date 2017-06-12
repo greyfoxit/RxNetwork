@@ -24,7 +24,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @RunWith(Parameterized.class)
-public class BaseEndpointInternetObservingStrategyTest {
+public class BaseInternetObservingStrategyTest {
 
     @Rule public MockitoRule rule = MockitoJUnit.rule();
 

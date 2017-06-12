@@ -15,12 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.factory;
 
-import static android.os.Build.VERSION.CODENAME;
-import static android.os.Build.VERSION.SDK_INT;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
-
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.RxNetwork;
@@ -29,6 +23,11 @@ import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyFacto
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 
+import static android.os.Build.VERSION.CODENAME;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.support.annotation.VisibleForTesting.PRIVATE;
+import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+
 /**
  * {@link RxNetwork}'s default implementation of {@link NetworkObservingStrategyFactory}
  * providing api-level dependent implementation of concrete network observing
@@ -36,31 +35,32 @@ import java.util.Collection;
  *
  * @author Radek Kozak
  */
-@SuppressWarnings("WeakerAccess")
 public final class BuiltInNetworkObservingStrategyFactory
-        implements NetworkObservingStrategyFactory {
+    implements NetworkObservingStrategyFactory {
 
-    private final Collection<NetworkObservingStrategyProvider> strategyProviders;
+  private final Collection<NetworkObservingStrategyProvider> strategyProviders;
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    BuiltInNetworkObservingStrategyFactory(@NonNull Collection
-            <NetworkObservingStrategyProvider> strategyProviders) {
-        this.strategyProviders = checkNotNull(strategyProviders, "strategyProviders");
+  @VisibleForTesting(otherwise = PRIVATE)
+  BuiltInNetworkObservingStrategyFactory(
+      @NonNull Collection<NetworkObservingStrategyProvider> strategyProviders) {
+    this.strategyProviders = checkNotNull(strategyProviders, "strategyProviders");
+  }
+
+  public static NetworkObservingStrategyFactory create(
+      @NonNull Collection<NetworkObservingStrategyProvider> providers) {
+    return new BuiltInNetworkObservingStrategyFactory(providers);
+  }
+
+  @NonNull
+  @Override
+  public NetworkObservingStrategy get() {
+    for (NetworkObservingStrategyProvider strategyProvider : strategyProviders) {
+      if (strategyProvider.canProvide()) {
+        return strategyProvider.provide();
+      }
     }
-
-    public static NetworkObservingStrategyFactory create(@NonNull Collection
-            <NetworkObservingStrategyProvider> providers) {
-        return new BuiltInNetworkObservingStrategyFactory(providers);
-    }
-
-    @NonNull
-    @Override
-    public NetworkObservingStrategy get() {
-        for (NetworkObservingStrategyProvider strategyProvider : strategyProviders) {
-            if (strategyProvider.canProvide()) return strategyProvider.provide();
-        }
-        throw new NullPointerException("No NetworkObservingStrategy found for API level "
-                + SDK_INT + " ( " + CODENAME + " )");
-    }
+    throw new NullPointerException(
+        "No NetworkObservingStrategy found for API level " + SDK_INT + " ( " + CODENAME + " )");
+  }
 }
 

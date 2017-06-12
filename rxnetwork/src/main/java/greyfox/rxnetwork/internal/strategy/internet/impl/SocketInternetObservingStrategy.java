@@ -15,15 +15,7 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
-
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-
-import static java.util.logging.Logger.getLogger;
-
 import android.support.annotation.NonNull;
-import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,134 +23,110 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
+
 /**
  * @author Radek Kozak
  */
+public final class SocketInternetObservingStrategy extends EndpointInternetObservingStrategy {
 
-public class SocketInternetObservingStrategy extends BaseEndpointInternetObservingStrategy {
+  /** Either default 80 or a user-specified port. In range [1..65535]. */
+  private final int port;
 
-    /** Canonical hostname. */
-    @NonNull private final String host;
+  @VisibleForTesting
+  SocketInternetObservingStrategy(@NonNull Builder builder) {
+    super(builder);
+    port = builder.port;
+  }
 
-    /** Either default 80 or a user-specified port. In range [1..65535]. */
-    private final int port;
+  @NonNull
+  public static SocketInternetObservingStrategy create() {
+    return builder().build();
+  }
 
-    private final long delay;
-    private final int timeout;
-    private final long interval;
+  @NonNull
+  public static Builder builder() {
+    return new Builder();
+  }
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    SocketInternetObservingStrategy() {
-        throw new AssertionError("Use static factory methods or Builder to create strategy");
-    }
+  @Override
+  Logger logger() {
+    return getLogger(SocketInternetObservingStrategy.class.getSimpleName());
+  }
 
-    @VisibleForTesting(otherwise = PRIVATE)
-    @RestrictTo(LIBRARY_GROUP)
-    SocketInternetObservingStrategy(@NonNull Builder builder) {
-        checkNotNull(builder, "builder");
-
-        delay = builder.getDelay();
-        timeout = builder.getTimeout();
-        interval = builder.getInterval();
-        host = builder.getEndpoint();
-        port = builder.getPort();
-    }
-
-    @NonNull
-    public static SocketInternetObservingStrategy create() {
-        return builder().build();
-    }
-
-    @NonNull
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    @Override
-    long delay() {
-        return this.delay;
-    }
-
-    @Override
-    long interval() {
-        return this.interval;
-    }
-
-    @Override
-    Logger logger() {
-        return getLogger(SocketInternetObservingStrategy.class.getSimpleName());
-    }
-
-    @Override
-    protected boolean checkConnection() {
-        boolean isConnected;
-        Socket socket = null;
-        try {
-            socket = connectSocketTo(new InetSocketAddress(host, port), timeout);
-            isConnected = isSocketConnected(socket);
-        } catch (IOException ioe) {
-            onError("Problem occurred while checking endpoint", ioe);
-            isConnected = Boolean.FALSE;
-        } finally {
-            try {
-                if (socket != null) socket.close();
-            } catch (IOException ioe) {
-                onError("Could not close the socket", ioe);
-            }
+  @Override
+  boolean checkConnection() {
+    boolean isConnected;
+    Socket socket = null;
+    try {
+      socket = connectSocketTo(new InetSocketAddress(endpoint(), port), timeout());
+      isConnected = isSocketConnected(socket);
+    } catch (IOException ioe) {
+      onError("Problem occurred while checking endpoint", ioe);
+      isConnected = Boolean.FALSE;
+    } finally {
+      try {
+        if (socket != null) {
+          socket.close();
         }
-
-        return isConnected;
+      } catch (IOException ioe) {
+        onError("Could not close the socket", ioe);
+      }
     }
 
-    Socket connectSocketTo(SocketAddress socketAddress, int timeout) throws IOException {
-        final Socket socket = new Socket();
-        socket.connect(socketAddress, timeout);
-        return socket;
-    }
+    return isConnected;
+  }
 
-    boolean isSocketConnected(Socket socket) {
-        return socket.isConnected();
-    }
+  Socket connectSocketTo(SocketAddress socketAddress, int timeout) throws IOException {
+    final Socket socket = new Socket();
+    socket.connect(socketAddress, timeout);
+    return socket;
+  }
+
+  private boolean isSocketConnected(Socket socket) {
+    return socket.isConnected();
+  }
+
+  // @formatter:off
+
+  /**
+   * {@link SocketInternetObservingStrategy} builder static inner class.
+   */
+  public static final class Builder extends
+      EndpointInternetObservingStrategy.Builder<SocketInternetObservingStrategy,
+          SocketInternetObservingStrategy.Builder> {
+
+    // @formatter:on
 
     /**
-     * {@code SocketInternetObservingStrategy} builder static inner class.
+     * Canonical hostname.
+     * <p>
+     * Endpoint effectively acting as a host part of {@link InetSocketAddress}
      */
-    public static final class Builder extends BaseEndpointInternetObservingStrategy
-            .Builder<SocketInternetObservingStrategy.Builder> {
+    private static final String DEFAULT_ENDPOINT = "g.cn";
+    private static final int DEFAULT_PORT = 80;
 
-        private static final int DEFAULT_TIMEOUT_MS = 3000;
+    private int port = DEFAULT_PORT;
 
-        private int timeout = DEFAULT_TIMEOUT_MS;
-
-        public int getTimeout() {
-            return timeout;
-        }
-
-        /**
-         * Sets the {@code timeout} and returns a reference to this Builder so that the methods can
-         * be chained together.
-         *
-         * @param timeout the {@code timeout} to set
-         *
-         * @return a reference to this Builder
-         */
-        @NonNull
-        public Builder timeout(int timeout) {
-            this.timeout = timeout;
-            return self();
-        }
-
-        /**
-         * Returns a {@code SocketInternetObservingStrategy} built from the parameters
-         * previously set.
-         *
-         * @return a {@code SocketInternetObservingStrategy} built with parameters
-         * of this {@code SocketInternetObservingStrategy.Builder}
-         */
-        @NonNull
-        @Override
-        public SocketInternetObservingStrategy build() {
-            return new SocketInternetObservingStrategy(this);
-        }
+    Builder() {
+      super();
+      endpoint(DEFAULT_ENDPOINT);
     }
+
+    @NonNull
+    public Builder port(int port) {
+      if (port <= 0 || port > 65535) {
+        throw new IllegalArgumentException("Invalid port: " + port);
+      }
+
+      this.port = port;
+      return self();
+    }
+
+    @NonNull
+    @Override
+    public SocketInternetObservingStrategy build() {
+      return new SocketInternetObservingStrategy(this);
+    }
+  }
 }

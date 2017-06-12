@@ -15,9 +15,6 @@
  */
 package com.example.rxnetwork;
 
-import static toothpick.registries.FactoryRegistryLocator.setRootRegistry;
-import static toothpick.registries.MemberInjectorRegistryLocator.setRootRegistry;
-
 import android.app.Application;
 import com.example.rxnetwork.internals.di.RxNetworkModule;
 import greyfox.rxnetwork.RxNetwork;
@@ -25,28 +22,31 @@ import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.configuration.Configuration;
 
+import static toothpick.registries.FactoryRegistryLocator.setRootRegistry;
+import static toothpick.registries.MemberInjectorRegistryLocator.setRootRegistry;
+
 /**
- * Entry point for the whole application.
+ * Entry point for the application.
  *
  * @author Radek Kozak
  */
 public class MainApplication extends Application {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+  @Override
+  public void onCreate() {
+    super.onCreate();
 
-        setupDi();
-    }
+    setupDi();
+  }
 
-    private void setupDi() {
+  private void setupDi() {
 
-        // If not using the reflection free configuration, the next 3 lines can be omitted
-        Toothpick.setConfiguration(Configuration.forProduction().disableReflection());
-        setRootRegistry(new com.example.rxnetwork.MemberInjectorRegistry());
-        setRootRegistry(new com.example.rxnetwork.FactoryRegistry());
+    // If not using the reflection free configuration, the next 3 lines can be omitted
+    Toothpick.setConfiguration(Configuration.forProduction().disableReflection());
+    setRootRegistry(new com.example.rxnetwork.MemberInjectorRegistry());
+    setRootRegistry(new com.example.rxnetwork.FactoryRegistry());
 
-        Scope statusScope = Toothpick.openScope(RxNetwork.class);
-        statusScope.installModules(new RxNetworkModule(this));
-    }
+    Scope statusScope = Toothpick.openScope(RxNetwork.class);
+    statusScope.installModules(new RxNetworkModule(this));
+  }
 }

@@ -1,60 +1,64 @@
 buildscript {
-    repositories {
-        maven {
-            url 'https://maven.google.com'
-        }
-        jcenter()
+  repositories {
+    maven {
+      url 'https://maven.google.com'
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha2'
-    }
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.0.0-alpha3'
+  }
 }
 
 allprojects {
-    repositories {
-        maven {
-            url 'https://maven.google.com'
-        }
-        jcenter()
+  repositories {
+    maven {
+      url 'https://maven.google.com'
     }
+    jcenter()
+  }
 }
 
 task clean(type: Delete) {
-    group "build"
-    delete "${project.buildDir}"
+  group "build"
+  delete "${project.buildDir}"
 }
 
 ext.versions = [
-        supportLibrary: '25.1.0',
-        minSdk        : 9,
-        compileSdk    : 25,
-        targetSdk     : 25,
-        buildTools    : '25.0.3',
 
-        gradle        : '4.0-milestone-1',
-        butterknife   : '8.6.0',
-        toothpick     : '1.0.6'
+    supportLibrary: '25.1.0',
+    minSdk        : 9,
+    compileSdk    : 25,
+    targetSdk     : 25,
+    buildTools    : '25.0.3',
+
+    gradle        : '4.0-milestone-1',
+    butterknife   : '8.6.0',
+    toothpick     : '1.0.6'
+
 ]
 
 ext.deps = [
-        // Android
-        appcompatv7        : "com.android.support:appcompat-v7:${versions.supportLibrary}",
-        supportAnnotations : "com.android.support:support-annotations:${versions.supportLibrary}",
-        constraintLayout   : 'com.android.support.constraint:constraint-layout:1.0.2',
 
-        // Third Party
-        rxjava             : 'io.reactivex.rxjava2:rxjava:2.1.0',
-        rxandroid          : 'io.reactivex.rxjava2:rxandroid:2.0.1',
-        butterknife        : "com.jakewharton:butterknife:${versions.butterknife}",
-        butterknifeCompiler: "com.jakewharton:butterknife-compiler:${versions.butterknife}",
-        toothpickRuntime   : "com.github.stephanenicolas.toothpick:toothpick-runtime:${versions.toothpick}",
-        toothpickSmoothie  : "com.github.stephanenicolas.toothpick:smoothie:${versions.toothpick}",
-        toothpickCompiler  : "com.github.stephanenicolas.toothpick:toothpick-compiler:${versions.toothpick}",
+    // Android
+    appcompatv7        : "com.android.support:appcompat-v7:${versions.supportLibrary}",
+    supportAnnotations : "com.android.support:support-annotations:${versions.supportLibrary}",
+    constraintLayout   : 'com.android.support.constraint:constraint-layout:1.0.2',
 
-        // Test dependencies
-        junit              : 'junit:junit:4.12',
-        robolectric        : 'org.robolectric:robolectric:3.3.2',
-        mockwebserver      : 'com.squareup.okhttp3:mockwebserver:3.6.0',
-        mockitoinline      : 'org.mockito:mockito-inline:2.8.9',
-        assertj            : 'org.assertj:assertj-core:2.6.0',
+    // Third Party
+    rxjava             : 'io.reactivex.rxjava2:rxjava:2.1.0',
+    rxandroid          : 'io.reactivex.rxjava2:rxandroid:2.0.1',
+    butterknife        : "com.jakewharton:butterknife:${versions.butterknife}",
+    butterknifeCompiler: "com.jakewharton:butterknife-compiler:${versions.butterknife}",
+    toothpickRuntime   : "com.github.stephanenicolas.toothpick:toothpick-runtime:${versions.toothpick}",
+    toothpickSmoothie  : "com.github.stephanenicolas.toothpick:smoothie:${versions.toothpick}",
+    toothpickCompiler  : "com.github.stephanenicolas.toothpick:toothpick-compiler:${versions.toothpick}",
+
+    // Test dependencies
+    junit              : 'junit:junit:4.12',
+    robolectric        : 'org.robolectric:robolectric:3.3.2',
+    mockwebserver      : 'com.squareup.okhttp3:mockwebserver:3.6.0',
+    mockitoinline      : 'org.mockito:mockito-inline:2.8.9',
+    assertj            : 'org.assertj:assertj-core:2.6.0'
+
 ]

@@ -23,5 +23,6 @@ import greyfox.rxnetwork.internal.strategy.ObservingStrategyFactory;
  * @author radekkozak
  */
 public interface InternetObservingStrategyFactory
-        extends ObservingStrategyFactory<InternetObservingStrategy> {
+    extends ObservingStrategyFactory<InternetObservingStrategy> {
+
 }

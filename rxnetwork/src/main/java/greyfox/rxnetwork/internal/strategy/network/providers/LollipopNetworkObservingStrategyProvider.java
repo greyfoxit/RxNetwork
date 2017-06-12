@@ -15,16 +15,15 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.providers;
 
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
-
-import static greyfox.rxnetwork.internal.os.Build.isAtLeastLollipop;
-import static greyfox.rxnetwork.internal.os.Build.isLessThanMarshmallow;
-
 import android.content.Context;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.internal.strategy.network.impl.LollipopNetworkObservingStrategy;
+
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static greyfox.rxnetwork.internal.os.Build.isAtLeastLollipop;
+import static greyfox.rxnetwork.internal.os.Build.isLessThanMarshmallow;
 
 /**
  * Provides network observing strategy implementation for Lollipop devices.
@@ -33,25 +32,25 @@ import greyfox.rxnetwork.internal.strategy.network.impl.LollipopNetworkObserving
  */
 final class LollipopNetworkObservingStrategyProvider extends Api21NetworkObservingStrategyProvider {
 
-    LollipopNetworkObservingStrategyProvider(@NonNull Context context) {
-        super(context);
-    }
+  LollipopNetworkObservingStrategyProvider(@NonNull Context context) {
+    super(context);
+  }
 
-    LollipopNetworkObservingStrategyProvider(@NonNull Context context,
-            @NonNull NetworkRequest networkRequest) {
+  LollipopNetworkObservingStrategyProvider(@NonNull Context context,
+      @NonNull NetworkRequest networkRequest) {
 
-        super(context, networkRequest);
-    }
+    super(context, networkRequest);
+  }
 
-    @Override
-    public boolean canProvide() {
-        return isAtLeastLollipop() && isLessThanMarshmallow();
-    }
+  @Override
+  public boolean canProvide() {
+    return isAtLeastLollipop() && isLessThanMarshmallow();
+  }
 
-    @Override
-    @RequiresApi(LOLLIPOP)
-    public LollipopNetworkObservingStrategy provide() {
-        return networkRequest == null ? new LollipopNetworkObservingStrategy(context)
-                : new LollipopNetworkObservingStrategy(context, networkRequest);
-    }
+  @Override
+  @RequiresApi(LOLLIPOP)
+  public LollipopNetworkObservingStrategy provide() {
+    return networkRequest == null ? new LollipopNetworkObservingStrategy(context)
+                                  : new LollipopNetworkObservingStrategy(context, networkRequest);
+  }
 }

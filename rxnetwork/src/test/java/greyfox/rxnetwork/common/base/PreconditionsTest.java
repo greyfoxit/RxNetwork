@@ -53,7 +53,8 @@ public class PreconditionsTest {
 
     @Test
     public void checkNotNull_withErrorMessageTemplate_shouldBeValid() {
-        String result = Preconditions.checkNotNullWithMessage(NON_NULL_ARG, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
+        String result = Preconditions.checkNotNullWithMessage(NON_NULL_ARG, ERROR_MESSAGE_TEMPLATE,
+                ERROR_MESSAGE_ARG);
         assertThat(NON_NULL_ARG).isEqualTo(result);
     }
 

@@ -24,16 +24,13 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.net.NetworkRequest;
-import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
-import greyfox.rxnetwork.internal.strategy.internet.impl.BuiltInInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.impl.SocketInternetObservingStrategy;
+import greyfox.rxnetwork.internal.strategy.internet.impl.WalledGardenInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork.internal.strategy.network.impl.BaseNetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
-import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import org.junit.Before;
@@ -53,9 +50,8 @@ public class RxNetworkTest {
     @Mock NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
     @Mock NetworkObservingStrategyFactory CUSTOM_NETWORK_STRATEGY_FACTORY;
     @Mock InternetObservingStrategy CUSTOM_INTERNET_STRATEGY;
+    @Mock InternetObservingStrategy BUILTIN_INTERNET_STRATEGY;
     @Mock InternetObservingStrategyFactory CUSTOM_INTERNET_STRATEGY_FACTORY;
-    @Mock Observable<RxNetworkInfo> VALID_NETWORK_OBSERVABLE;
-    @Mock Observable<Boolean> VALID_INTERNET_OBSERVABLE;
     @Mock NetworkRequest CUSTOM_NETWORK_REQUEST;
 
     @Before
@@ -85,15 +81,13 @@ public class RxNetworkTest {
 
         assertThat((sut.networkObservingStrategy())).isNull();
         assertThat(sut.internetObservingStrategy()).isNotNull()
-                .isInstanceOf(BuiltInInternetObservingStrategy.class);
+                .isInstanceOf(WalledGardenInternetObservingStrategy.class);
     }
 
     @Test
     public void shouldInitWithDefaultStrategies_andNoScheduler() {
-        assertThat((sut.networkObservingStrategy())).isNotNull()
-                .isInstanceOf(BaseNetworkObservingStrategy.class);
         assertThat((sut.internetObservingStrategy())).isNotNull()
-                .isInstanceOf(BuiltInInternetObservingStrategy.class);
+                .isInstanceOf(WalledGardenInternetObservingStrategy.class);
         assertThat(sut.scheduler()).isNull();
     }
 
@@ -161,7 +155,6 @@ public class RxNetworkTest {
     @Test
     public void observableShouldUseCustomStrategyInsteadOfDefault() {
         NetworkObservingStrategy builtInStrategy = spy(sut.networkObservingStrategy());
-        doReturn(VALID_NETWORK_OBSERVABLE).when(CUSTOM_NETWORK_STRATEGY).observe();
 
         sut.observe(CUSTOM_NETWORK_STRATEGY);
 
@@ -191,13 +184,12 @@ public class RxNetworkTest {
 
     @Test
     public void observableReal_shouldUseCustomStrategyInsteadOfDefault() {
-        InternetObservingStrategy builtInStrategy = spy(sut.internetObservingStrategy());
-        doReturn(VALID_INTERNET_OBSERVABLE).when(CUSTOM_INTERNET_STRATEGY).observe();
+        sut = spy(sut);
 
         sut.observeReal(CUSTOM_INTERNET_STRATEGY);
 
         verify(CUSTOM_INTERNET_STRATEGY).observe();
-        verify(builtInStrategy, never()).observe();
+        verify(sut, never()).internetObservingStrategy();
     }
 
     @Test(expected = NullPointerException.class)
