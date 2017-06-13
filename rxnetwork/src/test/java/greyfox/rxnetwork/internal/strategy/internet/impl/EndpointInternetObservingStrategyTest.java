@@ -15,47 +15,46 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.impl;
 
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
-
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.After;
 import org.junit.Before;
 
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
-public abstract class EndpointInternetObservingStrategyTest {
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 
-    protected static final String INVALID_HOST = "htt:/invalid.endpoint";
+abstract class EndpointInternetObservingStrategyTest {
 
-    protected static final int INVALID_SERVER_RESPONSE = HTTP_INTERNAL_ERROR;
-    protected static final int VALID_TIMEOUT_MS = 100;
-    protected static final String VALID_ENDPOINT = " http://localhost";
-    protected static final long VALID_DELAY = 500;
-    protected static final long VALID_INTERVAL = 1000;
+  static final String INVALID_HOST = "htt:/invalid.endpoint";
 
-    protected MockWebServer server;
+  static final int INVALID_SERVER_RESPONSE = HTTP_INTERNAL_ERROR;
+  static final int VALID_TIMEOUT_MS = 100;
+  static final String VALID_ENDPOINT = " http://localhost";
+  static final long VALID_DELAY = 500;
+  static final long VALID_INTERVAL = 1000;
 
-    @Before
-    public void setUp() throws Exception {
-        server = new MockWebServer();
-        server.start();
-    }
+  MockWebServer server;
 
-    @After
-    public void tearDown() throws Exception {
-        server.shutdown();
-    }
+  @Before
+  public void setUp() throws Exception {
+    server = new MockWebServer();
+    server.start();
+  }
 
-    protected void setServerWithHttpStatusResponse(int httpStatusCode) {
-        server.enqueue(new MockResponse().setResponseCode(httpStatusCode));
-    }
+  @After
+  public void tearDown() throws Exception {
+    server.shutdown();
+  }
 
-    protected InternetObservingStrategy buildStrategy() {
-        String testEndpoint = server.url("/").toString();
-        return strategyBuilder().endpoint(testEndpoint).build();
-    }
+  void setServerWithHttpStatusResponse(int httpStatusCode) {
+    server.enqueue(new MockResponse().setResponseCode(httpStatusCode));
+  }
 
-    protected abstract EndpointInternetObservingStrategy.Builder strategyBuilder();
+  InternetObservingStrategy buildStrategy() {
+    String testEndpoint = server.url("/").toString();
+    return strategyBuilder().endpoint(testEndpoint).build();
+  }
+
+  protected abstract EndpointInternetObservingStrategy.Builder strategyBuilder();
 }
 

@@ -15,13 +15,6 @@
  */
 package greyfox.rxnetwork;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.content.Context;
 import android.net.NetworkRequest;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
@@ -39,221 +32,229 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@SuppressWarnings({"WeakerAccess", "ConstantConditions"})
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class RxNetworkTest {
 
-    Scheduler CUSTOM_SCHEDULER = Schedulers.trampoline();
-    RxNetwork sut;
+  private static final Scheduler CUSTOM_SCHEDULER = Schedulers.trampoline();
+  private RxNetwork sut;
 
-    @Mock Context context;
-    @Mock NetworkObservingStrategy CUSTOM_NETWORK_STRATEGY;
-    @Mock NetworkObservingStrategyFactory CUSTOM_NETWORK_STRATEGY_FACTORY;
-    @Mock InternetObservingStrategy CUSTOM_INTERNET_STRATEGY;
-    @Mock InternetObservingStrategy BUILTIN_INTERNET_STRATEGY;
-    @Mock InternetObservingStrategyFactory CUSTOM_INTERNET_STRATEGY_FACTORY;
-    @Mock NetworkRequest CUSTOM_NETWORK_REQUEST;
+  @Mock private Context context;
+  @Mock private NetworkObservingStrategy customNetworkStrategy;
+  @Mock private NetworkObservingStrategyFactory customNetworkStrategyFactory;
+  @Mock private InternetObservingStrategy customInternetStrategy;
+  @Mock private InternetObservingStrategyFactory customInternetStrategyFactory;
+  @Mock private NetworkRequest customNetworkRequest;
 
-    @Before
-    public void setUp() throws Exception {
-        doReturn(context).when(context).getApplicationContext();
-        sut = RxNetwork.init(context);
-    }
+  @Before
+  public void setUp() {
+    doReturn(context).when(context).getApplicationContext();
+    sut = RxNetwork.init(context);
+  }
 
-    @Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaConstructor() {
-        new RxNetwork();
-    }
+  @Test(expected = AssertionError.class)
+  public void shouldThrow_whenTryingToInstantiateViaConstructor() {
+    new RxNetwork();
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new RxNetwork(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
+    new RxNetwork(null);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInitializeWithNullContext() {
-        RxNetwork.builder().init(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInitializeWithNullContext() {
+    RxNetwork.builder().init(null);
+  }
 
-    @Test
-    public void shouldInitWithInternetObservingStrategyOnly_whenInitializedWithoutContext() {
-        sut = RxNetwork.init();
+  @Test
+  public void shouldInitWithInternetObservingStrategyOnly_whenInitializedWithoutContext() {
 
-        assertThat((sut.networkObservingStrategy())).isNull();
-        assertThat(sut.internetObservingStrategy()).isNotNull()
-                .isInstanceOf(WalledGardenInternetObservingStrategy.class);
-    }
+    sut = RxNetwork.init();
 
-    @Test
-    public void shouldInitWithDefaultStrategies_andNoScheduler() {
-        assertThat((sut.internetObservingStrategy())).isNotNull()
-                .isInstanceOf(WalledGardenInternetObservingStrategy.class);
-        assertThat(sut.scheduler()).isNull();
-    }
+    assertThat((sut.networkObservingStrategy())).isNull();
+    assertThat(sut.internetObservingStrategy()).isNotNull();
+  }
 
-    @Test
-    public void shouldInitWithCustomScheduler() {
-        sut = RxNetwork.builder().defaultScheduler(CUSTOM_SCHEDULER).init(context);
+  @Test
+  public void shouldDefaultToWalledGardenInternetObservingStrategy_whenInitializedWithoutContext() {
 
-        assertThat(sut.scheduler()).isNotNull().isEqualTo(CUSTOM_SCHEDULER);
-    }
+    sut = RxNetwork.init();
 
-    @Test
-    public void shouldInitWithCustomNetworkObservingStrategy_viaFactory() {
-        when(CUSTOM_NETWORK_STRATEGY_FACTORY.get()).thenReturn(CUSTOM_NETWORK_STRATEGY);
+    assertThat((sut.networkObservingStrategy())).isNull();
+    assertThat(sut.internetObservingStrategy())
+        .isInstanceOf(WalledGardenInternetObservingStrategy.class);
+  }
 
-        sut = RxNetwork.builder().networkObservingStrategyFactory(CUSTOM_NETWORK_STRATEGY_FACTORY)
-                .init(context);
+  @Test
+  public void shouldInitWithNonNullStrategies_whenInitializedWithContext() {
+    assertThat(sut.internetObservingStrategy()).isNotNull();
+    assertThat(sut.networkObservingStrategy()).isNotNull();
+  }
 
-        assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(CUSTOM_NETWORK_STRATEGY);
-    }
+  @Test
+  public void shouldInitWithNoScheduler() {
+    assertThat(sut.scheduler()).isNull();
+  }
 
-    @Test
-    public void shouldInitWithCustomNetworkObservingStrategy() {
-        sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
-                .init(context);
+  @Test
+  public void shouldInitWithCustomScheduler() {
+    sut = RxNetwork.builder().defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
-        assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(CUSTOM_NETWORK_STRATEGY);
-    }
+    assertThat(sut.scheduler()).isNotNull().isEqualTo(CUSTOM_SCHEDULER);
+  }
 
-    @Test
-    public void shouldInitWithCustomInternetObservingStrategy_viaFactory() {
-        when(CUSTOM_INTERNET_STRATEGY_FACTORY.get()).thenReturn(CUSTOM_INTERNET_STRATEGY);
+  @Test
+  public void shouldInitWithCustomNetworkObservingStrategy() {
+    sut = RxNetwork.builder().networkObservingStrategy(customNetworkStrategy).init(context);
 
-        sut = RxNetwork.builder().internetObservingStrategyFactory(CUSTOM_INTERNET_STRATEGY_FACTORY)
-                .init(context);
+    assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(customNetworkStrategy);
+  }
 
-        assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(CUSTOM_INTERNET_STRATEGY);
-    }
+  @Test
+  public void shouldInitWithCustomNetworkObservingStrategy_viaFactory() {
+    when(customNetworkStrategyFactory.get()).thenReturn(customNetworkStrategy);
 
-    @Test
-    public void shouldInitWithCustomInternetObservingStrategy() {
-        sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
-                .init(context);
+    sut = RxNetwork.builder().networkObservingStrategyFactory(customNetworkStrategyFactory)
+                   .init(context);
 
-        assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(CUSTOM_INTERNET_STRATEGY);
-    }
+    assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(customNetworkStrategy);
+  }
 
-    @Test
-    public void shouldInitWithCustomNetworkRequest() {
-        sut = RxNetwork.builder().defaultNetworkRequest(CUSTOM_NETWORK_REQUEST)
-                .init(context);
+  @Test
+  public void shouldInitWithCustomInternetObservingStrategy() {
+    sut = RxNetwork.builder().internetObservingStrategy(customInternetStrategy).init(context);
 
-        assertThat(sut.networkRequest()).isNotNull().isEqualTo(CUSTOM_NETWORK_REQUEST);
-    }
+    assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(customInternetStrategy);
+  }
 
-    @Test
-    public void observableShouldNeverBeNull() {
-        assertThat(sut.observe()).isNotNull();
-    }
+  @Test
+  public void shouldInitWithCustomInternetObservingStrategy_viaFactory() {
+    when(customInternetStrategyFactory.get()).thenReturn(customInternetStrategy);
 
-    @Test
-    public void observableShouldSubscribeCorrectly() {
-        sut.observe().test().assertSubscribed();
-    }
+    sut = RxNetwork.builder().internetObservingStrategyFactory(customInternetStrategyFactory)
+                   .init(context);
 
-    @Test
-    public void observableShouldUseCustomStrategyInsteadOfDefault() {
-        NetworkObservingStrategy builtInStrategy = spy(sut.networkObservingStrategy());
+    assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(customInternetStrategy);
+  }
 
-        sut.observe(CUSTOM_NETWORK_STRATEGY);
+  @Test
+  public void shouldInitWithCustomNetworkRequest() {
+    sut = RxNetwork.builder().defaultNetworkRequest(customNetworkRequest).init(context);
 
-        verify(CUSTOM_NETWORK_STRATEGY).observe();
-        verify(builtInStrategy, never()).observe();
-    }
+    assertThat(sut.networkRequest()).isNotNull().isEqualTo(customNetworkRequest);
+  }
 
-    @Test
-    public void observableSimpleShouldNeverBeNull() {
-        assertThat(sut.observeSimple()).isNotNull();
-    }
+  @Test
+  public void shouldNeverBeNull() {
+    assertThat(sut.observe()).isNotNull();
+    assertThat(sut.observeSimple()).isNotNull();
+    assertThat(sut.observeReal()).isNotNull();
+  }
 
-    @Test
-    public void observableSimpleShouldSubscribeCorrectly() {
-        sut.observeSimple().test().assertSubscribed();
-    }
+  @Test
+  public void shouldSubscribeCorrectly_toObserve() {
+    sut.observe().test().assertSubscribed();
+  }
 
-    @Test
-    public void observableRealShouldNeverBeNull() {
-        assertThat(sut.observeReal()).isNotNull();
-    }
+  @Test
+  public void shouldOverrideDefaultStrategyWithCustom_whenProvidedToObserve() {
+    NetworkObservingStrategy builtInStrategy = spy(sut.networkObservingStrategy());
 
-    @Test
-    public void observableRealShouldSubscribeCorrectly() {
-        sut.observeReal().test().assertSubscribed();
-    }
+    sut.observe(customNetworkStrategy);
 
-    @Test
-    public void observableReal_shouldUseCustomStrategyInsteadOfDefault() {
-        sut = spy(sut);
+    verify(customNetworkStrategy).observe();
+    verify(builtInStrategy, never()).observe();
+  }
 
-        sut.observeReal(CUSTOM_INTERNET_STRATEGY);
+  @Test
+  public void shouldSubscribeCorrectly_toObserveSimple() {
+    sut.observeSimple().test().assertSubscribed();
+  }
 
-        verify(CUSTOM_INTERNET_STRATEGY).observe();
-        verify(sut, never()).internetObservingStrategy();
-    }
+  @Test
+  public void shouldSubscribeCorrectly_toObserveReal() {
+    sut.observeReal().test().assertSubscribed();
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToObserveWithNullNetworkStrategy() {
-        sut.observe(null);
-    }
+  @Test
+  public void shouldOverrideDefaultStrategyWithCustom_whenProvidedToObserveReal() {
+    sut = spy(sut);
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToObserveWithNullInternetStrategy() {
-        sut.observeReal(null);
-    }
+    sut.observeReal(customInternetStrategy);
 
-    @Test
-    public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy() {
-        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(context);
+    verify(customInternetStrategy).observe();
+    verify(sut, never()).internetObservingStrategy();
+  }
 
-        sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
-                .init(context);
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToObserveWithNullNetworkStrategy() {
+    sut.observe(null);
+  }
 
-        sut.observe(CUSTOM_NETWORK_STRATEGY).test().assertSubscribed();
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToObserveWithNullInternetStrategy() {
+    sut.observeReal(null);
+  }
 
-    @Test
-    public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy_andScheduler() {
-        CUSTOM_NETWORK_STRATEGY = new PreLollipopNetworkObservingStrategy(context);
+  @Test
+  public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy() {
+    customNetworkStrategy = new PreLollipopNetworkObservingStrategy(context);
 
-        sut = RxNetwork.builder().networkObservingStrategy(CUSTOM_NETWORK_STRATEGY)
-                .defaultScheduler(CUSTOM_SCHEDULER).init(context);
+    sut = RxNetwork.builder().networkObservingStrategy(customNetworkStrategy).init(context);
 
-        sut.observe(CUSTOM_NETWORK_STRATEGY).test().assertSubscribed();
-    }
+    sut.observe(customNetworkStrategy).test().assertSubscribed();
+  }
 
-    @Test
-    public void shouldSubscribeCorrectly_withCustomInternetObservingStrategy() {
-        CUSTOM_INTERNET_STRATEGY = SocketInternetObservingStrategy.create();
+  @Test
+  public void shouldSubscribeCorrectly_withCustomNetworkObservingStrategy_andScheduler() {
 
-        sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
-                .init(context);
+    customNetworkStrategy = new PreLollipopNetworkObservingStrategy(context);
 
-        sut.observeReal(CUSTOM_INTERNET_STRATEGY).test().assertSubscribed();
-    }
+    sut = RxNetwork.builder().networkObservingStrategy(customNetworkStrategy)
+                   .defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
-    @Test
-    public void shouldSubscribeCorrectly_withCustomInternetObservingStrategy_andScheduler() {
-        CUSTOM_INTERNET_STRATEGY = SocketInternetObservingStrategy.create();
+    sut.observe(customNetworkStrategy).test().assertSubscribed();
+  }
 
-        sut = RxNetwork.builder().internetObservingStrategy(CUSTOM_INTERNET_STRATEGY)
-                .defaultScheduler(CUSTOM_SCHEDULER).init(context);
+  @Test
+  public void shouldSubscribeCorrectly_withCustomInternetObservingStrategy() {
+    customInternetStrategy = SocketInternetObservingStrategy.create();
 
-        sut.observeReal(CUSTOM_INTERNET_STRATEGY).test().assertSubscribed();
-    }
+    sut = RxNetwork.builder().internetObservingStrategy(customInternetStrategy).init(context);
 
-    @Test(expected = NullPointerException.class)
-    public void builderShouldThrow_whenTryingToSetNullInternetStrategy() {
-        RxNetwork.builder().internetObservingStrategy(null);
-    }
+    sut.observeReal(customInternetStrategy).test().assertSubscribed();
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void builderShouldThrow_whenTryingToSetNullNetworkStrategy() {
-        RxNetwork.builder().networkObservingStrategy(null);
-    }
+  @Test
+  public void shouldSubscribeCorrectly_withCustomInternetObservingStrategy_andScheduler() {
 
-    @Test(expected = NullPointerException.class)
-    public void builderShouldThrow_whenTryingToSetNullScheduler() {
-        RxNetwork.builder().defaultScheduler(null);
-    }
+    customInternetStrategy = SocketInternetObservingStrategy.create();
+
+    sut = RxNetwork.builder().internetObservingStrategy(customInternetStrategy)
+                   .defaultScheduler(CUSTOM_SCHEDULER).init(context);
+
+    sut.observeReal(customInternetStrategy).test().assertSubscribed();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToSetNullInternetStrategyOnBuilder() {
+    RxNetwork.builder().internetObservingStrategy(null);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToSetNullNetworkStrategyOnBuilder() {
+    RxNetwork.builder().networkObservingStrategy(null);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToSetNullSchedulerOnBuilder() {
+    RxNetwork.builder().defaultScheduler(null);
+  }
 }

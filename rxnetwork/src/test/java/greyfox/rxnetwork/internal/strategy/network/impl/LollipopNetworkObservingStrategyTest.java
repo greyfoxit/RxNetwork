@@ -15,19 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
-import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
@@ -48,98 +35,106 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 @RequiresApi(api = LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = LOLLIPOP,
         shadows = ShadowConnectivityManagerWithCallback.class)
 public class LollipopNetworkObservingStrategyTest {
 
-    @Rule public MockitoRule rule = MockitoJUnit.rule();
+  private final TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
-    Context context;
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
-    BaseNetworkObservingStrategy sut;
-    TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
-    NetworkRequest NO_NETWORK_REQUEST = null;
+  private Context context;
+  private BaseNetworkObservingStrategy sut;
 
-    @Before
-    public void setUp() {
-        context = spy(RuntimeEnvironment.application.getApplicationContext());
-        sut = spy(new LollipopNetworkObservingStrategy(context));
-    }
+  @Before
+  public void setUp() {
+    context = spy(RuntimeEnvironment.application.getApplicationContext());
+    sut = spy(new LollipopNetworkObservingStrategy(context));
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithoutContext() {
-        new LollipopNetworkObservingStrategy(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithoutContext() {
+    new LollipopNetworkObservingStrategy(null);
+  }
 
-    @Test()
-    public void shouldRegisterWithDefaultNetworkRequest() {
-        NetworkRequest DEFAULT_REQUEST = new NetworkRequest.Builder().build();
-        ConnectivityManager manager = setUpManagerWithNetworkRequest(NO_NETWORK_REQUEST);
+  @Test()
+  public void shouldRegisterWithDefaultNetworkRequest() {
+    NetworkRequest defaultRequest = new NetworkRequest.Builder().build();
+    ConnectivityManager manager = setUpManagerWithNetworkRequest(null);
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-        verify(manager).registerNetworkCallback(eq(DEFAULT_REQUEST), any(NetworkCallback.class));
-    }
+    verify(manager).registerNetworkCallback(eq(defaultRequest), any(NetworkCallback.class));
+  }
 
-    @Test()
-    public void shouldRegisterWithCustomNetworkRequest() {
-        NetworkRequest CUSTOM_REQUEST = new NetworkRequest.Builder()
-                .addTransportType(TRANSPORT_WIFI).build();
-        ConnectivityManager manager = setUpManagerWithNetworkRequest(CUSTOM_REQUEST);
+  @Test()
+  public void shouldRegisterWithCustomNetworkRequest() {
+    NetworkRequest customRequest = new NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI)
+                                                               .build();
+    ConnectivityManager manager = setUpManagerWithNetworkRequest(customRequest);
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-        verify(manager).registerNetworkCallback(eq(CUSTOM_REQUEST), any(NetworkCallback.class));
-    }
+    verify(manager).registerNetworkCallback(eq(customRequest), any(NetworkCallback.class));
+  }
 
-    @Test
-    public void shouldSubscribeCorrectly() {
-        sut.observe().subscribeWith(testObserver);
+  @Test
+  public void shouldSubscribeCorrectly() {
+    sut.observe().subscribeWith(testObserver);
 
-        testObserver.assertSubscribed().assertValueCount(1);
-    }
+    testObserver.assertSubscribed().assertValueCount(1);
+  }
 
-    @Test
-    public void shouldDisposeCorrectly() {
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+  @Test
+  public void shouldDisposeCorrectly() {
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-        testObserver.dispose();
+    testObserver.dispose();
 
-        verify(sut).dispose();
-        testObserver.isDisposed();
-    }
+    verify(sut).dispose();
+    testObserver.isDisposed();
+  }
 
-    @Test
-    public void shouldDisposeWithException_whenDisposed() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        doReturn(connectivityManager).when(context).getSystemService(CONNECTIVITY_SERVICE);
-        doThrow(Exception.class).when(connectivityManager)
-                .unregisterNetworkCallback(any(NetworkCallback.class));
-        sut = spy(new LollipopNetworkObservingStrategy(context));
+  @Test
+  public void shouldDisposeWithException_whenObserverDisposed() {
+    ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+    doReturn(connectivityManager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+    doThrow(Exception.class).when(connectivityManager)
+                            .unregisterNetworkCallback(any(NetworkCallback.class));
+    sut = spy(new LollipopNetworkObservingStrategy(context));
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
-        testObserver.dispose();
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
+    testObserver.dispose();
 
-        verify(sut).dispose();
-        verify(sut).onError(anyString(), any(Exception.class));
-        testObserver.isDisposed();
-    }
+    verify(sut).dispose();
+    verify(sut).onError(anyString(), any(Exception.class));
+    testObserver.isDisposed();
+  }
 
-    private ConnectivityManager setUpManagerWithNetworkRequest(@Nullable
-            NetworkRequest networkRequest) {
+  private ConnectivityManager setUpManagerWithNetworkRequest(
+      @Nullable NetworkRequest networkRequest) {
 
-        ConnectivityManager manager = mock(ConnectivityManager.class);
-        doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+    ConnectivityManager manager = mock(ConnectivityManager.class);
+    doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
 
-        sut = spy(networkRequest == null ? new LollipopNetworkObservingStrategy(context)
-                : new LollipopNetworkObservingStrategy(context, networkRequest));
+    sut = spy(networkRequest == null ? new LollipopNetworkObservingStrategy(context)
+                                     : new LollipopNetworkObservingStrategy(context,
+                                         networkRequest));
 
-        return manager;
-    }
+    return manager;
+  }
 }

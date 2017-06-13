@@ -15,66 +15,65 @@
  */
 package greyfox.rxnetwork.common.base;
 
-import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import org.junit.Test;
 
+import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.fail;
 
-import org.junit.Test;
-
 public class PreconditionsTest {
 
-    private static final String NON_NULL_ARG = "non null arg";
-    private static final String ERROR_MESSAGE_TEMPLATE = "error message with %s";
-    private static final String ERROR_MESSAGE_ARG = "error arg";
-    private static final String ERROR_MESSAGE_RESULT = "error message with error arg";
+  private static final String NON_NULL_ARG = "non null arg";
+  private static final String ERROR_MESSAGE_TEMPLATE = "error message with %s";
+  private static final String ERROR_MESSAGE_ARG = "error arg";
+  private static final String ERROR_MESSAGE_RESULT = "error message with error arg";
 
-    @Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaPrivateConstructor() {
-        new Preconditions();
-    }
+  @Test(expected = AssertionError.class)
+  public void shouldThrow_whenTryingToInstantiateViaConstructor() {
+    new Preconditions();
+  }
 
-    @Test
-    public void checkNotNull_shouldBeValid() {
-        String result = checkNotNull(NON_NULL_ARG);
-        assertThat(NON_NULL_ARG).isEqualTo(result);
-    }
+  @Test
+  public void shouldReturnCheckingReference_whenNotNull() {
+    String result = checkNotNull(NON_NULL_ARG);
+    assertThat(NON_NULL_ARG).isEqualTo(result);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void checkNotNull_shouldThrow() {
-        checkNotNull(null);
-    }
+  @Test
+  public void shouldReturnCheckingReference_whenNotNull_andWithErrorMessage() {
+    String result = checkNotNull(NON_NULL_ARG, ERROR_MESSAGE_ARG);
+    assertThat(NON_NULL_ARG).isEqualTo(result);
+  }
 
-    @Test
-    public void checkNotNull_withErrorMessage_shouldBeValid() {
-        String result = checkNotNull(NON_NULL_ARG, ERROR_MESSAGE_ARG);
-        assertThat(NON_NULL_ARG).isEqualTo(result);
-    }
+  @Test
+  public void shouldReturnCheckingReference_whenNotNull_andWithErrorMessageTemplate() {
+    String result = Preconditions
+        .checkNotNullWithMessage(NON_NULL_ARG, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
+    assertThat(NON_NULL_ARG).isEqualTo(result);
+  }
 
-    @Test
-    public void checkNotNull_withErrorMessageTemplate_shouldBeValid() {
-        String result = Preconditions.checkNotNullWithMessage(NON_NULL_ARG, ERROR_MESSAGE_TEMPLATE,
-                ERROR_MESSAGE_ARG);
-        assertThat(NON_NULL_ARG).isEqualTo(result);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenNull() {
+    checkNotNull(null);
+  }
 
-    @Test
-    public void checkNotNull_shouldThrow_withCorrectErrorMessage() {
-        try {
-            checkNotNull(null, ERROR_MESSAGE_ARG);
-            fail("NullPointerException expected");
-        } catch (NullPointerException npe) {
-            assertThat(npe).hasMessageContaining(ERROR_MESSAGE_ARG);
-        }
+  @Test
+  public void shouldThrow_withCorrectErrorMessage() {
+    try {
+      checkNotNull(null, ERROR_MESSAGE_ARG);
+      fail("NullPointerException expected");
+    } catch (NullPointerException npe) {
+      assertThat(npe).hasMessageContaining(ERROR_MESSAGE_ARG);
     }
+  }
 
-    @Test
-    public void checkNotNull_shouldThrow_withCorrectErrorMessageFromTemplate() {
-        try {
-            Preconditions.checkNotNullWithMessage(null, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
-            fail("NullPointerException expected");
-        } catch (NullPointerException npe) {
-            assertThat(npe).hasMessage(ERROR_MESSAGE_RESULT);
-        }
+  @Test
+  public void shouldThrow_withCorrectErrorMessageFromTemplate() {
+    try {
+      Preconditions.checkNotNullWithMessage(null, ERROR_MESSAGE_TEMPLATE, ERROR_MESSAGE_ARG);
+      fail("NullPointerException expected");
+    } catch (NullPointerException npe) {
+      assertThat(npe).hasMessage(ERROR_MESSAGE_RESULT);
     }
+  }
 }

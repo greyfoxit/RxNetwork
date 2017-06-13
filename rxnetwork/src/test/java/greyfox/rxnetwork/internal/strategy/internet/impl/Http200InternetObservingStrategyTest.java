@@ -33,95 +33,83 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings({"ConstantConditions"})
 @RunWith(MockitoJUnitRunner.class)
 public class Http200InternetObservingStrategyTest extends EndpointInternetObservingStrategyTest {
 
-    private static final Http200InternetObservingStrategy.Builder NULL_BUILDER = null;
+  // Http200InternetObservingStrategy uses HTTP Status-Code 200: OK to validate connection
+  private static final int VALID_SERVER_RESPONSE = HTTP_OK;
 
-    // Http200InternetObservingStrategy uses HTTP Status-Code 200: OK to validate connection
-    private static final int VALID_SERVER_RESPONSE = HTTP_OK;
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
+    new Http200InternetObservingStrategy(null);
+  }
 
-    /*@Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
-        new Http200InternetObservingStrategy();
-    }*/
+  @Test
+  public void shouldSubscribeCorrectly() {
+    InternetObservingStrategy sut = Http200InternetObservingStrategy.create();
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new Http200InternetObservingStrategy(NULL_BUILDER);
-    }
+    sut.observe().test().assertSubscribed();
+  }
 
-    @Test
-    public void shouldSubscribeCorrectly() {
-        InternetObservingStrategy sut = Http200InternetObservingStrategy.create();
+  @Test
+  public void shouldReturnInternetConnectionIsTrue()
+      throws InternetObservingStrategyException, IOException {
 
-        sut.observe().test().assertSubscribed();
-    }
+    Http200InternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+    HttpURLConnection urlConnection = mock(HttpURLConnection.class);
+    doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
+    doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
 
-    @Test
-    public void internetConnectionShouldBeTrue()
-            throws InternetObservingStrategyException, IOException {
+    assertThat(sut.observe().blockingFirst()).isTrue();
+  }
 
-        Http200InternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
-        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
-        doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
-        doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
+  @Test
+  public void shouldReturnInternetConnectionIsFalse_whenTryingToObserveInvalidEndpoint() {
+    InternetObservingStrategy sut = builder().endpoint(INVALID_HOST).build();
 
-        assertThat(sut.observe().blockingFirst()).isTrue();
-    }
+    assertThat(sut.observe().blockingFirst()).isFalse();
+  }
 
-    @Test
-    public void internetConnectionShouldBeFalse_whenTryingToObserveInvalidEndpoint() {
-        InternetObservingStrategy sut = builder()
-                .endpoint(INVALID_HOST).build();
+  @Test(expected = InternetObservingStrategyException.class)
+  public void shouldThrowUnderlyingException_WrappedInInternetObservingStrategyException()
+      throws InternetObservingStrategyException, IOException {
 
-        assertThat(sut.observe().blockingFirst()).isFalse();
-    }
+    Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
+    HttpURLConnection urlConnection = spy(
+        (HttpURLConnection) server.url("/").url().openConnection());
+    doThrow(IOException.class).when(urlConnection).getResponseCode();
+    sut.isConnected(urlConnection);
 
-    @Test(expected = InternetObservingStrategyException.class)
-    public void shouldThrow_whenConnectionError()
-            throws InternetObservingStrategyException, IOException {
+    sut.observe().blockingFirst();
+  }
 
-        Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
-        HttpURLConnection urlConnection = spy((HttpURLConnection) server.url("/").url()
-                .openConnection());
-        doThrow(IOException.class).when(urlConnection).getResponseCode();
-        sut.isConnected(urlConnection);
+  @Test
+  public void shouldReturnInternetConnectionIsTrue_whenValidServerResponse()
+      throws InterruptedException, IOException {
 
-        sut.observe().blockingFirst();
-    }
+    setServerWithHttpStatusResponse(VALID_SERVER_RESPONSE);
+    InternetObservingStrategy sut = buildStrategy();
 
-    @Test
-    public void internetConnectionShouldBeTrue_whenValidServerResponse()
-            throws InterruptedException, IOException {
+    assertThat(sut.observe().blockingFirst()).isTrue();
+  }
 
-        setServerWithHttpStatusResponse(VALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy();
+  @Test
+  public void shouldReturnInternetConnectionIsFalse_whenInvalidServerResponse()
+      throws InterruptedException, IOException {
 
-        assertThat(sut.observe().blockingFirst()).isTrue();
-    }
+    setServerWithHttpStatusResponse(INVALID_SERVER_RESPONSE);
+    InternetObservingStrategy sut = buildStrategy();
 
-    @Test
-    public void internetConnectionShouldBeFalse_whenInvalidServerResponse()
-            throws InterruptedException, IOException {
+    assertThat(sut.observe().blockingFirst()).isFalse();
+  }
 
-        setServerWithHttpStatusResponse(INVALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy();
+  private Http200InternetObservingStrategy.Builder detailedStrategyBuilder() {
+    return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
+                    .endpoint(VALID_ENDPOINT);
+  }
 
-        assertThat(sut.observe().blockingFirst()).isFalse();
-    }
-
-    private Http200InternetObservingStrategy.Builder detailedStrategyBuilder() {
-        return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
-                .endpoint(VALID_ENDPOINT);
-    }
-
-    @Override
-    protected EndpointInternetObservingStrategy.Builder strategyBuilder() {
-        return builder();
-    }
+  @Override
+  protected EndpointInternetObservingStrategy.Builder strategyBuilder() {
+    return builder();
+  }
 }

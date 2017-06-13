@@ -15,16 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
-import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
-
-import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -41,59 +31,65 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class PreLollipopNetworkObservingStrategyTest {
 
-    @Rule public MockitoRule rule = MockitoJUnit.rule();
+  private final TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
 
-    Context context;
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
-    BaseNetworkObservingStrategy sut;
-    TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
+  private BaseNetworkObservingStrategy sut;
+  private RxNetworkInfo validRxnetworkInfo;
+  private Context context;
 
-    RxNetworkInfo VALID_RXNETWORK_INFO;
+  @Before
+  public void setUp() {
+    context = spy(RuntimeEnvironment.application.getApplicationContext());
+    sut = spy(new PreLollipopNetworkObservingStrategy(context));
+    validRxnetworkInfo = getRxNetworkInfoFrom(context);
+  }
 
-    @Before
-    public void setUp() {
-        context = spy(RuntimeEnvironment.application.getApplicationContext());
-        sut = spy(new PreLollipopNetworkObservingStrategy(context));
-        VALID_RXNETWORK_INFO = getRxNetworkInfoFrom(context);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithNullContext() {
+    new PreLollipopNetworkObservingStrategy(null);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithoutContext() {
-        new PreLollipopNetworkObservingStrategy(null);
-    }
+  @Test
+  public void shouldReceiveCorrectValue_whenConnectivityChanges() {
+    sut.observe().subscribeWith(testObserver);
 
-    @Test
-    public void shouldReceiveCorrectValue_whenConnectivityChanges() {
-        sut.observe().subscribeWith(testObserver);
+    RuntimeEnvironment.application.sendBroadcast(new Intent(CONNECTIVITY_ACTION));
+    testObserver.assertSubscribed().assertValue(validRxnetworkInfo);
+  }
 
-        RuntimeEnvironment.application.sendBroadcast(new Intent(CONNECTIVITY_ACTION));
-        testObserver.assertSubscribed().assertValue(VALID_RXNETWORK_INFO);
-    }
+  @Test
+  public void shouldDisposeCorrectly_whenObserverDisposed() {
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-    @Test
-    public void shouldDisposeCorrectly_whenDisposed() {
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    testObserver.dispose();
 
-        testObserver.dispose();
+    verify(sut).dispose();
+    testObserver.isDisposed();
+  }
 
-        verify(sut).dispose();
-        testObserver.isDisposed();
-    }
+  @Test
+  public void shouldLogError_whenUnregisterException() {
+    doThrow(Exception.class).when(context).unregisterReceiver(any(BroadcastReceiver.class));
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-    @Test
-    public void shouldDisposeWithException_whenDisposed() {
-        doThrow(Exception.class).when(context).unregisterReceiver(any(BroadcastReceiver.class));
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    testObserver.dispose();
 
-        testObserver.dispose();
-
-        verify(sut).dispose();
-        verify(sut).onError(anyString(), any(Exception.class));
-        testObserver.isDisposed();
-    }
+    verify(sut).dispose();
+    testObserver.isDisposed();
+    verify(sut).onError(anyString(), any(Exception.class));
+  }
 }

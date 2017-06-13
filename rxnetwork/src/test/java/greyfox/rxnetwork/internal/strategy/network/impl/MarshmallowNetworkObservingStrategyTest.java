@@ -15,21 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
-import static android.content.Context.POWER_SERVICE;
-import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
-import static android.os.Build.VERSION_CODES.M;
-import static android.os.PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -55,154 +40,166 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+import static android.content.Context.CONNECTIVITY_SERVICE;
+import static android.content.Context.POWER_SERVICE;
+import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
+import static android.os.Build.VERSION_CODES.M;
+import static android.os.PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 @RequiresApi(api = Build.VERSION_CODES.M)
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = M,
         shadows = ShadowConnectivityManagerWithCallback.class)
 public class MarshmallowNetworkObservingStrategyTest {
 
-    @Rule public MockitoRule rule = MockitoJUnit.rule();
+  private final TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
+  private final RxNetworkInfo defaultRxNetworkInfo = RxNetworkInfo.create();
 
-    Context context;
-    BaseNetworkObservingStrategy sut;
-    TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
+  @Mock private PowerManager powerManager;
 
-    @Mock PowerManager powerManager;
+  private Context context;
+  private BaseNetworkObservingStrategy sut;
 
-    RxNetworkInfo DEFAULT_RXNETWORK_INFO = RxNetworkInfo.create();
-    NetworkRequest NO_NETWORK_REQUEST = null;
+  @Before
+  public void setUp() {
+    context = spy(RuntimeEnvironment.application.getApplicationContext());
+    sut = spy(new MarshmallowNetworkObservingStrategy(context));
+  }
 
-    @Before
-    public void setUp() {
-        context = spy(RuntimeEnvironment.application.getApplicationContext());
-        sut = spy(new MarshmallowNetworkObservingStrategy(context));
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithNullContext() {
+    new MarshmallowNetworkObservingStrategy(null);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithoutContext() {
-        new MarshmallowNetworkObservingStrategy(null);
-    }
+  @Test()
+  public void shouldRegisterWithDefaultNetworkRequest() {
+    NetworkRequest defaultRequest = new NetworkRequest.Builder().build();
+    ConnectivityManager manager = setUpManagerWithNetworkRequest(null);
 
-    @Test()
-    public void shouldRegisterWithDefaultNetworkRequest() {
-        NetworkRequest DEFAULT_REQUEST = new NetworkRequest.Builder().build();
-        ConnectivityManager manager = setUpManagerWithNetworkRequest(NO_NETWORK_REQUEST);
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    verify(manager).registerNetworkCallback(eq(defaultRequest), any(NetworkCallback.class));
+  }
 
-        verify(manager).registerNetworkCallback(eq(DEFAULT_REQUEST), any(NetworkCallback.class));
-    }
+  @Test()
+  public void shouldRegisterWithCustomNetworkRequest() {
+    NetworkRequest customRequest = new NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI)
+                                                               .build();
+    ConnectivityManager manager = setUpManagerWithNetworkRequest(customRequest);
 
-    @Test()
-    public void shouldRegisterWithCustomNetworkRequest() {
-        NetworkRequest CUSTOM_REQUEST = new NetworkRequest.Builder()
-                .addTransportType(TRANSPORT_WIFI).build();
-        ConnectivityManager manager = setUpManagerWithNetworkRequest(CUSTOM_REQUEST);
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    verify(manager).registerNetworkCallback(eq(customRequest), any(NetworkCallback.class));
+  }
 
-        verify(manager).registerNetworkCallback(eq(CUSTOM_REQUEST), any(NetworkCallback.class));
-    }
+  @Test
+  public void shouldSubscribeCorrectly() {
+    sut.observe().subscribeWith(testObserver);
 
-    @Test
-    public void shouldSubscribeCorrectly() {
-        sut.observe().subscribeWith(testObserver);
+    testObserver.assertSubscribed().assertEmpty();
+  }
 
-        testObserver.assertSubscribed().assertEmpty();
-    }
+  @Test
+  public void shouldGetValue_whenIdleModeChanged_andDeviceNotIdled() {
+    setUpDeviceIdleMode(false);
 
-    @Test
-    public void shouldGetValue_whenIdleModeChanged_andDeviceNotIdled() {
-        setUpDeviceIdleMode(false);
+    sut.observe().subscribeWith(testObserver);
+    testObserver.assertSubscribed().assertEmpty();
 
-        sut.observe().subscribeWith(testObserver);
-        testObserver.assertSubscribed().assertEmpty();
+    RuntimeEnvironment.application.sendBroadcast(new Intent(ACTION_DEVICE_IDLE_MODE_CHANGED));
 
-        RuntimeEnvironment.application.sendBroadcast(new Intent(ACTION_DEVICE_IDLE_MODE_CHANGED));
+    testObserver.assertSubscribed().assertValueCount(1);
+  }
 
-        testObserver.assertSubscribed().assertValueCount(1);
-    }
+  @Test
+  public void shouldGetValue_whenIdleModeChanged_andDeviceIdled() {
+    setUpDeviceIdleMode(true);
+    doReturn(false).when(powerManager).isIgnoringBatteryOptimizations(anyString());
 
-    @Test
-    public void shouldGetValue_whenIdleModeChanged_andDeviceIdled() {
-        setUpDeviceIdleMode(true);
-        doReturn(false).when(powerManager).isIgnoringBatteryOptimizations(anyString());
+    sut.observe().subscribeWith(testObserver);
+    testObserver.assertSubscribed().assertEmpty();
 
-        sut.observe().subscribeWith(testObserver);
-        testObserver.assertSubscribed().assertEmpty();
+    RuntimeEnvironment.application.sendBroadcast(new Intent(ACTION_DEVICE_IDLE_MODE_CHANGED));
 
-        RuntimeEnvironment.application.sendBroadcast(new Intent(ACTION_DEVICE_IDLE_MODE_CHANGED));
+    testObserver.assertSubscribed().assertValue(defaultRxNetworkInfo);
+  }
 
-        testObserver.assertSubscribed().assertValue(DEFAULT_RXNETWORK_INFO);
-    }
+  @Test
+  public void shouldDisposeCorrectly_whenObserverDisposed() {
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
 
-    @Test
-    public void shouldDisposeCorrectly_whenDisposed() {
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
+    testObserver.dispose();
 
-        testObserver.dispose();
+    verify(sut).dispose();
+    testObserver.isDisposed();
+  }
 
-        verify(sut).dispose();
-        testObserver.isDisposed();
-    }
+  @Test
+  public void shouldLogError_whenReceiverUnregisterException() {
+    setupNetworkCallbackUnregisterException();
 
-    @Test
-    public void shouldCatch_whenReceiverUnregisterException() {
-        setupNetworkCallbackUnregisterException();
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
+    testObserver.dispose();
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
-        testObserver.dispose();
+    verify(sut).dispose();
+    testObserver.isDisposed();
+    verify(sut).onError(anyString(), any(Exception.class));
+  }
 
-        verify(sut).dispose();
-        verify(sut).onError(anyString(), any(Exception.class));
-        testObserver.isDisposed();
-    }
+  @Test
+  public void shouldLogError_whenNetworkCallbackUnregisterException() {
+    setupForBroadcastReceiverUnregisterException();
 
-    @Test
-    public void shouldCatch_whenNetworkCallbackUnregisterException() {
-        setupForBroadcastReceiverUnregisterException();
+    sut.observe().subscribeWith(testObserver).assertSubscribed();
+    testObserver.dispose();
 
-        sut.observe().subscribeWith(testObserver).assertSubscribed();
-        testObserver.dispose();
+    verify(sut).dispose();
+    testObserver.isDisposed();
+    verify(sut).onError(anyString(), any(Exception.class));
+  }
 
-        verify(sut).dispose();
-        verify(sut).onError(anyString(), any(Exception.class));
-        testObserver.isDisposed();
-    }
+  private void setupForBroadcastReceiverUnregisterException() {
+    ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+    doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
+    doThrow(Exception.class).when(context).unregisterReceiver(any(BroadcastReceiver.class));
+    sut = spy(new MarshmallowNetworkObservingStrategy(context));
+  }
 
-    private void setupForBroadcastReceiverUnregisterException() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
-        doThrow(Exception.class).when(context).unregisterReceiver(any(BroadcastReceiver.class));
-        sut = spy(new MarshmallowNetworkObservingStrategy(context));
-    }
+  private void setupNetworkCallbackUnregisterException() {
+    ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+    doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
+    doThrow(Exception.class).when(connectivityManager)
+                            .unregisterNetworkCallback(any(NetworkCallback.class));
 
-    private void setupNetworkCallbackUnregisterException() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
-        doThrow(Exception.class).when(connectivityManager)
-                .unregisterNetworkCallback(any(NetworkCallback.class));
+    sut = spy(new MarshmallowNetworkObservingStrategy(context));
+  }
 
-        sut = spy(new MarshmallowNetworkObservingStrategy(context));
-    }
+  private void setUpDeviceIdleMode(boolean isIdle) {
+    context = spy(RuntimeEnvironment.application.getApplicationContext());
+    doReturn(isIdle).when(powerManager).isDeviceIdleMode();
+    doReturn(powerManager).when(context).getSystemService(POWER_SERVICE);
+    sut = spy(new MarshmallowNetworkObservingStrategy(context));
+  }
 
-    private void setUpDeviceIdleMode(boolean isIdle) {
-        context = spy(RuntimeEnvironment.application.getApplicationContext());
-        doReturn(isIdle).when(powerManager).isDeviceIdleMode();
-        doReturn(powerManager).when(context).getSystemService(POWER_SERVICE);
-        sut = spy(new MarshmallowNetworkObservingStrategy(context));
-    }
+  private ConnectivityManager setUpManagerWithNetworkRequest(
+      @Nullable NetworkRequest networkRequest) {
 
-    private ConnectivityManager setUpManagerWithNetworkRequest(@Nullable
-            NetworkRequest networkRequest) {
+    ConnectivityManager manager = mock(ConnectivityManager.class);
+    doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
 
-        ConnectivityManager manager = mock(ConnectivityManager.class);
-        doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
+    sut = spy(networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
+                                     : new MarshmallowNetworkObservingStrategy(context,
+                                         networkRequest));
 
-        sut = spy(networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
-                : new MarshmallowNetworkObservingStrategy(context, networkRequest));
-
-        return manager;
-    }
+    return manager;
+  }
 }
