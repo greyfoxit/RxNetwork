@@ -15,10 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.providers;
 
-import static android.os.Build.VERSION_CODES.KITKAT;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import android.content.Context;
 import greyfox.rxnetwork.BuildConfig;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategyProvider;
@@ -35,60 +31,60 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings("WeakerAccess")
+import static android.os.Build.VERSION_CODES.KITKAT;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class BuiltInNetworkObservingObservingStrategyProvidersTest {
 
-    @Rule public MockitoRule rule = MockitoJUnit.rule();
-    @Mock NetworkObservingStrategyProvider ANY_PROVIDER;
+  private final Context context = RuntimeEnvironment.application;
 
-    Context context = RuntimeEnvironment.application;
+  private final Collection<NetworkObservingStrategyProvider> sut
+      = new BuiltInNetworkObservingStrategyProviders(context).get();
 
-    Collection<NetworkObservingStrategyProvider> sut
-            = new BuiltInNetworkObservingStrategyProviders(context).get();
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
-    @Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
-        new BuiltInNetworkObservingStrategyProviders();
+  @Mock private NetworkObservingStrategyProvider anyProvider;
+
+  @Test(expected = AssertionError.class)
+  public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
+    new BuiltInNetworkObservingStrategyProviders();
+  }
+
+  @Test
+  public void shouldNeverBeNull() {
+    assertThat(sut).isNotNull();
+  }
+
+  @Test
+  public void shouldHaveAtLeastOneProvider() {
+    assertThat(sut).hasAtLeastOneElementOfType(NetworkObservingStrategyProvider.class);
+  }
+
+  @Test
+  @Config(sdk = KITKAT)
+  public void shouldHaveOnlyOneProviderThatCanProvide_forGivenPlatform() {
+    assertThat(sut).haveExactly(1, new CanProvide());
+  }
+
+  @Test
+  public void shouldNotHaveDuplicateProviders() {
+    assertThat(sut).doesNotHaveDuplicates();
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void shouldBeUnmodifiable() {
+    // hacky but we don't want to test for every collection methods
+    assertThat(sut.getClass().getName()).contains("Unmodifiable");
+    sut.add(anyProvider);
+  }
+
+  private static final class CanProvide extends Condition<ObservingStrategyProvider> {
+
+    @Override
+    public boolean matches(ObservingStrategyProvider value) {
+      return value.canProvide();
     }
-
-    @Test
-    public void builtInProviders_shouldNeverBeNull() {
-        assertThat(sut).isNotNull();
-    }
-
-    @Test
-    public void builtInProviders_shouldHaveAtLeastOneProvider() {
-        assertThat(sut).hasAtLeastOneElementOfType(NetworkObservingStrategyProvider.class);
-    }
-
-    @Test
-    @Config(sdk = KITKAT)
-    public void onlyOneProviderShouldBeAbleToProvide_forGivenPlatform() {
-        assertThat(sut).haveExactly(1, new CanProvide());
-    }
-
-    @Test
-    public void builtInProviders_shouldNotHaveDuplicates() {
-        assertThat(sut).doesNotHaveDuplicates();
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void builtInProviders_shouldBeUnmodifiable() {
-        // hacky but we don't want to test for every collection methods
-        assertThat(sut.getClass().getName()).contains("Unmodifiable");
-        sut.add(ANY_PROVIDER);
-    }
-
-    static class CanProvide extends Condition<ObservingStrategyProvider> {
-
-        @Override
-        public boolean matches(ObservingStrategyProvider value) {
-            return value.canProvide();
-        }
-    }
+  }
 }

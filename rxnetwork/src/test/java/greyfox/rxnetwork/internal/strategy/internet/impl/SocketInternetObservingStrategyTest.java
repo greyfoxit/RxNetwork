@@ -36,89 +36,79 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
 @RunWith(MockitoJUnitRunner.class)
 public class SocketInternetObservingStrategyTest {
 
-    int TIMEOUT_MS = 200;
-    int DELAY_MS = 100;
-    int INTERVAL_MS = 200;
-    String INVALID_HOST = "invalid.endpoint";
-    String VALID_HOST = "localhost";
-    MockWebServer server;
+  private static final int TIMEOUT_MS = 200;
+  private static final int DELAY_MS = 100;
+  private static final int INTERVAL_MS = 200;
+  private static final String INVALID_HOST = "invalid.endpoint";
 
-    @Before
-    public void setUp() throws Exception {
-        server = new MockWebServer();
-        server.start();
-    }
+  private MockWebServer server;
 
-    @After
-    public void tearDown() throws Exception {
-        server.shutdown();
-    }
+  @Before
+  public void setUp() throws Exception {
+    server = new MockWebServer();
+    server.start();
+  }
 
-    /*@Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
-        new SocketInternetObservingStrategy();
-    }*/
+  @After
+  public void tearDown() throws Exception {
+    server.shutdown();
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new SocketInternetObservingStrategy(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
+    new SocketInternetObservingStrategy(null);
+  }
 
-    @Test
-    public void shouldSubscribeCorrectly() {
-        InternetObservingStrategy sut = SocketInternetObservingStrategy.create();
+  @Test
+  public void shouldSubscribeCorrectly() {
+    InternetObservingStrategy sut = SocketInternetObservingStrategy.create();
 
-        sut.observe().test().assertSubscribed();
-    }
+    sut.observe().test().assertSubscribed();
+  }
 
-    @Test
-    public void shouldSubscribeCorrectly_whenCreatedFromDetailedBuilder() {
-        InternetObservingStrategy sut = detailedStrategyBuilder().build();
+  @Test
+  public void shouldSubscribeCorrectly_whenCreatedFromDetailedBuilder() {
+    InternetObservingStrategy sut = detailedStrategyBuilder().build();
 
-        sut.observe().test().assertSubscribed();
-    }
+    sut.observe().test().assertSubscribed();
+  }
 
-    @Test
-    public void shouldLogError_whenProblemClosingSocket() throws IOException {
-        SocketInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
-        Socket socket = mock(Socket.class);
-        doThrow(IOException.class).when(socket).close();
+  @Test
+  public void shouldLogError_whenProblemClosingSocket() throws IOException {
+    SocketInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+    Socket socket = mock(Socket.class);
+    doThrow(IOException.class).when(socket).close();
 
-        doReturn(socket).when(sut).connectSocketTo(any(SocketAddress.class), anyInt());
+    doReturn(socket).when(sut).connectSocketTo(any(SocketAddress.class), anyInt());
 
-        sut.observe().blockingFirst();
-        verify(sut).onError(anyString(), any(Exception.class));
-    }
+    sut.observe().blockingFirst();
+    verify(sut).onError(anyString(), any(Exception.class));
+  }
 
-    @Test
-    public void internetConnectionShouldBeFalse_whenTryingToObserveInvalidEndpoint() {
-        InternetObservingStrategy sut = detailedStrategyBuilder().endpoint(INVALID_HOST).build();
+  @Test
+  public void shouldReturnInternetConnectionIsFalse_whenTryingToObserveInvalidEndpoint() {
+    InternetObservingStrategy sut = detailedStrategyBuilder().endpoint(INVALID_HOST).build();
 
-        assertThat(sut.observe().blockingFirst()).isFalse();
-    }
+    assertThat(sut.observe().blockingFirst()).isFalse();
+  }
 
-    @Test
-    public void internetConnectionShouldBeTrue_whenTryingToObserveValidEndpoint()
-            throws InterruptedException, IOException {
+  @Test
+  public void shouldReturnInternetConnectionIsTrue_whenObservingValidEndpoint()
+      throws InterruptedException, IOException {
 
-        String host = server.url("/").host();
-        int port = server.url("/").port();
+    String host = server.url("/").host();
+    int port = server.url("/").port();
 
-        InternetObservingStrategy sut = detailedStrategyBuilder()
-                .endpoint(VALID_HOST).port(port).build();
+    InternetObservingStrategy sut = detailedStrategyBuilder().endpoint(host).port(port).build();
 
-        assertThat(sut.observe().blockingFirst()).isTrue();
-    }
+    assertThat(sut.observe().blockingFirst()).isTrue();
+  }
 
-    private SocketInternetObservingStrategy.Builder detailedStrategyBuilder() {
-        return SocketInternetObservingStrategy.builder().timeout(TIMEOUT_MS).delay(DELAY_MS)
-                .interval(INTERVAL_MS);
-    }
+  private SocketInternetObservingStrategy.Builder detailedStrategyBuilder() {
+    return SocketInternetObservingStrategy.builder().timeout(TIMEOUT_MS).delay(DELAY_MS)
+                                          .interval(INTERVAL_MS);
+  }
 }

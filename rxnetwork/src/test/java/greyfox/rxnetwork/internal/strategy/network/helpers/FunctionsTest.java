@@ -15,43 +15,39 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.helpers;
 
-import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import org.junit.Test;
 
-/**
- * @author Radek Kozak
- */
+import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 public class FunctionsTest {
 
-    @Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaConstructor() {
-        new Functions();
-    }
+  @Test(expected = AssertionError.class)
+  public void shouldThrow_whenTryingToInstantiateViaConstructor() {
+    new Functions();
+  }
 
-    @Test
-    public void shouldBeTrue_whenRxNetworkInfoIsConnected() throws Exception {
-        RxNetworkInfo sut = RxNetworkInfo.builder().connected(true).build();
-        boolean result = TO_CONNECTION_STATE.apply(sut);
+  @Test
+  public void shouldBeTrue_whenRxNetworkInfoIsConnected() throws Exception {
+    RxNetworkInfo sut = RxNetworkInfo.builder().connected(true).build();
+    boolean result = TO_CONNECTION_STATE.apply(sut);
 
-        assertThat(result).isTrue();
-    }
+    assertThat(result).isTrue();
+  }
 
-    @Test
-    public void shouldBeFalse_whenRxNetworkInfoNotConnected() throws Exception {
-        RxNetworkInfo sut = RxNetworkInfo.builder().connected(false).build();
-        boolean result = TO_CONNECTION_STATE.apply(sut);
+  @Test
+  public void shouldBeFalse_whenRxNetworkInfoNotConnected() throws Exception {
+    RxNetworkInfo sut = RxNetworkInfo.builder().connected(false).build();
+    boolean result = TO_CONNECTION_STATE.apply(sut);
 
-        assertThat(result).isFalse();
-    }
+    assertThat(result).isFalse();
+  }
 
-    @Test
-    public void shouldBeFalse_whenRxNetworkInfoIsNull() throws Exception {
-        boolean result = TO_CONNECTION_STATE.apply(null);
+  @Test
+  public void shouldBeFalse_whenRxNetworkInfoIsNull() throws Exception {
+    boolean result = TO_CONNECTION_STATE.apply(null);
 
-        assertThat(result).isFalse();
-    }
+    assertThat(result).isFalse();
+  }
 }

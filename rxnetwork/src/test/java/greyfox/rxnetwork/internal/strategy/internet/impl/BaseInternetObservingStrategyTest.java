@@ -26,18 +26,17 @@ import org.mockito.junit.MockitoRule;
 @RunWith(Parameterized.class)
 public class BaseInternetObservingStrategyTest {
 
-    @Rule public MockitoRule rule = MockitoJUnit.rule();
+  @Rule public MockitoRule rule = MockitoJUnit.rule();
 
-    @Parameterized.Parameter
-    public int INVALID_PORT;
+  @Parameterized.Parameter public int invalidPort;
 
-    @Parameterized.Parameters
-    public static Iterable<? extends Integer> invalidPorts() {
-        return Arrays.asList(-1, 0, 65536);
-    }
+  @Parameterized.Parameters
+  public static Iterable<? extends Integer> invalidPorts() {
+    return Arrays.asList(-1, 0, 65536);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrow_whenTryingToBuildStrategyWithInvalidPort() {
-        SocketInternetObservingStrategy.builder().port(INVALID_PORT);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldThrow_whenTryingToBuildStrategyWithInvalidPort() {
+    SocketInternetObservingStrategy.builder().port(invalidPort);
+  }
 }

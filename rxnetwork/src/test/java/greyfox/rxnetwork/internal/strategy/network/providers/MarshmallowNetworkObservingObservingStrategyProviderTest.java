@@ -15,14 +15,7 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.providers;
 
-import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static android.os.Build.VERSION_CODES.M;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
-import android.support.annotation.RequiresApi;
 import greyfox.rxnetwork.BuildConfig;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.impl.MarshmallowNetworkObservingStrategy;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,39 +23,38 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static android.os.Build.VERSION_CODES.M;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class MarshmallowNetworkObservingObservingStrategyProviderTest {
 
-    MarshmallowNetworkObservingStrategyProvider sut
-            = new MarshmallowNetworkObservingStrategyProvider(RuntimeEnvironment.application);
+  private final MarshmallowNetworkObservingStrategyProvider sut
+      = new MarshmallowNetworkObservingStrategyProvider(RuntimeEnvironment.application);
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenProvidedNullContext() {
-        new MarshmallowNetworkObservingStrategyProvider(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInitializeWithNullContext() {
+    new MarshmallowNetworkObservingStrategyProvider(null);
+  }
 
-    @Test
-    @Config(sdk = M)
-    public void shouldProvide_whenAtLeastMarshmallow() throws Exception {
-        assertThat(sut.canProvide()).isTrue();
-    }
+  @Test
+  @Config(sdk = M)
+  public void shouldProvide_whenAtLeastMarshmallow() {
+    assertThat(sut.canProvide()).isTrue();
+  }
 
-    @Test
-    @Config(sdk = LOLLIPOP)
-    public void shouldNotProvide_whenOnPreMarshmallow() throws Exception {
-        assertThat(sut.canProvide()).isFalse();
-    }
+  @Test
+  @Config(sdk = LOLLIPOP)
+  public void shouldNotProvide_whenOnPreMarshmallow() {
+    assertThat(sut.canProvide()).isFalse();
+  }
 
-    @RequiresApi(M)
-    @Test
-    @Config(sdk = M)
-    public void shouldProvideConcreteStrategy() throws Exception {
-        assertThat(sut.provide()).isNotNull().isInstanceOf(NetworkObservingStrategy.class)
-                .isExactlyInstanceOf(MarshmallowNetworkObservingStrategy.class);
-    }
+  @Test
+  @Config(sdk = M)
+  public void shouldProvideConcreteStrategy() {
+    assertThat(sut.provide()).isNotNull()
+                             .isExactlyInstanceOf(MarshmallowNetworkObservingStrategy.class);
+  }
 }

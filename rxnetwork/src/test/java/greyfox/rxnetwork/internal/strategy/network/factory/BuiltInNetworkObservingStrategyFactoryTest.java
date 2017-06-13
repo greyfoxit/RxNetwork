@@ -15,8 +15,6 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.factory;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import android.content.Context;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
@@ -29,45 +27,44 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 @RunWith(MockitoJUnitRunner.class)
 public class BuiltInNetworkObservingStrategyFactoryTest {
 
-    static Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS = Collections.emptySet();
+  private static final Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS = Collections
+      .emptySet();
 
-    @Mock Context context;
+  private ObservingStrategyFactory sut;
 
-    ObservingStrategyFactory sut;
+  @Mock private Context context;
 
-    @Before
-    public void setUp() {
-        Collection<NetworkObservingStrategyProvider> providers
-                = new BuiltInNetworkObservingStrategyProviders(context).get();
-        sut = BuiltInNetworkObservingStrategyFactory.create(providers);
-    }
+  @Before
+  public void setUp() {
+    Collection<NetworkObservingStrategyProvider> providers
+        = new BuiltInNetworkObservingStrategyProviders(context).get();
+    sut = BuiltInNetworkObservingStrategyFactory.create(providers);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingInstantiateWithNullProviders() {
-        new BuiltInNetworkObservingStrategyFactory(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingInstantiateWithNullProviders_viaConstructor() {
+    new BuiltInNetworkObservingStrategyFactory(null);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToCreateWithNullProviders() {
-        BuiltInNetworkObservingStrategyFactory.create(null);
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToCreateWithNullProviders() {
+    BuiltInNetworkObservingStrategyFactory.create(null);
+  }
 
-    @Test
-    public void shouldNeverGetNullStrategy() throws Exception {
-        assertThat(sut.get()).isNotNull();
-    }
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenProvidersEmpty() {
+    sut = BuiltInNetworkObservingStrategyFactory.create(EMPTY_PROVIDERS);
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenProvidersEmpty() throws Exception {
-        sut = BuiltInNetworkObservingStrategyFactory.create(EMPTY_PROVIDERS);
+    sut.get();
+  }
 
-        sut.get();
-    }
+  @Test
+  public void shouldNeverGetNullStrategy() {
+    assertThat(sut.get()).isNotNull();
+  }
 }

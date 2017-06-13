@@ -18,102 +18,92 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-/**
- * @author Radek Kozak
- */
-@SuppressWarnings("ConstantConditions")
 public class WalledGardenInternetObservingStrategyTest
-        extends EndpointInternetObservingStrategyTest {
+    extends EndpointInternetObservingStrategyTest {
 
-    private static final WalledGardenInternetObservingStrategy.Builder NULL_BUILDER = null;
+  private static final WalledGardenInternetObservingStrategy.Builder NULL_BUILDER = null;
 
-    // WalledGardenInternetStrategy uses HTTP Status-Code 204: No Content to validate connection
-    private static final int VALID_SERVER_RESPONSE = HTTP_NO_CONTENT;
+  // WalledGardenInternetStrategy uses HTTP Status-Code 204: No Content to validate connection
+  private static final int VALID_SERVER_RESPONSE = HTTP_NO_CONTENT;
 
-    /*@Test(expected = AssertionError.class)
-    public void shouldThrow_whenTryingToInstantiateViaEmptyConstructor() {
-        new WalledGardenInternetObservingStrategy();
-    }*/
+  @Test(expected = NullPointerException.class)
+  public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
+    new WalledGardenInternetObservingStrategy(NULL_BUILDER);
+  }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-        new WalledGardenInternetObservingStrategy(NULL_BUILDER);
-    }
+  @Test
+  public void shouldSubscribeCorrectly_whenCreatedFromDefaultFactory() {
+    InternetObservingStrategy sut = WalledGardenInternetObservingStrategy.create();
 
-    @Test
-    public void shouldSubscribeCorrectly_whenCreatedFromDefaultFactory() {
-        InternetObservingStrategy sut = WalledGardenInternetObservingStrategy.create();
+    sut.observe().test().assertSubscribed();
+  }
 
-        sut.observe().test().assertSubscribed();
-    }
+  @Test
+  public void shouldSubscribeCorrectly_whenCreatedFromDetailedBuilder() {
+    InternetObservingStrategy sut = detailedStrategyBuilder().build();
 
-    @Test
-    public void shouldSubscribeCorrectly_whenCreatedFromDetailedBuilder() {
-        InternetObservingStrategy sut = detailedStrategyBuilder().build();
+    sut.observe().test().assertSubscribed();
+  }
 
-        sut.observe().test().assertSubscribed();
-    }
+  @Test
+  public void shouldThrow_whenTryingToObserveInvalidEndpoint() {
+    InternetObservingStrategy sut = builder().endpoint(INVALID_HOST).build();
 
-    @Test
-    public void shouldThrow_whenTryingToObserveInvalidEndpoint() {
-        InternetObservingStrategy sut = builder()
-                .endpoint(INVALID_HOST).build();
+    assertThat(sut.observe().blockingFirst()).isFalse();
+  }
 
-        assertThat(sut.observe().blockingFirst()).isFalse();
-    }
+  @Test
+  public void shouldReturnInternetConnectionIsTrue()
+      throws IOException, InternetObservingStrategyException {
 
-    @Test
-    public void internetConnectionShouldBeTrue()
-            throws IOException, InternetObservingStrategyException {
+    WalledGardenInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+    HttpURLConnection urlConnection = mock(HttpURLConnection.class);
+    doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
+    doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
 
-        WalledGardenInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
-        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
-        doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
-        doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
+    assertThat(sut.observe().blockingFirst()).isTrue();
+  }
 
-        assertThat(sut.observe().blockingFirst()).isTrue();
-    }
+  @Test
+  public void shouldReturnInternetConnectionIsTrue_whenValidServerResponse()
+      throws InterruptedException, IOException {
 
-    @Test
-    public void internetConnectionShouldBeTrue_whenValidServerResponse()
-            throws InterruptedException, IOException {
+    setServerWithHttpStatusResponse(VALID_SERVER_RESPONSE);
+    InternetObservingStrategy sut = buildStrategy();
 
-        setServerWithHttpStatusResponse(VALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy();
+    assertThat(sut.observe().blockingFirst()).isTrue();
+  }
 
-        assertThat(sut.observe().blockingFirst()).isTrue();
-    }
+  @Test
+  public void shouldLogError_whenProblemGettingResponseCode()
+      throws IOException, InternetObservingStrategyException {
 
-    @Test
-    public void shouldLogError_whenProblemGettingResponseCode() throws IOException,
-            InternetObservingStrategyException {
+    WalledGardenInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+    HttpURLConnection urlConnection = mock(HttpURLConnection.class);
+    doThrow(IOException.class).when(urlConnection).getResponseCode();
 
-        WalledGardenInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
-        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
-        doThrow(IOException.class).when(urlConnection).getResponseCode();
+    doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
 
-        doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
+    assertThat(sut.observe().blockingFirst()).isFalse();
+    verify(sut).onError(anyString(), any(Exception.class));
+  }
 
-        assertThat(sut.observe().blockingFirst()).isFalse();
-        verify(sut).onError(anyString(), any(Exception.class));
-    }
+  @Test
+  public void shouldReturnInternetConnectionIsFalse_whenInvalidServerResponse() throws IOException {
 
-    @Test
-    public void internetConnectionShouldBeFalse_whenInvalidServerResponse() throws IOException {
+    setServerWithHttpStatusResponse(INVALID_SERVER_RESPONSE);
+    InternetObservingStrategy sut = buildStrategy();
 
-        setServerWithHttpStatusResponse(INVALID_SERVER_RESPONSE);
-        InternetObservingStrategy sut = buildStrategy();
+    assertThat(sut.observe().blockingFirst()).isFalse();
+  }
 
-        assertThat(sut.observe().blockingFirst()).isFalse();
-    }
+  private WalledGardenInternetObservingStrategy.Builder detailedStrategyBuilder() {
+    return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
+                    .endpoint(VALID_ENDPOINT);
+  }
 
-    private WalledGardenInternetObservingStrategy.Builder detailedStrategyBuilder() {
-        return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
-                .endpoint(VALID_ENDPOINT);
-    }
-
-    @Override
-    protected EndpointInternetObservingStrategy.Builder strategyBuilder() {
-        return builder();
-    }
+  @Override
+  protected EndpointInternetObservingStrategy.Builder strategyBuilder() {
+    return builder();
+  }
 }
