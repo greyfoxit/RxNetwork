@@ -17,6 +17,8 @@ package com.example.rxnetwork.internals.di;
 
 import android.content.Context;
 import greyfox.rxnetwork.RxNetwork;
+import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
+import greyfox.rxnetwork.internal.strategy.internet.impl.Http200InternetObservingStrategy;
 import toothpick.config.Module;
 
 /**
@@ -27,6 +29,13 @@ import toothpick.config.Module;
 public class RxNetworkModule extends Module {
 
   public RxNetworkModule(Context context) {
-    bind(RxNetwork.class).toInstance(RxNetwork.init(context));
+
+    InternetObservingStrategy customStrategy = Http200InternetObservingStrategy.builder()
+        .endpoint("http://captive.apple.com").delay(1000).interval(5000).build();
+
+    RxNetwork custom = RxNetwork.builder().internetObservingStrategy(customStrategy).init();
+
+    bind(RxNetwork.class).toInstance(RxNetwork.init(context)); // default RxNetwork
+    bind(RxNetwork.class).withName("custom").toInstance(custom);
   }
 }
