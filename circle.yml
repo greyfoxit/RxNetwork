@@ -39,6 +39,10 @@ jobs:
           name: Website
           command: .scripts/deploy-website.sh || exit 0
 
+      - run:
+          name: Deploy
+          command: .scripts/deploy-snapshot.sh
+
       - save_cache:
           key: rxnetwork-{{ checksum "build.gradle" }}-{{ checksum "rxnetwork/build.gradle" }}-{{ checksum "app/build.gradle" }}-{{ checksum "circle.yml" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           paths:
