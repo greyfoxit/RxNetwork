@@ -29,17 +29,17 @@ import static android.net.ConnectivityManager.TYPE_MOBILE;
 import static android.net.ConnectivityManager.TYPE_WIFI;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 /**
  * Contains predefined predicates for filtering reactive streams of {@link RxNetwork}.
  *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
 @RestrictTo(LIBRARY_GROUP)
 public final class RxNetworkInfoPredicate {
 
-  @VisibleForTesting(otherwise = PRIVATE)
+  @VisibleForTesting
   RxNetworkInfoPredicate() {
     throw new AssertionError("No instances.");
   }
@@ -60,7 +60,7 @@ public final class RxNetworkInfoPredicate {
    */
   public static final class State {
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     State() {
       throw new AssertionError("No instances.");
     }
@@ -101,7 +101,7 @@ public final class RxNetworkInfoPredicate {
     public static final Predicate<RxNetworkInfo> IS_MOBILE = isOfTypeMobile();
     public static final Predicate<RxNetworkInfo> IS_WIFI = isOfTypeWifi();
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     Type() {
       throw new AssertionError("No instances.");
     }
@@ -142,7 +142,7 @@ public final class RxNetworkInfoPredicate {
   @RequiresApi(LOLLIPOP)
   public static final class Capabilities {
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     Capabilities() {
       throw new AssertionError("No instances");
     }

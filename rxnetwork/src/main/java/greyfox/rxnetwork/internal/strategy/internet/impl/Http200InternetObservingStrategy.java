@@ -22,9 +22,14 @@ import java.net.HttpURLConnection;
 import java.util.logging.Logger;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.logging.Logger.getLogger;
 
 /**
+ * Variation of {@link UrlConnectionInternetObservingStrategy}
+ * that uses {@linkplain HttpURLConnection#HTTP_OK} (Status-Code 200)
+ * as default check against given endpoint.
+ *
  * @author Radek Kozak
  */
 public final class Http200InternetObservingStrategy extends UrlConnectionInternetObservingStrategy {
@@ -50,7 +55,7 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
     checkNotNull(urlConnection, "urlConnection");
 
     try {
-      return urlConnection.getResponseCode() == 200;
+      return urlConnection.getResponseCode() == HTTP_OK;
     } catch (IOException ioe) {
       throw new InternetObservingStrategyException("Unable to check internet access", ioe);
     }

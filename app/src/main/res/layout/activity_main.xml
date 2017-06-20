@@ -8,8 +8,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.rxnetwork.DefaultRxNetworkFragment">
 
-  <app:fragment xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
+  <app:fragment
       android:id="@+id/default_rxnetwork_fragment"
       android:name="com.example.rxnetwork.DefaultRxNetworkFragment"
       android:layout_width="match_parent"
@@ -20,8 +19,7 @@
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toTopOf="parent"/>
 
-  <app:fragment xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
+  <app:fragment
       android:id="@+id/custom_rxnetwork_fragment"
       android:name="com.example.rxnetwork.CustomRxNetworkFragment"
       android:layout_width="match_parent"

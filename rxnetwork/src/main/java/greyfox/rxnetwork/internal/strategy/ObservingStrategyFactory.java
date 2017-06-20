@@ -16,9 +16,10 @@
 package greyfox.rxnetwork.internal.strategy;
 
 /**
+ * Base interface for {@code ObservingStrategyFactory}.
+ *
  * @author Radek Kozak
  */
-
 public interface ObservingStrategyFactory<T extends ObservingStrategy> {
 
   T get();

@@ -22,7 +22,7 @@ import java.net.URL;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
- * Defines endpoint-based internet observing strategy.
+ * Defines basic endpoint-based internet observing strategy.
  * <p>
  * Endpoint is meant here in a broad sense. Depending on specific strategy implementation
  * It can pose as, for example, a canonical hostname (as in {@link InetSocketAddress})

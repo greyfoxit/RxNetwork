@@ -40,8 +40,8 @@ public class BuiltInNetworkObservingObservingStrategyProvidersTest {
 
   private final Context context = RuntimeEnvironment.application;
 
-  private final Collection<NetworkObservingStrategyProvider> sut
-      = new BuiltInNetworkObservingStrategyProviders(context).get();
+  private final Collection<NetworkObservingStrategyProvider> sut =
+      new BuiltInNetworkObservingStrategyProviders(context).get();
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 

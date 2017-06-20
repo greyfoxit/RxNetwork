@@ -18,9 +18,10 @@ package greyfox.rxnetwork.internal.strategy;
 import java.util.Collection;
 
 /**
+ * Base interface for {@code ObservingStrategyProviders}.
+ *
  * @author Radek Kozak
  */
-
 public interface ObservingStrategyProviders<T extends ObservingStrategyProvider> {
 
   Collection<T> get();

@@ -15,9 +15,18 @@
  */
 package greyfox.rxnetwork.internal.strategy.internet.error;
 
+import android.support.annotation.RestrictTo;
+import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
+
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
+
 /**
+ * Custom exception for {@link InternetObservingStrategy} related stuff.
+ *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
+@RestrictTo(LIBRARY_GROUP)
 public class InternetObservingStrategyException extends Exception {
 
   public InternetObservingStrategyException() {

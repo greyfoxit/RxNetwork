@@ -18,9 +18,10 @@ package greyfox.rxnetwork.internal.strategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 
 /**
+ * Base interface for {@code ObservingStrategyProvider}.
+ *
  * @author Radek Kozak
  */
-
 public interface ObservingStrategyProvider<T extends ObservingStrategy> {
 
   /**

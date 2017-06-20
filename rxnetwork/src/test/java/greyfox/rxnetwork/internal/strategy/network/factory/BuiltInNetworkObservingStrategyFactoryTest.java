@@ -29,11 +29,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(MockitoJUnitRunner.class)
 public class BuiltInNetworkObservingStrategyFactoryTest {
 
-  private static final Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS = Collections
-      .emptySet();
+  private static final Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS =
+      Collections.emptySet();
 
   private ObservingStrategyFactory sut;
 
@@ -41,8 +42,8 @@ public class BuiltInNetworkObservingStrategyFactoryTest {
 
   @Before
   public void setUp() {
-    Collection<NetworkObservingStrategyProvider> providers
-        = new BuiltInNetworkObservingStrategyProviders(context).get();
+    Collection<NetworkObservingStrategyProvider> providers =
+        new BuiltInNetworkObservingStrategyProviders(context).get();
     sut = BuiltInNetworkObservingStrategyFactory.create(providers);
   }
 

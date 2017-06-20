@@ -64,6 +64,7 @@ import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_C
  *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
 public final class RxNetwork {
 
   @Nullable private final Scheduler scheduler;
@@ -271,8 +272,8 @@ public final class RxNetwork {
                                    : new BuiltInNetworkObservingStrategyProviders(context,
                                        networkRequest);
 
-      return networkObservingStrategy = BuiltInNetworkObservingStrategyFactory
-          .create(providers.get()).get();
+      return networkObservingStrategy =
+          BuiltInNetworkObservingStrategyFactory.create(providers.get()).get();
     }
   }
 }

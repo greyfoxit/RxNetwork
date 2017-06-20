@@ -33,6 +33,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(MockitoJUnitRunner.class)
 public class Http200InternetObservingStrategyTest extends EndpointInternetObservingStrategyTest {
 
@@ -52,8 +53,7 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
   }
 
   @Test
-  public void shouldReturnInternetConnectionIsTrue()
-      throws InternetObservingStrategyException, IOException {
+  public void shouldReturnInternetConnectionIsTrue() throws InternetObservingStrategyException, IOException {
 
     Http200InternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
     HttpURLConnection urlConnection = mock(HttpURLConnection.class);
@@ -75,8 +75,8 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
       throws InternetObservingStrategyException, IOException {
 
     Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
-    HttpURLConnection urlConnection = spy(
-        (HttpURLConnection) server.url("/").url().openConnection());
+    HttpURLConnection urlConnection =
+        spy((HttpURLConnection) server.url("/").url().openConnection());
     doThrow(IOException.class).when(urlConnection).getResponseCode();
     sut.isConnected(urlConnection);
 
@@ -105,7 +105,7 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
 
   private Http200InternetObservingStrategy.Builder detailedStrategyBuilder() {
     return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
-                    .endpoint(VALID_ENDPOINT);
+        .endpoint(VALID_ENDPOINT);
   }
 
   @Override

@@ -19,6 +19,7 @@ import android.content.Context;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.impl.LollipopNetworkObservingStrategy;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
@@ -26,7 +27,7 @@ import static greyfox.rxnetwork.internal.os.Build.isAtLeastLollipop;
 import static greyfox.rxnetwork.internal.os.Build.isLessThanMarshmallow;
 
 /**
- * Provides network observing strategy implementation for Lollipop devices.
+ * Provides {@link NetworkObservingStrategy} for Lollipop devices.
  *
  * @author Radek Kozak
  */

@@ -15,17 +15,24 @@
  */
 package greyfox.rxnetwork.internal.net;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
-import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
+import java.util.logging.Logger;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfo.Helper.getCapabilities;
+import static greyfox.rxnetwork.internal.net.RxNetworkInfo.Helper.getNetworkInfo;
+import static java.util.logging.Level.WARNING;
+import static java.util.logging.Logger.getLogger;
 
 /**
  * Decorator class of {@link NetworkInfo}.
@@ -56,14 +63,15 @@ public class RxNetworkInfo {
   private final String extraInfo;
   private final NetworkCapabilities networkCapabilities;
 
-  @VisibleForTesting(otherwise = PRIVATE)
+  @VisibleForTesting
   RxNetworkInfo() {
     throw new AssertionError("Use static factory methods or Builder to create RxNetworkInfo");
   }
 
-  @VisibleForTesting(otherwise = PRIVATE)
+  @VisibleForTesting
   RxNetworkInfo(@NonNull Builder builder) {
     checkNotNull(builder, "builder");
+
     state = builder.state;
     detailedState = builder.detailedState;
     type = builder.type;
@@ -84,26 +92,66 @@ public class RxNetworkInfo {
     return new Builder().build();
   }
 
-  public static RxNetworkInfo createFrom(@NonNull NetworkInfo networkInfo) {
+  public static RxNetworkInfo create(@NonNull NetworkInfo networkInfo) {
     checkNotNull(networkInfo, "networkInfo");
-    return builderFrom(networkInfo).build();
+    return builder(networkInfo).build();
+  }
+
+  /**
+   * Gets {@link RxNetworkInfo network information} from provided {@link Context context}.
+   *
+   * @param context {@link Context}
+   *
+   * @return {@link RxNetworkInfo} instance
+   */
+  public static RxNetworkInfo create(@NonNull Context context) {
+    checkNotNull(context, "context");
+
+    final ConnectivityManager manager =
+        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    final NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+    return networkInfo == null ? create() : create(networkInfo);
+  }
+
+  /**
+   * Gets {@link RxNetworkInfo network information} from given {@link Network} instance
+   * along with {@link NetworkCapabilities} provided at the time of registering network callback
+   * in {@linkplain ConnectivityManager#registerNetworkCallback} (if available).
+   *
+   * @param network             {@link Network}
+   * @param connectivityManager {@link ConnectivityManager}
+   *
+   * @return {@link RxNetworkInfo} instance
+   */
+  @RequiresApi(LOLLIPOP)
+  public static RxNetworkInfo create(@NonNull Network network,
+      @NonNull ConnectivityManager connectivityManager) {
+
+    checkNotNull(network, "network");
+    checkNotNull(connectivityManager, "manager");
+
+    final NetworkInfo networkInfo = getNetworkInfo(network, connectivityManager);
+    final NetworkCapabilities capabilities = getCapabilities(network, connectivityManager);
+
+    return networkInfo != null ? builder(networkInfo).networkCapabilities(capabilities).build()
+                               : create();
   }
 
   public static Builder builder() {
     return new Builder();
   }
 
-  public static Builder builderFrom(@NonNull NetworkInfo networkInfo) {
+  static Builder builder(@NonNull NetworkInfo networkInfo) {
     checkNotNull(networkInfo, "networkInfo");
 
     return new Builder().state(networkInfo.getState()).detailedState(networkInfo.getDetailedState())
-                        .type(networkInfo.getType()).subType(networkInfo.getSubtype())
-                        .available(networkInfo.isAvailable())
-                        .connectedOrConnecting(networkInfo.isConnectedOrConnecting())
-                        .connected(networkInfo.isConnected()).failover(networkInfo.isFailover())
-                        .roaming(networkInfo.isRoaming()).typeName(networkInfo.getTypeName())
-                        .subTypeName(networkInfo.getSubtypeName()).reason(networkInfo.getReason())
-                        .extraInfo(networkInfo.getExtraInfo());
+        .type(networkInfo.getType()).subType(networkInfo.getSubtype())
+        .available(networkInfo.isAvailable()).connected(networkInfo.isConnected())
+        .connectedOrConnecting(networkInfo.isConnectedOrConnecting())
+        .failover(networkInfo.isFailover()).roaming(networkInfo.isRoaming())
+        .typeName(networkInfo.getTypeName()).subTypeName(networkInfo.getSubtypeName())
+        .reason(networkInfo.getReason()).extraInfo(networkInfo.getExtraInfo());
   }
 
   /** @see NetworkInfo#getState() */
@@ -178,6 +226,7 @@ public class RxNetworkInfo {
   }
 
   // @formatter:off
+
   @Override
   public int hashCode() {
     int h = 1;
@@ -207,15 +256,13 @@ public class RxNetworkInfo {
     h ^= (this.reason == null) ? 0 : this.reason.hashCode();
     h *= 1000003;
     h ^= (this.extraInfo == null) ? 0 : this.extraInfo.hashCode();
-
-    if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-      h *= 1000003;
-      h ^= (this.networkCapabilities == null) ? 0 : this.networkCapabilities.hashCode();
-    }
+    h *= 1000003;
+    h ^= (this.networkCapabilities == null) ? 0 : this.networkCapabilities.hashCode();
 
     return h;
   }
 
+  @SuppressWarnings("ConstantConditions")
   @Override
   public boolean equals(Object o) {
     if (o == this) {
@@ -223,10 +270,13 @@ public class RxNetworkInfo {
     }
     if (o instanceof RxNetworkInfo) {
       RxNetworkInfo that = (RxNetworkInfo) o;
-      final boolean equal = ((this.state == null) ? (that.state == null)
-          : this.state.equals(that.state))
+
+      return ((this.state == null) ? (that.state == null)
+                                   : this.state.equals(that.state))
+
           && ((this.detailedState == null) ? (that.detailedState == null)
-          : this.detailedState.equals(that.detailedState))
+                                           : this.detailedState.equals(that.detailedState))
+
           && (this.type == that.type)
           && (this.subType == that.subType)
           && (this.available == that.available)
@@ -234,26 +284,30 @@ public class RxNetworkInfo {
           && (this.connected == that.connected)
           && (this.failover == that.failover)
           && (this.roaming == that.roaming)
-          && ((this.typeName == null) ? (that.typeName == null)
-          : this.typeName.equals(that.typeName))
-          && ((this.subTypeName == null) ? (that.subTypeName == null)
-          : this.subTypeName.equals(that.subTypeName))
-          && ((this.reason == null) ? (that.reason == null)
-          : this.reason.equals(that.reason))
-          && ((this.extraInfo == null) ? (that.extraInfo == null)
-          : this.extraInfo.equals(that.extraInfo));
 
-      if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-        return equal && ((this.networkCapabilities == null)
-            ? (that.networkCapabilities == null)
-            : this.networkCapabilities.equals(that.networkCapabilities));
-      } else {
-        return equal;
-      }
+          && ((this.typeName == null) ? (that.typeName == null)
+                                      : this.typeName.equals(that.typeName))
+
+          && ((this.subTypeName == null) ? (that.subTypeName == null)
+                                         : this.subTypeName.equals(that.subTypeName))
+
+          && ((this.reason == null) ? (that.reason == null)
+                                    : this.reason.equals(that.reason))
+
+          && ((this.extraInfo == null) ? (that.extraInfo == null)
+                                       : this.extraInfo.equals(that.extraInfo))
+
+          && ((this.networkCapabilities == null) ? (that.networkCapabilities == null)
+                                                 : this.networkCapabilities.equals(
+                                                     that.networkCapabilities));
     }
+
     return false;
   }
 
+  // @formatter:off
+
+  @SuppressLint("NewApi")
   @Override
   public String toString() {
     return "RxNetworkInfo{"
@@ -273,8 +327,10 @@ public class RxNetworkInfo {
         + "networkCapabilities=" + networkCapabilities
         + "}";
   }
+
   // @formatter:on
 
+  @SuppressWarnings("WeakerAccess")
   public static final class Builder {
 
     private static final int TYPE_UNKNOWN = -1;
@@ -294,7 +350,7 @@ public class RxNetworkInfo {
     private String reason = "";
     private String extraInfo = "";
 
-    @RequiresApi(LOLLIPOP) private NetworkCapabilities networkCapabilities;
+    private NetworkCapabilities networkCapabilities;
 
     Builder() {
     }
@@ -372,6 +428,50 @@ public class RxNetworkInfo {
 
     public RxNetworkInfo build() {
       return new RxNetworkInfo(this);
+    }
+  }
+
+  static final class Helper {
+
+    private static final Logger logger = getLogger(Helper.class.getSimpleName());
+
+    @VisibleForTesting
+    Helper() {
+      throw new AssertionError("No instances.");
+    }
+
+    @RequiresApi(LOLLIPOP)
+    @Nullable
+    static NetworkCapabilities getCapabilities(@NonNull Network network,
+        @NonNull ConnectivityManager connectivityManager) {
+
+      NetworkCapabilities networkCapabilities = null;
+
+      try {
+        networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+      } catch (Exception exc) {
+        logger.log(WARNING,
+            "Could not retrieve network capabilities from provided network: " + exc.getMessage());
+      }
+
+      return networkCapabilities;
+    }
+
+    @RequiresApi(LOLLIPOP)
+    @Nullable
+    static NetworkInfo getNetworkInfo(@NonNull Network network,
+        @NonNull ConnectivityManager connectivityManager) {
+
+      NetworkInfo networkInfo = null;
+
+      try {
+        networkInfo = connectivityManager.getNetworkInfo(network);
+      } catch (Exception exc) {
+        logger.log(WARNING,
+            "Could not retrieve network info from provided network: " + exc.getMessage());
+      }
+
+      return networkInfo;
     }
   }
 }

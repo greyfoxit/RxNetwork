@@ -54,10 +54,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+@SuppressWarnings("ConstantConditions")
 @RequiresApi(api = Build.VERSION_CODES.M)
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = M,
-        shadows = ShadowConnectivityManagerWithCallback.class)
+@Config(constants = BuildConfig.class, sdk = M, shadows = ShadowConnectivityManagerWithCallback.class)
 public class MarshmallowNetworkObservingStrategyTest {
 
   private final TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
@@ -92,8 +92,8 @@ public class MarshmallowNetworkObservingStrategyTest {
 
   @Test()
   public void shouldRegisterWithCustomNetworkRequest() {
-    NetworkRequest customRequest = new NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI)
-                                                               .build();
+    NetworkRequest customRequest =
+        new NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI).build();
     ConnectivityManager manager = setUpManagerWithNetworkRequest(customRequest);
 
     sut.observe().subscribeWith(testObserver).assertSubscribed();
@@ -178,7 +178,7 @@ public class MarshmallowNetworkObservingStrategyTest {
     ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
     doReturn(connectivityManager).when(context).getSystemService(Context.CONNECTIVITY_SERVICE);
     doThrow(Exception.class).when(connectivityManager)
-                            .unregisterNetworkCallback(any(NetworkCallback.class));
+        .unregisterNetworkCallback(any(NetworkCallback.class));
 
     sut = spy(new MarshmallowNetworkObservingStrategy(context));
   }
@@ -190,15 +190,13 @@ public class MarshmallowNetworkObservingStrategyTest {
     sut = spy(new MarshmallowNetworkObservingStrategy(context));
   }
 
-  private ConnectivityManager setUpManagerWithNetworkRequest(
-      @Nullable NetworkRequest networkRequest) {
+  private ConnectivityManager setUpManagerWithNetworkRequest(@Nullable NetworkRequest networkRequest) {
 
     ConnectivityManager manager = mock(ConnectivityManager.class);
     doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
 
-    sut = spy(networkRequest == null ? new MarshmallowNetworkObservingStrategy(context)
-                                     : new MarshmallowNetworkObservingStrategy(context,
-                                         networkRequest));
+    sut = spy(networkRequest == null ? new MarshmallowNetworkObservingStrategy(context) : new MarshmallowNetworkObservingStrategy(context,
+        networkRequest));
 
     return manager;
   }

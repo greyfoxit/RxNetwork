@@ -25,7 +25,7 @@ import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static greyfox.rxnetwork.internal.os.Build.isLessThanLollipop;
 
 /**
- * Provides network observing strategy implementation for pre-Lollipop devices.
+ * Provides {@link NetworkObservingStrategy} implementation for pre-Lollipop devices.
  *
  * @author Radek Kozak
  */

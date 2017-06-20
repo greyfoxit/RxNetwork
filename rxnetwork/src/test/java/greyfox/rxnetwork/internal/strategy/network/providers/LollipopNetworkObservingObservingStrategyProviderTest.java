@@ -33,8 +33,8 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 @Config(constants = BuildConfig.class)
 public class LollipopNetworkObservingObservingStrategyProviderTest {
 
-  private final LollipopNetworkObservingStrategyProvider sut
-      = new LollipopNetworkObservingStrategyProvider(RuntimeEnvironment.application);
+  private final LollipopNetworkObservingStrategyProvider sut =
+      new LollipopNetworkObservingStrategyProvider(RuntimeEnvironment.application);
 
   @Test(expected = NullPointerException.class)
   public void shouldThrow_whenTryingToInitializeWithNullContext() {
@@ -63,6 +63,6 @@ public class LollipopNetworkObservingObservingStrategyProviderTest {
   @Config(sdk = LOLLIPOP)
   public void shouldProvideConcreteStrategy() {
     assertThat(sut.provide()).isNotNull()
-                             .isExactlyInstanceOf(LollipopNetworkObservingStrategy.class);
+        .isExactlyInstanceOf(LollipopNetworkObservingStrategy.class);
   }
 }

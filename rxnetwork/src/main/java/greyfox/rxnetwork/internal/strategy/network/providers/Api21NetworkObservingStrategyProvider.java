@@ -10,7 +10,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
- * Abstract provider for <i>Lollipop+</i> strategies.
+ * Base provider for Lollipop+ (<i>API > 21</i>) network observing strategies.
  *
  * @author Radek Kozak
  */

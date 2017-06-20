@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
@@ -56,10 +57,10 @@ abstract class BaseInternetObservingStrategy implements InternetObservingStrateg
 
   /** Base observing implementation for all internet observing stategies. */
   @Override
-  @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+  @RestrictTo(LIBRARY_GROUP)
   public Observable<Boolean> observe() {
     return Observable.interval(delay, interval, TimeUnit.MILLISECONDS).map(toConnectionState())
-                     .distinctUntilChanged();
+        .distinctUntilChanged();
   }
 
   abstract boolean checkConnection();

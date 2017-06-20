@@ -22,11 +22,9 @@ import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import io.reactivex.functions.Function;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 /**
- * Predefined collection of {@link RxNetworkInfo} related functions that can be used for mapping
- * reactive streams of RxNetwork.
+ * Predefined collection of {@link RxNetworkInfo} related helper functions.
  *
  * @author Radek Kozak
  */
@@ -35,7 +33,7 @@ public final class Functions {
 
   public static final Function<RxNetworkInfo, Boolean> TO_CONNECTION_STATE = toConnectionState();
 
-  @VisibleForTesting(otherwise = PRIVATE)
+  @VisibleForTesting
   Functions() {
     throw new AssertionError("No instances.");
   }

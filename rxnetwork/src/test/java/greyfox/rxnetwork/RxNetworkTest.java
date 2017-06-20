@@ -39,6 +39,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(MockitoJUnitRunner.class)
 public class RxNetworkTest {
 
@@ -88,8 +89,7 @@ public class RxNetworkTest {
     sut = RxNetwork.init();
 
     assertThat((sut.networkObservingStrategy())).isNull();
-    assertThat(sut.internetObservingStrategy())
-        .isInstanceOf(WalledGardenInternetObservingStrategy.class);
+    assertThat(sut.internetObservingStrategy()).isInstanceOf(WalledGardenInternetObservingStrategy.class);
   }
 
   @Test
@@ -122,7 +122,7 @@ public class RxNetworkTest {
     when(customNetworkStrategyFactory.get()).thenReturn(customNetworkStrategy);
 
     sut = RxNetwork.builder().networkObservingStrategyFactory(customNetworkStrategyFactory)
-                   .init(context);
+        .init(context);
 
     assertThat(sut.networkObservingStrategy()).isNotNull().isEqualTo(customNetworkStrategy);
   }
@@ -139,7 +139,7 @@ public class RxNetworkTest {
     when(customInternetStrategyFactory.get()).thenReturn(customInternetStrategy);
 
     sut = RxNetwork.builder().internetObservingStrategyFactory(customInternetStrategyFactory)
-                   .init(context);
+        .init(context);
 
     assertThat(sut.internetObservingStrategy()).isNotNull().isEqualTo(customInternetStrategy);
   }
@@ -218,7 +218,7 @@ public class RxNetworkTest {
     customNetworkStrategy = new PreLollipopNetworkObservingStrategy(context);
 
     sut = RxNetwork.builder().networkObservingStrategy(customNetworkStrategy)
-                   .defaultScheduler(CUSTOM_SCHEDULER).init(context);
+        .defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
     sut.observe(customNetworkStrategy).test().assertSubscribed();
   }
@@ -238,7 +238,7 @@ public class RxNetworkTest {
     customInternetStrategy = SocketInternetObservingStrategy.create();
 
     sut = RxNetwork.builder().internetObservingStrategy(customInternetStrategy)
-                   .defaultScheduler(CUSTOM_SCHEDULER).init(context);
+        .defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
     sut.observeReal(customInternetStrategy).test().assertSubscribed();
   }
