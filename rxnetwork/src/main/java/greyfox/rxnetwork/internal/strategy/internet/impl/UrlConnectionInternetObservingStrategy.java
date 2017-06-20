@@ -26,7 +26,11 @@ import java.net.URL;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
+ * Defines basic {@link HttpURLConnection} based internet observing strategies.
+ *
  * @author Radek Kozak
+ * @see Http200InternetObservingStrategy
+ * @see WalledGardenInternetObservingStrategy
  */
 abstract class UrlConnectionInternetObservingStrategy extends EndpointInternetObservingStrategy {
 
@@ -99,9 +103,6 @@ abstract class UrlConnectionInternetObservingStrategy extends EndpointInternetOb
 
   // @formatter:off
 
-  /**
-   * {@code EndpointInternetObservingStrategy} builder static inner class.
-   */
   abstract static class Builder<S extends UrlConnectionInternetObservingStrategy,
       B extends UrlConnectionInternetObservingStrategy.Builder<S, B>>
       extends EndpointInternetObservingStrategy.Builder<S, B> {

@@ -18,7 +18,7 @@ package greyfox.rxnetwork.internal.strategy.internet;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategyFactory;
 
 /**
- * Factory class for {@link InternetObservingStrategy}.
+ * Base interface for {@link InternetObservingStrategy} factory.
  *
  * @author radekkozak
  */

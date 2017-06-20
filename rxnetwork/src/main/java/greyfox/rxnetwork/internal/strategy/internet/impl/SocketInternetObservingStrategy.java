@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 
 /**
+ * Socket-based strategy for monitoring connectivity with the Internet.
+ *
  * @author Radek Kozak
  */
 public final class SocketInternetObservingStrategy extends EndpointInternetObservingStrategy {
@@ -89,9 +91,7 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
 
   // @formatter:off
 
-  /**
-   * {@link SocketInternetObservingStrategy} builder static inner class.
-   */
+  /** Build a new {@link SocketInternetObservingStrategy}. */
   public static final class Builder extends
       EndpointInternetObservingStrategy.Builder<SocketInternetObservingStrategy,
           SocketInternetObservingStrategy.Builder> {
@@ -103,7 +103,7 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
      * <p>
      * Endpoint effectively acting as a host part of {@link InetSocketAddress}
      */
-    private static final String DEFAULT_ENDPOINT = "g.cn";
+    private static final String DEFAULT_ENDPOINT = "google.cn";
     private static final int DEFAULT_PORT = 80;
 
     private int port = DEFAULT_PORT;
@@ -113,6 +113,7 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
       endpoint(DEFAULT_ENDPOINT);
     }
 
+    /** Set the port for the strategy. */
     @NonNull
     public Builder port(int port) {
       if (port <= 0 || port > 65535) {
@@ -123,6 +124,10 @@ public final class SocketInternetObservingStrategy extends EndpointInternetObser
       return self();
     }
 
+    /**
+     * Create an immutable instance of {@link SocketInternetObservingStrategy} using
+     * configured values.
+     */
     @NonNull
     @Override
     public SocketInternetObservingStrategy build() {

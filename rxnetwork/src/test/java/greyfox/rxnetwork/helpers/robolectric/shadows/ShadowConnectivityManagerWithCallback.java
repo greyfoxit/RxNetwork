@@ -15,6 +15,7 @@
  */
 package greyfox.rxnetwork.helpers.robolectric.shadows;
 
+import android.annotation.SuppressLint;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
 import android.net.Network;
@@ -47,6 +48,8 @@ import static org.robolectric.RuntimeEnvironment.getApiLevel;
  *
  * @author radekkozak
  */
+@SuppressWarnings({ "WeakerAccess", "unused" })
+@SuppressLint("UseSparseArrays")
 @Implements(ConnectivityManager.class)
 public class ShadowConnectivityManagerWithCallback {
 
@@ -67,8 +70,8 @@ public class ShadowConnectivityManagerWithCallback {
     NetworkInfo wifi = ShadowNetworkInfo.newInstance(DISCONNECTED, TYPE_WIFI, 0, true, false);
     networkTypeToNetworkInfo.put(TYPE_WIFI, wifi);
 
-    NetworkInfo mobile = ShadowNetworkInfo
-        .newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS, true, true);
+    NetworkInfo mobile =
+        ShadowNetworkInfo.newInstance(CONNECTED, TYPE_MOBILE, TYPE_MOBILE_MMS, true, true);
     networkTypeToNetworkInfo.put(TYPE_MOBILE, mobile);
 
     this.activeNetworkInfo = mobile;
@@ -139,7 +142,7 @@ public class ShadowConnectivityManagerWithCallback {
   @Implementation
   public NetworkInfo[] getAllNetworkInfo() {
     return networkTypeToNetworkInfo.values()
-                                   .toArray(new NetworkInfo[networkTypeToNetworkInfo.size()]);
+        .toArray(new NetworkInfo[networkTypeToNetworkInfo.size()]);
   }
 
   @Implementation
@@ -187,11 +190,7 @@ public class ShadowConnectivityManagerWithCallback {
    */
   @Implementation
   public boolean isActiveNetworkMetered() {
-    if (activeNetworkInfo != null) {
-      return activeNetworkInfo.getType() == TYPE_MOBILE;
-    } else {
-      return false;
-    }
+    return activeNetworkInfo != null && activeNetworkInfo.getType() == TYPE_MOBILE;
   }
 
   public void setNetworkInfo(int networkType, NetworkInfo networkInfo) {

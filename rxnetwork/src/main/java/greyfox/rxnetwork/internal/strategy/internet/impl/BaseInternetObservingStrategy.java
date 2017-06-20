@@ -24,10 +24,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
- * Defines base internet observing strategy to use with {@link Observable#interval}.
+ * Defines base internet observing strategy to use with {@linkplain Observable#interval}.
  *
  * @author Radek Kozak
  */
@@ -56,10 +57,10 @@ abstract class BaseInternetObservingStrategy implements InternetObservingStrateg
 
   /** Base observing implementation for all internet observing stategies. */
   @Override
-  @RestrictTo(RestrictTo.Scope.SUBCLASSES)
+  @RestrictTo(LIBRARY_GROUP)
   public Observable<Boolean> observe() {
     return Observable.interval(delay, interval, TimeUnit.MILLISECONDS).map(toConnectionState())
-                     .distinctUntilChanged();
+        .distinctUntilChanged();
   }
 
   abstract boolean checkConnection();
@@ -90,22 +91,21 @@ abstract class BaseInternetObservingStrategy implements InternetObservingStrateg
       return (B) this;
     }
 
+    /** Set the delay for the strategy used in {@linkplain Observable#interval}. */
     @NonNull
     public B delay(long delay) {
       this.delay = delay;
       return self();
     }
 
+    /** Set the interval for the strategy used in {@linkplain Observable#interval}. */
     @NonNull
     public B interval(long interval) {
       this.interval = interval;
       return self();
     }
 
-    /**
-     * Returns an immutable {@link BaseInternetObservingStrategy}
-     * based on the fields set in this builder.
-     */
+    /** Create an immutable {@linkplain BaseInternetObservingStrategy} using configured values. */
     @NonNull
     public abstract S build();
   }

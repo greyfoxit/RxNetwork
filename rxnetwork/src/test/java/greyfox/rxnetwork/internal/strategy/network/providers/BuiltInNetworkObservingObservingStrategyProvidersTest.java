@@ -17,8 +17,6 @@ package greyfox.rxnetwork.internal.strategy.network.providers;
 
 import android.content.Context;
 import greyfox.rxnetwork.BuildConfig;
-import greyfox.rxnetwork.internal.strategy.ObservingStrategyProvider;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 import org.assertj.core.api.Condition;
 import org.junit.Rule;
@@ -40,8 +38,8 @@ public class BuiltInNetworkObservingObservingStrategyProvidersTest {
 
   private final Context context = RuntimeEnvironment.application;
 
-  private final Collection<NetworkObservingStrategyProvider> sut
-      = new BuiltInNetworkObservingStrategyProviders(context).get();
+  private final Collection<NetworkObservingStrategyProvider> sut =
+      new BuiltInNetworkObservingStrategyProviders(context).get();
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 

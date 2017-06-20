@@ -18,11 +18,11 @@ package greyfox.rxnetwork.internal.strategy.network.impl;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
-import android.net.Network;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.annotation.RestrictTo;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -30,8 +30,8 @@ import io.reactivex.ObservableOnSubscribe;
 import java.util.logging.Logger;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 
 /**
  * RxNetworkInfo observing strategy for Android devices with API 21 (Lollipop) or higher.
@@ -39,15 +39,17 @@ import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInf
  * @author Radek Kozak
  */
 @RequiresApi(LOLLIPOP)
-public final class LollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
+@RestrictTo(LIBRARY_GROUP)
+public final class LollipopNetworkObservingStrategy extends Api21BaseNetworkObservingStrategy {
 
-  private final ConnectivityManager manager;
+  private final ConnectivityManager connectivityManager;
   @Nullable private NetworkRequest networkRequest;
   private NetworkCallback networkCallback;
 
   public LollipopNetworkObservingStrategy(@NonNull Context context) {
     checkNotNull(context, "context");
-    manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    connectivityManager =
+        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
   }
 
   public LollipopNetworkObservingStrategy(@NonNull Context context,
@@ -63,15 +65,15 @@ public final class LollipopNetworkObservingStrategy extends BaseNetworkObserving
   }
 
   private void register() {
-    NetworkRequest request = networkRequest != null ? networkRequest
-                                                    : new NetworkRequest.Builder().build();
-    manager.registerNetworkCallback(request, networkCallback);
+    NetworkRequest request =
+        networkRequest != null ? networkRequest : new NetworkRequest.Builder().build();
+    connectivityManager.registerNetworkCallback(request, networkCallback);
   }
 
   @Override
   void dispose() {
     try {
-      manager.unregisterNetworkCallback(networkCallback);
+      connectivityManager.unregisterNetworkCallback(networkCallback);
     } catch (Exception e) {
       onError("Could not unregister network callback", e);
     }
@@ -82,22 +84,17 @@ public final class LollipopNetworkObservingStrategy extends BaseNetworkObserving
     return Logger.getLogger(LollipopNetworkObservingStrategy.class.getSimpleName());
   }
 
+  @Override
+  ConnectivityManager connectivityManager() {
+    return this.connectivityManager;
+  }
+
   private final class LollipopOnSubscribe implements ObservableOnSubscribe<RxNetworkInfo> {
 
     @Override
-    public void subscribe(final ObservableEmitter<RxNetworkInfo> emitter) throws Exception {
-      networkCallback = new NetworkCallback() {
-        @Override
-        public void onAvailable(Network network) {
-          emitter.onNext(getRxNetworkInfoFrom(network, manager));
-        }
-
-        @Override
-        public void onLost(Network network) {
-          emitter.onNext(getRxNetworkInfoFrom(network, manager));
-        }
-      };
-      emitter.setCancellable(new StrategyCancellable());
+    public void subscribe(final ObservableEmitter<RxNetworkInfo> upstream) throws Exception {
+      networkCallback = new StrategyNetworkCallback(upstream);
+      upstream.setCancellable(new StrategyCancellable());
       register();
     }
   }

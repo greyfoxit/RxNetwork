@@ -21,14 +21,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import java.util.logging.Logger;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -36,10 +37,11 @@ import static java.util.logging.Logger.getLogger;
  *
  * @author Radek Kozak
  */
+@RestrictTo(LIBRARY_GROUP)
 public final class PreLollipopNetworkObservingStrategy extends BaseNetworkObservingStrategy {
 
-  private static final IntentFilter CONNECTIVITY_INTENT_FILTER = new IntentFilter(
-      ConnectivityManager.CONNECTIVITY_ACTION);
+  private static final IntentFilter CONNECTIVITY_INTENT_FILTER =
+      new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
 
   @NonNull private final Context context;
   private BroadcastReceiver broadcastReceiver;
@@ -78,9 +80,10 @@ public final class PreLollipopNetworkObservingStrategy extends BaseNetworkObserv
       broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-          emitter.onNext(getRxNetworkInfoFrom(context));
+          emitter.onNext(RxNetworkInfo.create(context));
         }
       };
+
       emitter.setCancellable(new StrategyCancellable());
       register();
     }

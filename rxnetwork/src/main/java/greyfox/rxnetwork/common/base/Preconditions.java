@@ -25,10 +25,9 @@ import static java.lang.String.format;
  * Static convenience methods that help a method or constructor check whether it was invoked
  * correctly (whether its <i>preconditions</i> have been met). In the case of {@code
  * checkNotNullWithMessage}, an object reference which is expected to be non-null). When {@code
- * false} (or
- * {@code null}) is passed instead, the {@code Preconditions} method throws an unchecked exception,
- * which helps the calling method communicate to <i>its</i> caller that <i>that</i> caller has made
- * a mistake.
+ * false} (or {@code null}) is passed instead, the {@code Preconditions} method throws an unchecked
+ * exception, which helps the calling method communicate to <i>its</i> caller that <i>that</i>
+ * caller has made a mistake.
  *
  * @author Radek Kozak
  */

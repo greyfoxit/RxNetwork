@@ -26,7 +26,7 @@ import static android.os.Build.VERSION_CODES.M;
 import static greyfox.rxnetwork.internal.os.Build.isAtLeastMarshmallow;
 
 /**
- * Provides network observing strategy implementation for Marshmallow devices.
+ * Provides {@link NetworkObservingStrategy} implementation for Marshmallow devices.
  *
  * @author Radek Kozak
  */

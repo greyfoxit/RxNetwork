@@ -19,8 +19,8 @@ import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategy;
 
 /**
- * Interface allowing to implement different strategies for monitoring network connectivity change.
- * (Network monitoring API may differ depending of specific Android version)
+ * Interface allowing to implement different strategies
+ * for monitoring network connectivity change.
  *
  * @author Radek Kozak
  */

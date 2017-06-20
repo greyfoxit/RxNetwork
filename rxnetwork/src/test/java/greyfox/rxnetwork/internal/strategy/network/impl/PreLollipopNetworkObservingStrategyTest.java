@@ -32,13 +32,13 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
-import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class PreLollipopNetworkObservingStrategyTest {
@@ -55,7 +55,7 @@ public class PreLollipopNetworkObservingStrategyTest {
   public void setUp() {
     context = spy(RuntimeEnvironment.application.getApplicationContext());
     sut = spy(new PreLollipopNetworkObservingStrategy(context));
-    validRxnetworkInfo = getRxNetworkInfoFrom(context);
+    validRxnetworkInfo = RxNetworkInfo.create(context);
   }
 
   @Test(expected = NullPointerException.class)

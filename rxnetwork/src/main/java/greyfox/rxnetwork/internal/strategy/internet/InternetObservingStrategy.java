@@ -18,8 +18,8 @@ package greyfox.rxnetwork.internal.strategy.internet;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategy;
 
 /**
- * Interface allowing to implement different strategies for monitoring real internet
- * connectivity changes.
+ * Interface allowing to implement different strategies
+ * for monitoring real internet connectivity changes.
  *
  * @author Radek Kozak
  */

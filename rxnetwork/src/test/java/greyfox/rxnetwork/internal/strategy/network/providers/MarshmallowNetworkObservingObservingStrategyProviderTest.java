@@ -27,12 +27,13 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.M;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class MarshmallowNetworkObservingObservingStrategyProviderTest {
 
-  private final MarshmallowNetworkObservingStrategyProvider sut
-      = new MarshmallowNetworkObservingStrategyProvider(RuntimeEnvironment.application);
+  private final MarshmallowNetworkObservingStrategyProvider sut =
+      new MarshmallowNetworkObservingStrategyProvider(RuntimeEnvironment.application);
 
   @Test(expected = NullPointerException.class)
   public void shouldThrow_whenTryingToInitializeWithNullContext() {
@@ -55,6 +56,6 @@ public class MarshmallowNetworkObservingObservingStrategyProviderTest {
   @Config(sdk = M)
   public void shouldProvideConcreteStrategy() {
     assertThat(sut.provide()).isNotNull()
-                             .isExactlyInstanceOf(MarshmallowNetworkObservingStrategy.class);
+        .isExactlyInstanceOf(MarshmallowNetworkObservingStrategy.class);
   }
 }

@@ -20,50 +20,72 @@ import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
-import greyfox.rxnetwork.internal.strategy.ObservingStrategyProviders;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.internet.impl.WalledGardenInternetObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork.internal.strategy.network.factory.BuiltInNetworkObservingStrategyFactory;
 import greyfox.rxnetwork.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
+import greyfox.rxnetwork.internal.strategy.network.providers.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork.internal.strategy.network.providers.ObservingStrategyProviders;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNullWithMessage;
 import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_CONNECTION_STATE;
 
 /**
  * RxNetwork is a class that listens to network connectivity changes in a reactive manner.
- * It uses default {@link BuiltInNetworkObservingStrategyFactory factory} under the hood along with
- * provider mechanism to choose concrete, api-level dependent
- * {@link NetworkObservingStrategy strategy} for observing network connectivity changes.
  * <p>
- * Custom factory can be used by simply implementing {@link NetworkObservingStrategyFactory}
- * and registering it with {@linkplain RxNetwork}:
+ * Instances of RxNetwork can be created simply like this:
  * <pre><code>
- * public class ExampleApplication extends Application {
+ *     RxNetwork rxnetwork = RxNetwork.init(this));
  *
- *   {@literal @}Override
- *    public void onCreate() {
- *        super.onCreate();
- *
- *        // initialize like this
- *        RxNetwork.init(this));
- *
- *        // or like this - passing default defaultScheduler
- *        RxNetwork.init(this, Schedulers.io());
- *    }
+ *     // or event like this, if working only with internet strategies
+ *     RxNetwork rxnetwork = RxNetwork.init();
+ * </code></pre>
+ * <p>
+ * You can also configure various aspects of RxNetwork by using provided
+ * {@linkplain Builder builder}.
+ * <p>
+ * For example,
+ * <pre><code>
+ *     RxNetwork rxnetwork = RxNetwork.builder()
+ *         .defaultScheduler(AndroidSchedulers.mainThread())
+ *         .networkObservingStrategy(new YourCustomNetworkObservingStrategy())
+ *         .internetObservingStrategy(new YourCustomInternetObservingStrategy())
+ *         .build();
+ * </code></pre>
+ * <p>
+ * For more "dynamic" approach custom factories can be provided
+ * <pre><code>
+ *     RxNetwork rxnetwork = RxNetwork.builder()
+ *         .networkObservingFactory(new YourCustomNetworkObservingFactory())
+ *         .internetObservingFactory(new YourCustomInternetObservingFactory())
+ *         .build();
  * }
+ * </code></pre>
+ * <p>
+ * From Lollipop and up (API 21+) you can specify {@code defaultNetworkRequest} to be used
+ * by built in network observing strategy:
+ * <pre><code>
+ *     NetworkRequest customRequest = new NetworkRequest.Builder()
+ *         .addCapability(NET_CAPABILITY_INTERNET)
+ *         .addTransportType(TRANSPORT_WIFI)
+ *         .build();
+ *
+ *     RxNetwork.builder().defaultNetworkRequest(customRequest).build();
  * </code></pre>
  *
  * @author Radek Kozak
  */
+@SuppressWarnings("WeakerAccess")
 public final class RxNetwork {
 
   @Nullable private final Scheduler scheduler;
@@ -86,11 +108,13 @@ public final class RxNetwork {
     networkRequest = builder.networkRequest;
   }
 
+  /** Create default implementation of RxNetwork. */
   @NonNull
   public static RxNetwork init(@NonNull Context context) {
     return builder().init(context.getApplicationContext());
   }
 
+  /** Create default implementation of RxNetwork if not using network observing strategies. */
   @NonNull
   public static RxNetwork init() {
     return builder().init();
@@ -199,6 +223,9 @@ public final class RxNetwork {
     return observable;
   }
 
+  /**
+   * Build a new {@link RxNetwork}.
+   */
   public static final class Builder {
 
     private Scheduler scheduler;
@@ -209,16 +236,19 @@ public final class RxNetwork {
     Builder() {
     }
 
+    /** Set default <i>"subscribeOn"</i> scheduler to be used by all library's observables. */
     public Builder defaultScheduler(@NonNull Scheduler scheduler) {
       this.scheduler = checkNotNull(scheduler, "scheduler");
       return this;
     }
 
+    /** Set custom network observing strategy to be used by library. */
     public Builder networkObservingStrategy(@NonNull NetworkObservingStrategy strategy) {
       networkObservingStrategy = checkNotNull(strategy, "network observing strategy");
       return this;
     }
 
+    /** Set custom network observing strategy factory to be used as library's default. */
     public Builder networkObservingStrategyFactory(
         @NonNull NetworkObservingStrategyFactory factory) {
 
@@ -227,11 +257,13 @@ public final class RxNetwork {
       return this;
     }
 
+    /** Set custom internet observing strategy to be used by library. */
     public Builder internetObservingStrategy(@NonNull InternetObservingStrategy strategy) {
       this.internetObservingStrategy = checkNotNull(strategy, "internet observing strategy");
       return this;
     }
 
+    /** Set custom internet observing strategy factory to be used as library's default. */
     public Builder internetObservingStrategyFactory(
         @NonNull InternetObservingStrategyFactory factory) {
 
@@ -240,11 +272,26 @@ public final class RxNetwork {
       return this;
     }
 
+    /**
+     * Set the default {@link NetworkRequest network request} to be used
+     * by network strategy when on <i>Lollipop+</i> device.
+     * <p>
+     * <b>This is useful and only take effect on {@code API 21+}</b>
+     */
+    @RequiresApi(LOLLIPOP)
     public Builder defaultNetworkRequest(@NonNull NetworkRequest networkRequest) {
       this.networkRequest = checkNotNull(networkRequest, "networkRequest");
       return this;
     }
 
+    /**
+     * Create the {@link RxNetwork} instance using the configured values.
+     * <p>
+     * This method should be called if <i>"network strategies part"</i> of library
+     * is going to be used in any way.
+     * <p>
+     * This is recommended way of initializing RxNetwork
+     */
     @NonNull
     public RxNetwork init(@NonNull Context context) {
       checkNotNull(context, "Cannot initialize RxNetwork with null context");
@@ -256,6 +303,14 @@ public final class RxNetwork {
       return init();
     }
 
+    /**
+     * Create the {@link RxNetwork} instance using the configured values.
+     * <p>
+     * This method can be used if only <i>"internet strategies part"</i> of library
+     * is going to be used.
+     * <p>
+     * Otherwise it is recommended to call {@link #init(Context)}.
+     */
     @NonNull
     public RxNetwork init() {
       if (internetObservingStrategy == null) {
@@ -271,8 +326,8 @@ public final class RxNetwork {
                                    : new BuiltInNetworkObservingStrategyProviders(context,
                                        networkRequest);
 
-      return networkObservingStrategy = BuiltInNetworkObservingStrategyFactory
-          .create(providers.get()).get();
+      return networkObservingStrategy =
+          BuiltInNetworkObservingStrategyFactory.create(providers).get();
     }
   }
 }

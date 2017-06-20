@@ -15,10 +15,10 @@
  */
 package greyfox.rxnetwork.internal.strategy.network.predicate;
 
+import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.support.annotation.RequiresApi;
-import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.RxNetwork;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
@@ -28,28 +28,27 @@ import java.util.Arrays;
 import static android.net.ConnectivityManager.TYPE_MOBILE;
 import static android.net.ConnectivityManager.TYPE_WIFI;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
 
 /**
  * Contains predefined predicates for filtering reactive streams of {@link RxNetwork}.
  *
  * @author Radek Kozak
  */
-@RestrictTo(LIBRARY_GROUP)
+@SuppressWarnings("WeakerAccess")
 public final class RxNetworkInfoPredicate {
 
-  @VisibleForTesting(otherwise = PRIVATE)
+  @VisibleForTesting
   RxNetworkInfoPredicate() {
     throw new AssertionError("No instances.");
   }
 
   /**
-   * Predicate that returns true if at least one given {@link NetworkInfo.State state} occurred.
+   * Predicate class for filtering reactive streams of {@link RxNetwork}
+   * by {@link NetworkInfo.State network state}.
    * <p>
-   * This can be useful for filtering reactive streams of {@link RxNetwork}, for example:
+   * Example usage:
    * <pre><code>
-   * RxNetwork.observe()
+   * rxnetwork.observe()
    *          .subscribeOn(Schedulers.io())
    *          .filter(hasState(CONNECTED, CONNECTING))
    *          .observeOn(AndroidSchedulers.mainThread())
@@ -60,13 +59,13 @@ public final class RxNetworkInfoPredicate {
    */
   public static final class State {
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     State() {
       throw new AssertionError("No instances.");
     }
 
     /**
-     * Filter for determining if any of provided network states occurred.
+     * Determines if any of provided {@link NetworkInfo.State states} occurred.
      *
      * @param networkStates one or many {@link NetworkInfo.State}
      *
@@ -83,11 +82,12 @@ public final class RxNetworkInfoPredicate {
   }
 
   /**
-   * Predicate that returns true if at least one given {@link NetworkInfo#getType} type} occurred.
+   * Predicate class for filtering reactive streams of {@link RxNetwork}
+   * by {@link NetworkInfo#getType network type}.
    * <p>
-   * This can be useful for filtering reactive streams of {@link RxNetwork}, for example:
+   * Example usage:
    * <pre><code>
-   * RxNetwork.observe()
+   * rxnetwork.observe()
    *          .subscribeOn(Schedulers.io())
    *          .filter(hasType(TYPE_WIFI, TYPE_MOBILE))
    *          .observeOn(AndroidSchedulers.mainThread())
@@ -98,14 +98,24 @@ public final class RxNetworkInfoPredicate {
    */
   public static final class Type {
 
+    /** Predefined predicate for {@link ConnectivityManager#TYPE_MOBILE mobile} network type */
     public static final Predicate<RxNetworkInfo> IS_MOBILE = isOfTypeMobile();
+
+    /** Predefined predicate for {@link ConnectivityManager#TYPE_WIFI wifi} network type */
     public static final Predicate<RxNetworkInfo> IS_WIFI = isOfTypeWifi();
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     Type() {
       throw new AssertionError("No instances.");
     }
 
+    /**
+     * Determines if at least one of provided network types occurred.
+     *
+     * @param networkTypes one or many {@link NetworkInfo#getType}
+     *
+     * @return {@code true} if any of the given network states occurred, {@code false} otherwise
+     */
     public static Predicate<RxNetworkInfo> hasType(final int... networkTypes) {
       return new Predicate<RxNetworkInfo>() {
         @Override
@@ -139,14 +149,36 @@ public final class RxNetworkInfoPredicate {
     }
   }
 
+  /**
+   * Predicate class for filtering reactive streams of {@link RxNetwork}
+   * by various {@link NetworkCapabilities network capabilities}.
+   * <p>
+   * Example usage:
+   * <pre><code>
+   * rxnetwork.observe()
+   *          .subscribeOn(Schedulers.io())
+   *          .filter(hasCapability(NET_CAPABILITY_NOT_VPN, NET_CAPABILITY_NOT_METERED))
+   *          .observeOn(AndroidSchedulers.mainThread())
+   *          .subscribe(...);
+   * </code></pre>
+   *
+   * @author Radek Kozak
+   */
   @RequiresApi(LOLLIPOP)
   public static final class Capabilities {
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting
     Capabilities() {
       throw new AssertionError("No instances");
     }
 
+    /**
+     * Determines if any of specified network capabilities occurred.
+     *
+     * @param capabilities one or many {@code NetworkCapabilities.NET_CAPABILITY_*}
+     *
+     * @return {@code true} if any of the given capabilities occurred, {@code false} otherwise
+     */
     public static Predicate<RxNetworkInfo> hasCapability(final int... capabilities) {
 
       return new Predicate<RxNetworkInfo>() {
@@ -167,6 +199,13 @@ public final class RxNetworkInfoPredicate {
       };
     }
 
+    /**
+     * Determines if any of specified transport types occurred.
+     *
+     * @param transportTypes one or many {@code NetworkCapabilities#TRANSPORT_*}
+     *
+     * @return {@code true} if any of the given transport types occurred, {@code false} otherwise
+     */
     public static Predicate<RxNetworkInfo> hasTransportType(final int... transportTypes) {
       return new Predicate<RxNetworkInfo>() {
         @Override
@@ -205,8 +244,7 @@ public final class RxNetworkInfoPredicate {
         public boolean test(RxNetworkInfo networkInfo) throws Exception {
           final NetworkCapabilities networkCapabilities = networkInfo.getNetworkCapabilities();
 
-          return networkCapabilities != null
-              && networkCapabilities.getLinkUpstreamBandwidthKbps() >= upBandwidth;
+          return networkCapabilities != null && networkCapabilities.getLinkUpstreamBandwidthKbps() >= upBandwidth;
         }
       };
     }
@@ -231,8 +269,7 @@ public final class RxNetworkInfoPredicate {
         public boolean test(RxNetworkInfo networkInfo) throws Exception {
           final NetworkCapabilities networkCapabilities = networkInfo.getNetworkCapabilities();
 
-          return networkCapabilities != null
-              && networkCapabilities.getLinkDownstreamBandwidthKbps() >= downBandwidth;
+          return networkCapabilities != null && networkCapabilities.getLinkDownstreamBandwidthKbps() >= downBandwidth;
         }
       };
     }

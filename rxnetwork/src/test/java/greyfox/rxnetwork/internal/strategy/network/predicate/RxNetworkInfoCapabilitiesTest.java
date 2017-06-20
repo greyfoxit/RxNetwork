@@ -49,22 +49,22 @@ import static org.mockito.Mockito.when;
 @Config(constants = BuildConfig.class, sdk = LOLLIPOP)
 public class RxNetworkInfoCapabilitiesTest {
 
-  private static final Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES = hasCapability(
-      NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
+  private static final Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES =
+      hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
 
   private static final int INVALID_UP_BANDWIDTH = 2000;
   private static final int INVALID_DOWN_BANDWIDTH = 500;
 
-  private static final Predicate<RxNetworkInfo> VALID_TRANSPORT_TYPES = hasTransportType(
-      TRANSPORT_CELLULAR, TRANSPORT_WIFI);
+  private static final Predicate<RxNetworkInfo> VALID_TRANSPORT_TYPES =
+      hasTransportType(TRANSPORT_CELLULAR, TRANSPORT_WIFI);
 
   private static int VALID_UP_BANDWIDTH = 2048;
-  private static final Predicate<RxNetworkInfo> VALID_UPSTREAM_PREDICATE = isSatisfiedByUpBandwidth(
-      VALID_UP_BANDWIDTH);
+  private static final Predicate<RxNetworkInfo> VALID_UPSTREAM_PREDICATE =
+      isSatisfiedByUpBandwidth(VALID_UP_BANDWIDTH);
 
   private static int VALID_DOWN_BANDWIDTH = 512;
-  private static final Predicate<RxNetworkInfo> VALID_DOWNSTREAM_PREDICATE
-      = isSatisfiedByDownBandwidth(VALID_DOWN_BANDWIDTH);
+  private static final Predicate<RxNetworkInfo> VALID_DOWNSTREAM_PREDICATE =
+      isSatisfiedByDownBandwidth(VALID_DOWN_BANDWIDTH);
 
   @Rule public MockitoRule rule = MockitoJUnit.rule();
 
