@@ -34,7 +34,7 @@ android {
 dependencies {
   api deps.rxjava
   api deps.rxandroid
-  implementation deps.supportAnnotations
+  api deps.supportAnnotations
 
   testImplementation deps.junit
   testImplementation deps.assertj

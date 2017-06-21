@@ -22,11 +22,11 @@ task clean(type: Delete) {
 
 ext.versions = [
 
-    supportLibrary: '25.1.0',
+    supportLibrary: '25.4.0',
     minSdk        : 9,
-    compileSdk    : 25,
-    targetSdk     : 25,
-    buildTools    : '25.0.3',
+    compileSdk    : 26,
+    targetSdk     : 25, // until Robolectric supports Android O (API 26)
+    buildTools    : '26.0.0',
 
     butterknife   : '8.6.0',
     toothpick     : '1.0.6'
