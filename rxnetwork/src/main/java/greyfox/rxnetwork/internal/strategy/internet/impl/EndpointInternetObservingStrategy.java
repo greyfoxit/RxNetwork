@@ -29,7 +29,7 @@ import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
  * or even full blown String representation of {@link URL}
  * <p>
  * You can see more of this at work in {@link WalledGardenInternetObservingStrategy}
- * and {@link Http200InternetObservingStrategy}
+ * and {@link HttpOkInternetObservingStrategy}
  *
  * @author Radek Kozak
  */
