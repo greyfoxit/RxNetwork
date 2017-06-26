@@ -18,14 +18,13 @@ package greyfox.rxnetwork.internal.strategy.network.providers;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork.internal.strategy.network.impl.PreLollipopNetworkObservingStrategy;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static greyfox.rxnetwork.internal.os.Build.isLessThanLollipop;
 
 /**
- * Provides network observing strategy implementation for pre-Lollipop devices.
+ * Provides {@link NetworkObservingStrategy} implementation for pre-Lollipop devices.
  *
  * @author Radek Kozak
  */

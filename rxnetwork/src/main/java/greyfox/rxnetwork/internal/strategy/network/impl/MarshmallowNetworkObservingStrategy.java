@@ -20,23 +20,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkRequest;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.annotation.RestrictTo;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Action;
 import io.reactivex.subjects.PublishSubject;
 import java.util.logging.Logger;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION_CODES.M;
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
-import static greyfox.rxnetwork.internal.net.RxNetworkInfoHelper.getRxNetworkInfoFrom;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -45,20 +47,20 @@ import static java.util.logging.Logger.getLogger;
  * @author Radek Kozak
  */
 @RequiresApi(M)
-public final class MarshmallowNetworkObservingStrategy extends BaseNetworkObservingStrategy {
+@RestrictTo(LIBRARY_GROUP)
+public final class MarshmallowNetworkObservingStrategy extends Api21BaseNetworkObservingStrategy {
 
-  private static final IntentFilter IDLE_MODE_CHANGED = new IntentFilter(
-      PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
-
-  private static ConnectivityManager.NetworkCallback networkCallback;
-  private static BroadcastReceiver idleModeReceiver;
+  private static final IntentFilter IDLE_MODE_CHANGED =
+      new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED);
 
   @NonNull private final ConnectivityManager connectivityManager;
   @NonNull private final PowerManager powerManager;
   @NonNull private final Context context;
   @NonNull private final PublishSubject<RxNetworkInfo> networkChange = PublishSubject.create();
 
-  private NetworkRequest networkRequest;
+  private ConnectivityManager.NetworkCallback networkCallback;
+  private BroadcastReceiver idleModeReceiver;
+  @Nullable private NetworkRequest networkRequest;
 
   public MarshmallowNetworkObservingStrategy(@NonNull Context context) {
     this.context = checkNotNull(context, "context");
@@ -106,6 +108,11 @@ public final class MarshmallowNetworkObservingStrategy extends BaseNetworkObserv
     }
   }
 
+  @Override
+  ConnectivityManager connectivityManager() {
+    return this.connectivityManager;
+  }
+
   @RequiresApi(M)
   private final class DeviceIdleReceiver extends BroadcastReceiver {
 
@@ -120,7 +127,7 @@ public final class MarshmallowNetworkObservingStrategy extends BaseNetworkObserv
       if (isDeviceInIdleMode(context)) {
         upstream.onNext(RxNetworkInfo.create());
       } else {
-        upstream.onNext(getRxNetworkInfoFrom(context));
+        upstream.onNext(RxNetworkInfo.create(context));
       }
     }
 
@@ -135,13 +142,10 @@ public final class MarshmallowNetworkObservingStrategy extends BaseNetworkObserv
   private final class MarshmallowOnSubscribe implements ObservableOnSubscribe<RxNetworkInfo> {
 
     @Override
-    public void subscribe(@NonNull final ObservableEmitter<RxNetworkInfo> upstream)
-        throws Exception {
-
-      checkNotNull(upstream, "upstream");
+    public void subscribe(final ObservableEmitter<RxNetworkInfo> upstream) throws Exception {
+      upstream.setCancellable(new StrategyCancellable());
       registerIdleModeReceiver(upstream);
       registerNetworkCallback(upstream);
-      upstream.setCancellable(new StrategyCancellable());
     }
 
     private void registerIdleModeReceiver(ObservableEmitter<RxNetworkInfo> upstream) {
@@ -150,31 +154,20 @@ public final class MarshmallowNetworkObservingStrategy extends BaseNetworkObserv
     }
 
     private void registerNetworkCallback(ObservableEmitter<RxNetworkInfo> upstream) {
-      networkCallback = new MarshmallowNetworkCallback(upstream);
+      networkCallback = new StrategyNetworkCallback(upstream);
 
-      NetworkRequest request = networkRequest != null ? networkRequest
-                                                      : new NetworkRequest.Builder().build();
+      NetworkRequest request =
+          networkRequest != null ? networkRequest : new NetworkRequest.Builder().build();
 
       connectivityManager.registerNetworkCallback(request, networkCallback);
     }
   }
 
-  private final class MarshmallowNetworkCallback extends ConnectivityManager.NetworkCallback {
-
-    final ObservableEmitter<RxNetworkInfo> upstream;
-
-    MarshmallowNetworkCallback(@NonNull ObservableEmitter<RxNetworkInfo> upstream) {
-      this.upstream = checkNotNull(upstream, "upstream");
-    }
+  private final class OnDisposeAction implements Action {
 
     @Override
-    public void onAvailable(Network network) {
-      upstream.onNext(getRxNetworkInfoFrom(network, connectivityManager));
-    }
-
-    @Override
-    public void onLost(Network network) {
-      upstream.onNext(getRxNetworkInfoFrom(network, connectivityManager));
+    public void run() throws Exception {
+      dispose();
     }
   }
 }

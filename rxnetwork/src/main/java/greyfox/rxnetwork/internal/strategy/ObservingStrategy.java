@@ -18,6 +18,8 @@ package greyfox.rxnetwork.internal.strategy;
 import io.reactivex.Observable;
 
 /**
+ * Base interface for {@code ObservingStrategy}.
+ *
  * @author Radek Kozak
  */
 public interface ObservingStrategy<T> {

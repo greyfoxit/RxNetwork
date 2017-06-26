@@ -35,6 +35,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
  *
  * @author Radek Kozak
  */
+@SuppressWarnings({ "WeakerAccess", "SameParameterValue", "unused" })
 @Implements(NetworkCapabilities.class)
 @RequiresApi(LOLLIPOP)
 public class ShadowNetworkCapabilities {
@@ -70,30 +71,30 @@ public class ShadowNetworkCapabilities {
   }
 
   public static String transportNamesOf(int[] types) {
-    String transports = "";
+    StringBuilder transports = new StringBuilder();
     for (int i = 0; i < types.length; ) {
       switch (types[i]) {
         case TRANSPORT_CELLULAR:
-          transports += "CELLULAR";
+          transports.append("CELLULAR");
           break;
         case TRANSPORT_WIFI:
-          transports += "WIFI";
+          transports.append("WIFI");
           break;
         case TRANSPORT_BLUETOOTH:
-          transports += "BLUETOOTH";
+          transports.append("BLUETOOTH");
           break;
         case TRANSPORT_ETHERNET:
-          transports += "ETHERNET";
+          transports.append("ETHERNET");
           break;
         case TRANSPORT_VPN:
-          transports += "VPN";
+          transports.append("VPN");
           break;
       }
       if (++i < types.length) {
-        transports += "|";
+        transports.append("|");
       }
     }
-    return transports;
+    return transports.toString();
   }
 
   public void addTransportType(int transportType) {
@@ -161,10 +162,8 @@ public class ShadowNetworkCapabilities {
   }
 
   public boolean hasCapability(int capability) {
-    if (capability < MIN_NET_CAPABILITY || capability > MAX_NET_CAPABILITY) {
-      return false;
-    }
-    return ((mNetworkCapabilities & (1 << capability)) != 0);
+    return !(capability < MIN_NET_CAPABILITY || capability > MAX_NET_CAPABILITY) && (
+        (mNetworkCapabilities & (1 << capability)) != 0);
   }
 
   @Implementation

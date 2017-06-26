@@ -47,10 +47,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+@SuppressWarnings("ConstantConditions")
 @RequiresApi(api = LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = LOLLIPOP,
-        shadows = ShadowConnectivityManagerWithCallback.class)
+@Config(constants = BuildConfig.class, sdk = LOLLIPOP, shadows = ShadowConnectivityManagerWithCallback.class)
 public class LollipopNetworkObservingStrategyTest {
 
   private final TestObserver<RxNetworkInfo> testObserver = new TestObserver<>();
@@ -83,8 +83,8 @@ public class LollipopNetworkObservingStrategyTest {
 
   @Test()
   public void shouldRegisterWithCustomNetworkRequest() {
-    NetworkRequest customRequest = new NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI)
-                                                               .build();
+    NetworkRequest customRequest =
+        new NetworkRequest.Builder().addTransportType(TRANSPORT_WIFI).build();
     ConnectivityManager manager = setUpManagerWithNetworkRequest(customRequest);
 
     sut.observe().subscribeWith(testObserver).assertSubscribed();
@@ -114,7 +114,7 @@ public class LollipopNetworkObservingStrategyTest {
     ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
     doReturn(connectivityManager).when(context).getSystemService(CONNECTIVITY_SERVICE);
     doThrow(Exception.class).when(connectivityManager)
-                            .unregisterNetworkCallback(any(NetworkCallback.class));
+        .unregisterNetworkCallback(any(NetworkCallback.class));
     sut = spy(new LollipopNetworkObservingStrategy(context));
 
     sut.observe().subscribeWith(testObserver).assertSubscribed();
@@ -125,15 +125,13 @@ public class LollipopNetworkObservingStrategyTest {
     testObserver.isDisposed();
   }
 
-  private ConnectivityManager setUpManagerWithNetworkRequest(
-      @Nullable NetworkRequest networkRequest) {
+  private ConnectivityManager setUpManagerWithNetworkRequest(@Nullable NetworkRequest networkRequest) {
 
     ConnectivityManager manager = mock(ConnectivityManager.class);
     doReturn(manager).when(context).getSystemService(CONNECTIVITY_SERVICE);
 
     sut = spy(networkRequest == null ? new LollipopNetworkObservingStrategy(context)
-                                     : new LollipopNetworkObservingStrategy(context,
-                                         networkRequest));
+                                     : new LollipopNetworkObservingStrategy(context, networkRequest));
 
     return manager;
   }

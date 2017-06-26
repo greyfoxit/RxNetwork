@@ -16,7 +16,6 @@
 package greyfox.rxnetwork.internal.strategy.network.impl;
 
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Cancellable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,14 +33,6 @@ abstract class BaseNetworkObservingStrategy implements NetworkObservingStrategy 
 
   void onError(String message, Exception exception) {
     logger().log(Level.WARNING, message + ": " + exception.getMessage());
-  }
-
-  final class OnDisposeAction implements Action {
-
-    @Override
-    public void run() throws Exception {
-      dispose();
-    }
   }
 
   final class StrategyCancellable implements Cancellable {

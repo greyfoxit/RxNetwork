@@ -27,12 +27,13 @@ import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class PreLollipopNetworkObservingObservingStrategyProviderTest {
 
-  private final PreLollipopNetworkObservingStrategyProvider sut
-      = new PreLollipopNetworkObservingStrategyProvider(RuntimeEnvironment.application);
+  private final PreLollipopNetworkObservingStrategyProvider sut =
+      new PreLollipopNetworkObservingStrategyProvider(RuntimeEnvironment.application);
 
   @Test(expected = NullPointerException.class)
   public void shouldThrow_whenTryingToInitializeWithNullContext() {
@@ -55,6 +56,6 @@ public class PreLollipopNetworkObservingObservingStrategyProviderTest {
   @Config(sdk = KITKAT)
   public void shouldProvideConcreteStrategy() {
     assertThat(sut.provide()).isNotNull()
-                             .isExactlyInstanceOf(PreLollipopNetworkObservingStrategy.class);
+        .isExactlyInstanceOf(PreLollipopNetworkObservingStrategy.class);
   }
 }

@@ -17,8 +17,9 @@ package greyfox.rxnetwork.internal.strategy.network.factory;
 
 import android.content.Context;
 import greyfox.rxnetwork.internal.strategy.ObservingStrategyFactory;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import greyfox.rxnetwork.internal.strategy.network.providers.BuiltInNetworkObservingStrategyProviders;
+import greyfox.rxnetwork.internal.strategy.network.providers.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork.internal.strategy.network.providers.ObservingStrategyProviders;
 import java.util.Collection;
 import java.util.Collections;
 import org.junit.Before;
@@ -28,21 +29,24 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(MockitoJUnitRunner.class)
 public class BuiltInNetworkObservingStrategyFactoryTest {
 
-  private static final Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS = Collections
-      .emptySet();
+  private static final Collection<NetworkObservingStrategyProvider> EMPTY_PROVIDERS =
+      Collections.emptySet();
 
+  private ObservingStrategyProviders<NetworkObservingStrategyProvider> providers;
   private ObservingStrategyFactory sut;
 
   @Mock private Context context;
 
   @Before
   public void setUp() {
-    Collection<NetworkObservingStrategyProvider> providers
-        = new BuiltInNetworkObservingStrategyProviders(context).get();
+    providers = spy(new BuiltInNetworkObservingStrategyProviders(context));
     sut = BuiltInNetworkObservingStrategyFactory.create(providers);
   }
 
@@ -58,7 +62,8 @@ public class BuiltInNetworkObservingStrategyFactoryTest {
 
   @Test(expected = NullPointerException.class)
   public void shouldThrow_whenProvidersEmpty() {
-    sut = BuiltInNetworkObservingStrategyFactory.create(EMPTY_PROVIDERS);
+    doReturn(EMPTY_PROVIDERS).when(providers).get();
+    sut = BuiltInNetworkObservingStrategyFactory.create(providers);
 
     sut.get();
   }

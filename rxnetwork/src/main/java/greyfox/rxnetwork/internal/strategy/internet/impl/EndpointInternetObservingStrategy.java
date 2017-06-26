@@ -22,7 +22,7 @@ import java.net.URL;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
- * Defines endpoint-based internet observing strategy.
+ * Defines basic endpoint-based internet observing strategy.
  * <p>
  * Endpoint is meant here in a broad sense. Depending on specific strategy implementation
  * It can pose as, for example, a canonical hostname (as in {@link InetSocketAddress})
@@ -57,9 +57,6 @@ abstract class EndpointInternetObservingStrategy extends BaseInternetObservingSt
 
   // @formatter:off
 
-  /**
-   * {@code EndpointInternetObservingStrategy} builder static inner class.
-   */
   abstract static class Builder<S extends EndpointInternetObservingStrategy,
       B extends EndpointInternetObservingStrategy.Builder<S, B>>
       extends BaseInternetObservingStrategy.Builder<S, B> {
@@ -73,28 +70,14 @@ abstract class EndpointInternetObservingStrategy extends BaseInternetObservingSt
       super();
     }
 
-    /**
-     * Sets the {@code timeout} and returns a reference to this Builder so that the methods can
-     * be chained together.
-     *
-     * @param timeout the {@code timeout} to set
-     *
-     * @return a reference to this Builder
-     */
+    /** Set the timeout for the strategy. */
     @NonNull
     public B timeout(int timeout) {
       this.timeout = timeout;
       return self();
     }
 
-    /**
-     * Sets the {@code endpoint} and returns a reference to this Builder so that the methods can
-     * be chained together.
-     *
-     * @param endpoint the {@code endpoint} to set
-     *
-     * @return a reference to this Builder
-     */
+    /** Set the endpoint for the strategy. */
     @NonNull
     public B endpoint(@NonNull String endpoint) {
       this.endpoint = checkNotNull(endpoint, "endpoint");

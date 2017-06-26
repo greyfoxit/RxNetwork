@@ -18,28 +18,28 @@ package greyfox.rxnetwork.internal.strategy.network.providers;
 import android.content.Context;
 import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
-import greyfox.rxnetwork.internal.strategy.ObservingStrategyProviders;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static android.support.annotation.VisibleForTesting.PRIVATE;
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
- * RxNetwork's built-in providers for network observing strategies.
+ * Library's built-in providers of network observing strategies.
  *
  * @author Radek Kozak
  */
+@RestrictTo(LIBRARY_GROUP)
 public final class BuiltInNetworkObservingStrategyProviders
     implements ObservingStrategyProviders<NetworkObservingStrategyProvider> {
 
   private final Context context;
   private NetworkRequest networkRequest;
 
-  @VisibleForTesting(otherwise = PRIVATE)
+  @VisibleForTesting
   BuiltInNetworkObservingStrategyProviders() {
     throw new AssertionError("No instances.");
   }
@@ -55,7 +55,7 @@ public final class BuiltInNetworkObservingStrategyProviders
   }
 
   /**
-   * Gets collection of unmodifiable {@link ObservingStrategyProviders}'s.
+   * Gets collection of unmodifiable {@link NetworkObservingStrategyProvider}'s.
    *
    * @return Collection of {@linkplain NetworkObservingStrategyProvider providers}
    */

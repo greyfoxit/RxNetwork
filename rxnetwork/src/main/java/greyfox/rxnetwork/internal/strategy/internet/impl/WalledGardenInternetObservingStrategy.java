@@ -7,9 +7,18 @@ import java.net.HttpURLConnection;
 import java.util.logging.Logger;
 
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.util.logging.Logger.getLogger;
 
 /**
+ * Library's default for monitoring real internet connectivity changes.
+ * <p>
+ * <b>This strategy takes care of captive portals / walled-garden internet scenarios</b>
+ * by using Android team's solution (as seen in {@code android.net.wifi.WifiWatchdogStateMachine})
+ * <p>
+ * This strategy uses {@linkplain HttpURLConnection#HTTP_NO_CONTENT} (Status-Code 204)
+ * as default check against given endpoint.
+ *
  * @author Radek Kozak
  */
 public final class WalledGardenInternetObservingStrategy
@@ -36,7 +45,7 @@ public final class WalledGardenInternetObservingStrategy
     checkNotNull(urlConnection, "urlConnection");
 
     try {
-      return urlConnection.getResponseCode() == 204;
+      return urlConnection.getResponseCode() == HTTP_NO_CONTENT;
     } catch (IOException ioe) {
       throw new InternetObservingStrategyException("Unable to check internet access", ioe);
     }
@@ -49,13 +58,14 @@ public final class WalledGardenInternetObservingStrategy
     return getLogger(WalledGardenInternetObservingStrategy.class.getSimpleName());
   }
 
+  /** Build a new {@link WalledGardenInternetObservingStrategy}. */
   public static final class Builder extends
       UrlConnectionInternetObservingStrategy.Builder<WalledGardenInternetObservingStrategy,
           WalledGardenInternetObservingStrategy.Builder> {
 
     // @formatter:on
 
-    private static final String DEFAULT_ENDPOINT = "http://g.cn/generate_204";
+    private static final String DEFAULT_ENDPOINT = "http://google.cn/generate_204";
     private static final int DEFAULT_TIMEOUT_MS = 3000;
 
     Builder() {
@@ -65,11 +75,8 @@ public final class WalledGardenInternetObservingStrategy
     }
 
     /**
-     * Returns a {@code WalledGardenInternetObservingStrategy} built from the parameters
-     * previously set.
-     *
-     * @return a {@code WalledGardenInternetObservingStrategy} built with parameters
-     * of this {@code WalledGardenInternetObservingStrategy.Builder}
+     * Create an immutable instance of {@link WalledGardenInternetObservingStrategy} using
+     * configured values.
      */
     @NonNull
     @Override

@@ -16,45 +16,45 @@
 package greyfox.rxnetwork.internal.strategy.network.factory;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import greyfox.rxnetwork.RxNetwork;
+import android.support.annotation.RestrictTo;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategy;
 import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyFactory;
-import greyfox.rxnetwork.internal.strategy.network.NetworkObservingStrategyProvider;
-import java.util.Collection;
+import greyfox.rxnetwork.internal.strategy.network.providers.NetworkObservingStrategyProvider;
+import greyfox.rxnetwork.internal.strategy.network.providers.ObservingStrategyProviders;
 
 import static android.os.Build.VERSION.CODENAME;
 import static android.os.Build.VERSION.SDK_INT;
-import static android.support.annotation.VisibleForTesting.PRIVATE;
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link RxNetwork}'s default implementation of {@link NetworkObservingStrategyFactory}
- * providing api-level dependent implementation of concrete network observing
- * {@link NetworkObservingStrategy strategy}.
+ * Library's built-in implementation of {@link NetworkObservingStrategyFactory}.
+ * <p>
+ * This factory provides API-specific implementation of concrete {@link NetworkObservingStrategy}
  *
  * @author Radek Kozak
  */
+@RestrictTo(LIBRARY_GROUP)
 public final class BuiltInNetworkObservingStrategyFactory
     implements NetworkObservingStrategyFactory {
 
-  private final Collection<NetworkObservingStrategyProvider> strategyProviders;
+  private final ObservingStrategyProviders<NetworkObservingStrategyProvider> strategyProviders;
 
-  @VisibleForTesting(otherwise = PRIVATE)
   BuiltInNetworkObservingStrategyFactory(
-      @NonNull Collection<NetworkObservingStrategyProvider> strategyProviders) {
+      @NonNull ObservingStrategyProviders<NetworkObservingStrategyProvider> strategyProviders) {
     this.strategyProviders = checkNotNull(strategyProviders, "strategyProviders");
   }
 
   public static NetworkObservingStrategyFactory create(
-      @NonNull Collection<NetworkObservingStrategyProvider> providers) {
-    return new BuiltInNetworkObservingStrategyFactory(providers);
+      @NonNull ObservingStrategyProviders<NetworkObservingStrategyProvider> strategyProviders) {
+    return new BuiltInNetworkObservingStrategyFactory(strategyProviders);
   }
 
+  /** Returns API-specific network observing strategy */
   @NonNull
   @Override
   public NetworkObservingStrategy get() {
-    for (NetworkObservingStrategyProvider strategyProvider : strategyProviders) {
+    for (NetworkObservingStrategyProvider strategyProvider : strategyProviders.get()) {
       if (strategyProvider.canProvide()) {
         return strategyProvider.provide();
       }
