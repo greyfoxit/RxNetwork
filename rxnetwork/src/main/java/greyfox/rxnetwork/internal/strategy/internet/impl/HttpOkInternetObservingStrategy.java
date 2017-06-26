@@ -26,20 +26,20 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.logging.Logger.getLogger;
 
 /**
- * Variation of {@link UrlConnectionInternetObservingStrategy}
- * that uses {@linkplain HttpURLConnection#HTTP_OK} (Status-Code 200)
- * as default check against given endpoint.
+ * Variation of {@link UrlConnectionInternetObservingStrategy} that uses
+ * {@linkplain HttpURLConnection#HTTP_OK} (Status-Code 200) as default check
+ * against given endpoint.
  *
  * @author Radek Kozak
  */
-public final class Http200InternetObservingStrategy extends UrlConnectionInternetObservingStrategy {
+public final class HttpOkInternetObservingStrategy extends UrlConnectionInternetObservingStrategy {
 
-  Http200InternetObservingStrategy(@NonNull Builder builder) {
+  HttpOkInternetObservingStrategy(@NonNull Builder builder) {
     super(builder);
   }
 
   @NonNull
-  public static Http200InternetObservingStrategy create() {
+  public static HttpOkInternetObservingStrategy create() {
     return builder().build();
   }
 
@@ -63,17 +63,17 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
 
   @Override
   Logger logger() {
-    return getLogger(Http200InternetObservingStrategy.class.getSimpleName());
+    return getLogger(HttpOkInternetObservingStrategy.class.getSimpleName());
   }
 
   // @formatter:off
 
   /**
-   * {@code Http200InternetObservingStrategy} builder static inner class.
+   * {@code HttpOkInternetObservingStrategy} builder static inner class.
    */
   public static final class Builder extends
-      UrlConnectionInternetObservingStrategy.Builder<Http200InternetObservingStrategy,
-          Http200InternetObservingStrategy.Builder> {
+      UrlConnectionInternetObservingStrategy.Builder<HttpOkInternetObservingStrategy,
+          HttpOkInternetObservingStrategy.Builder> {
 
     // @formatter:on
 
@@ -87,13 +87,13 @@ public final class Http200InternetObservingStrategy extends UrlConnectionInterne
     }
 
     /**
-     * Create an immutable instance of {@link Http200InternetObservingStrategy} using
+     * Create an immutable instance of {@link HttpOkInternetObservingStrategy} using
      * configured values.
      */
     @NonNull
     @Override
-    public Http200InternetObservingStrategy build() {
-      return new Http200InternetObservingStrategy(this);
+    public HttpOkInternetObservingStrategy build() {
+      return new HttpOkInternetObservingStrategy(this);
     }
   }
 }

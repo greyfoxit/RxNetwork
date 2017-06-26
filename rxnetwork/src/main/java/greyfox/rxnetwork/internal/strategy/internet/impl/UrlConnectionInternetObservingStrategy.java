@@ -29,7 +29,7 @@ import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
  * Defines basic {@link HttpURLConnection} based internet observing strategies.
  *
  * @author Radek Kozak
- * @see Http200InternetObservingStrategy
+ * @see HttpOkInternetObservingStrategy
  * @see WalledGardenInternetObservingStrategy
  */
 abstract class UrlConnectionInternetObservingStrategy extends EndpointInternetObservingStrategy {

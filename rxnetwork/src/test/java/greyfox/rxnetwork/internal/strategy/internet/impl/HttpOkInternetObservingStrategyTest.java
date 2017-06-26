@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static greyfox.rxnetwork.internal.strategy.internet.impl.Http200InternetObservingStrategy.builder;
+import static greyfox.rxnetwork.internal.strategy.internet.impl.HttpOkInternetObservingStrategy.builder;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,19 +35,19 @@ import static org.mockito.Mockito.spy;
 
 @SuppressWarnings("ConstantConditions")
 @RunWith(MockitoJUnitRunner.class)
-public class Http200InternetObservingStrategyTest extends EndpointInternetObservingStrategyTest {
+public class HttpOkInternetObservingStrategyTest extends EndpointInternetObservingStrategyTest {
 
-  // Http200InternetObservingStrategy uses HTTP Status-Code 200: OK to validate connection
+  // HttpOkInternetObservingStrategy uses HTTP Status-Code 200: OK to validate connection
   private static final int VALID_SERVER_RESPONSE = HTTP_OK;
 
   @Test(expected = NullPointerException.class)
   public void shouldThrow_whenTryingToInstantiateWithNullBuilder() {
-    new Http200InternetObservingStrategy(null);
+    new HttpOkInternetObservingStrategy(null);
   }
 
   @Test
   public void shouldSubscribeCorrectly() {
-    InternetObservingStrategy sut = Http200InternetObservingStrategy.create();
+    InternetObservingStrategy sut = HttpOkInternetObservingStrategy.create();
 
     sut.observe().test().assertSubscribed();
   }
@@ -55,7 +55,7 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
   @Test
   public void shouldReturnInternetConnectionIsTrue() throws InternetObservingStrategyException, IOException {
 
-    Http200InternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
+    HttpOkInternetObservingStrategy sut = spy(detailedStrategyBuilder().build());
     HttpURLConnection urlConnection = mock(HttpURLConnection.class);
     doReturn(VALID_SERVER_RESPONSE).when(urlConnection).getResponseCode();
     doReturn(urlConnection).when(sut).buildUrlConnection(any(URL.class));
@@ -74,7 +74,7 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
   public void shouldThrowUnderlyingException_WrappedInInternetObservingStrategyException()
       throws InternetObservingStrategyException, IOException {
 
-    Http200InternetObservingStrategy sut = spy(Http200InternetObservingStrategy.create());
+    HttpOkInternetObservingStrategy sut = spy(HttpOkInternetObservingStrategy.create());
     HttpURLConnection urlConnection =
         spy((HttpURLConnection) server.url("/").url().openConnection());
     doThrow(IOException.class).when(urlConnection).getResponseCode();
@@ -103,7 +103,7 @@ public class Http200InternetObservingStrategyTest extends EndpointInternetObserv
     assertThat(sut.observe().blockingFirst()).isFalse();
   }
 
-  private Http200InternetObservingStrategy.Builder detailedStrategyBuilder() {
+  private HttpOkInternetObservingStrategy.Builder detailedStrategyBuilder() {
     return builder().delay(VALID_DELAY).interval(VALID_INTERVAL).timeout(VALID_TIMEOUT_MS)
         .endpoint(VALID_ENDPOINT);
   }
