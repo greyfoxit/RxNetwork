@@ -242,8 +242,7 @@ public final class RxNetworkInfoPredicate {
       return new Predicate<RxNetworkInfo>() {
         @Override
         public boolean test(RxNetworkInfo networkInfo) throws Exception {
-          final NetworkCapabilities networkCapabilities = networkInfo.
-              getNetworkCapabilities();
+          final NetworkCapabilities networkCapabilities = networkInfo.getNetworkCapabilities();
 
           return networkCapabilities != null
               && networkCapabilities.getLinkUpstreamBandwidthKbps() >= upBandwidth;
