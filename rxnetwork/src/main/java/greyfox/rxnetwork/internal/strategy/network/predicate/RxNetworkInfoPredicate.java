@@ -242,9 +242,11 @@ public final class RxNetworkInfoPredicate {
       return new Predicate<RxNetworkInfo>() {
         @Override
         public boolean test(RxNetworkInfo networkInfo) throws Exception {
-          final NetworkCapabilities networkCapabilities = networkInfo.getNetworkCapabilities();
+          final NetworkCapabilities networkCapabilities = networkInfo.
+              getNetworkCapabilities();
 
-          return networkCapabilities != null && networkCapabilities.getLinkUpstreamBandwidthKbps() >= upBandwidth;
+          return networkCapabilities != null
+              && networkCapabilities.getLinkUpstreamBandwidthKbps() >= upBandwidth;
         }
       };
     }
@@ -269,7 +271,8 @@ public final class RxNetworkInfoPredicate {
         public boolean test(RxNetworkInfo networkInfo) throws Exception {
           final NetworkCapabilities networkCapabilities = networkInfo.getNetworkCapabilities();
 
-          return networkCapabilities != null && networkCapabilities.getLinkDownstreamBandwidthKbps() >= downBandwidth;
+          return networkCapabilities != null
+              && networkCapabilities.getLinkDownstreamBandwidthKbps() >= downBandwidth;
         }
       };
     }
