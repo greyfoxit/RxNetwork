@@ -6,5 +6,5 @@ All notable changes to this project will be documented in this file.
 
 *2017-06-27*
 
-* Initial public release
-* Imported from Gitlab
+* Initial public release 
+* Project imported from Gitlab
