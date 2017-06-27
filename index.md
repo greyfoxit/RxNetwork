@@ -587,11 +587,11 @@ that your observables provide you information about internet accessibility** ple
 #### Observing real access
 
 As you might've suspected: you can observe true Internet connectivity with RxNetwork. This is done 
-simply by using `observeReal()` method. This observable will simply return `true` if there is real 
-Internet connection and `false` if not.
+simply by using `observeInternetAccess()` method. This observable will simply return `true` if 
+there is real Internet connection and `false` if not.
 
 ```java
-rxNetwork.observeReal()
+rxNetwork.observeInternetAccess()
     .observeOn(AndroidSchedulers.mainThread())
     .subscribe(connectedToInternet -> System.out.println("You are: " 
         + (connectedToInternet ? "connected" : "not connected")));
@@ -601,7 +601,7 @@ Of course similar as before you can use your own strategy. All you need to do is
 `InternetObservingStrategy` interface and pass it like here:
 
 ```java
-rxNetwork.observeReal(new YourCustomInternetObservingStrategy())
+rxNetwork.observeInternetAccess(new YourCustomInternetObservingStrategy())
     .observeOn(AndroidSchedulers.mainThread())
     .subscribe(...);
 ``` 
@@ -612,7 +612,7 @@ own server or whatever). You can either do with your own strategy, as described 
 that is already provided for you in the library:
 
 ```java
-rxNetwork.observeReal(SocketInternetObservingStrategy.create())
+rxNetwork.observeInternetAccess(SocketInternetObservingStrategy.create())
     .observeOn(AndroidSchedulers.mainThread())
     .subscribe(...);
 ```
@@ -625,7 +625,7 @@ InternetObservingStrategy internetObservingStrategy = SocketInternetObservingStr
     .endpoint("www.apple.com").port(80).delay(1500).interval(5000).timeout(5000)
     .build();
 
-rxNetwork.observeReal(internetObservingStrategy)
+rxNetwork.observeInternetAccess(internetObservingStrategy)
     .observeOn(AndroidSchedulers.mainThread())
     .subscribe(...);
 ```
