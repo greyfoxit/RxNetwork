@@ -220,9 +220,7 @@ public final class RxNetwork {
   /**
    * Real internet access observable with custom defined {@link InternetObservingStrategy strategy}.
    *
-   * @param strategy {@link InternetObservingStrategy} instance
-   *
-   * @param strategy custom {@link InternetObservingStrategy}
+   * @param strategy custom {@link InternetObservingStrategy} instance
    *
    * @return RxJava Observable with {@code Boolean} ( {@code true} if there is real internet access,
    * {@code false} if not )
