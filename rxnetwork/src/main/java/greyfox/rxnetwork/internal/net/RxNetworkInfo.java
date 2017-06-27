@@ -35,7 +35,7 @@ import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 
 /**
- * Decorator class of {@link NetworkInfo}.
+ * Wrapper class for {@link NetworkInfo}.
  * <p>
  * For pre-Lollipop (API &lt; 21) this class is simple one-to-one wrapper of {@link NetworkInfo}.
  * <p>

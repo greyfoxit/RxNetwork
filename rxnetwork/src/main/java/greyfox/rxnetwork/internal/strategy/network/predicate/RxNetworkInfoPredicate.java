@@ -44,7 +44,7 @@ public final class RxNetworkInfoPredicate {
 
   /**
    * Predicate class for filtering reactive streams of {@link RxNetwork}
-   * by {@link NetworkInfo.State network state}.
+   * by {@link android.net.NetworkInfo.State network state}.
    * <p>
    * Example usage:
    * <pre><code>
@@ -65,9 +65,9 @@ public final class RxNetworkInfoPredicate {
     }
 
     /**
-     * Determines if any of provided {@link NetworkInfo.State states} occurred.
+     * Determines if any of provided {@link android.net.NetworkInfo.State states} occurred.
      *
-     * @param networkStates one or many {@link NetworkInfo.State}
+     * @param networkStates one or many {@link android.net.NetworkInfo.State}
      *
      * @return {@code true} if any of the given network states occurred, {@code false} otherwise
      */
@@ -230,8 +230,7 @@ public final class RxNetworkInfoPredicate {
      * from technology type and other link parameters as documented in
      * {@link NetworkCapabilities#getLinkDownstreamBandwidthKbps()}
      *
-     * @param downBandwidth estimated first hop downstream (device to network) bandwidth in
-     *                      Kbps
+     * @param downBandwidth estimated first hop downstream (device to network) bandwidth in Kbps
      *
      * @return {@code true} if downstream bandwidth is satisfied, {@code false} otherwise
      *

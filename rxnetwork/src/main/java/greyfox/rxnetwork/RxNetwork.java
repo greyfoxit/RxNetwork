@@ -158,7 +158,7 @@ public final class RxNetwork {
    * Use this if you're interested in more than just the connection and could use
    * more information of actual network information being emitted.
    *
-   * @return {@link NetworkInfo}
+   * @return RxJava Observable with {@link RxNetworkInfo} containing network information
    */
   @NonNull
   @RequiresPermission(ACCESS_NETWORK_STATE)
@@ -172,7 +172,7 @@ public final class RxNetwork {
    *
    * @param strategy custom {@link NetworkObservingStrategy} instance
    *
-   * @return {@link NetworkInfo} Observable
+   * @return RxJava Observable with {@link RxNetworkInfo} containing network information
    */
   @NonNull
   @RequiresPermission(ACCESS_NETWORK_STATE)
@@ -196,7 +196,8 @@ public final class RxNetwork {
    * <p>
    * Use this if you don't care about all the {@link NetworkInfo} details.
    *
-   * @return {@code true} if network available and connected or connecting, {@code false} if not
+   * @return RxJava Observable with {@code Boolean} ( {@code true} if network available and
+   * connected, {@code false} if not )
    */
   @NonNull
   @RequiresPermission(ACCESS_NETWORK_STATE)
@@ -207,7 +208,8 @@ public final class RxNetwork {
   /**
    * Real internet access observable.
    *
-   * @return {@code true} if there is real internet access, {@code false} otherwise
+   * @return RxJava Observable with {@code Boolean} ( {@code true} if there is real internet access,
+   * {@code false} if not )
    */
   @NonNull
   @RequiresPermission(INTERNET)
@@ -220,7 +222,10 @@ public final class RxNetwork {
    *
    * @param strategy {@link InternetObservingStrategy} instance
    *
-   * @return {@code true} if there is real internet access, {@code false} otherwise
+   * @param strategy custom {@link InternetObservingStrategy}
+   *
+   * @return RxJava Observable with {@code Boolean} ( {@code true} if there is real internet access,
+   * {@code false} if not )
    */
   @NonNull
   @RequiresPermission(INTERNET)

@@ -12,10 +12,3 @@
  10. `git commit -am "Prepare next development version"`
 
 If step 5 or 6 fails, drop the Sonatype repo, fix the problem, commit, and start again at step 5.
-
-## Prerequisites
-
-In `~/.gradle/gradle.properties`, set the following:
-
- * `NEXUS_USERNAME` - Sonatype username for releasing to `inc.greyfox`.
- * `NEXUS_PASSWORD` - Sonatype password for releasing to `inc.greyfox`.
