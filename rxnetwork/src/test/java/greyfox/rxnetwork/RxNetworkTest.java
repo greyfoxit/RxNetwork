@@ -155,7 +155,7 @@ public class RxNetworkTest {
   public void shouldNeverBeNull() {
     assertThat(sut.observe()).isNotNull();
     assertThat(sut.observeSimple()).isNotNull();
-    assertThat(sut.observeReal()).isNotNull();
+    assertThat(sut.observeInternetAccess()).isNotNull();
   }
 
   @Test
@@ -174,20 +174,20 @@ public class RxNetworkTest {
   }
 
   @Test
-  public void shouldSubscribeCorrectly_toObserveSimple() {
+  public void shouldSubscribeCorrectly_observeSimple() {
     sut.observeSimple().test().assertSubscribed();
   }
 
   @Test
-  public void shouldSubscribeCorrectly_toObserveReal() {
-    sut.observeReal().test().assertSubscribed();
+  public void shouldSubscribeCorrectly_observeInternetAccess() {
+    sut.observeInternetAccess().test().assertSubscribed();
   }
 
   @Test
-  public void shouldOverrideDefaultStrategyWithCustom_whenProvidedToObserveReal() {
+  public void shouldOverrideDefaultStrategyWithCustom_whenProvidedToObserveInternetAccess() {
     sut = spy(sut);
 
-    sut.observeReal(customInternetStrategy);
+    sut.observeInternetAccess(customInternetStrategy);
 
     verify(customInternetStrategy).observe();
     verify(sut, never()).internetObservingStrategy();
@@ -200,7 +200,7 @@ public class RxNetworkTest {
 
   @Test(expected = NullPointerException.class)
   public void shouldThrow_whenTryingToObserveWithNullInternetStrategy() {
-    sut.observeReal(null);
+    sut.observeInternetAccess(null);
   }
 
   @Test
@@ -229,7 +229,7 @@ public class RxNetworkTest {
 
     sut = RxNetwork.builder().internetObservingStrategy(customInternetStrategy).init(context);
 
-    sut.observeReal(customInternetStrategy).test().assertSubscribed();
+    sut.observeInternetAccess(customInternetStrategy).test().assertSubscribed();
   }
 
   @Test
@@ -240,7 +240,7 @@ public class RxNetworkTest {
     sut = RxNetwork.builder().internetObservingStrategy(customInternetStrategy)
         .defaultScheduler(CUSTOM_SCHEDULER).init(context);
 
-    sut.observeReal(customInternetStrategy).test().assertSubscribed();
+    sut.observeInternetAccess(customInternetStrategy).test().assertSubscribed();
   }
 
   @Test(expected = NullPointerException.class)

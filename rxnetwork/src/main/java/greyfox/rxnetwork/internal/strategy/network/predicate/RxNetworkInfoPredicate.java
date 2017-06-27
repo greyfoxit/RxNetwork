@@ -173,33 +173,6 @@ public final class RxNetworkInfoPredicate {
     }
 
     /**
-     * Determines if any of specified network capabilities occurred.
-     *
-     * @param capabilities one or many {@code NetworkCapabilities.NET_CAPABILITY_*}
-     *
-     * @return {@code true} if any of the given capabilities occurred, {@code false} otherwise
-     */
-    public static Predicate<RxNetworkInfo> hasCapability(final int... capabilities) {
-
-      return new Predicate<RxNetworkInfo>() {
-        @Override
-        public boolean test(RxNetworkInfo networkInfo) throws Exception {
-          final NetworkCapabilities networkCapabilities = networkInfo.getNetworkCapabilities();
-
-          if (networkCapabilities != null) {
-            for (Integer capability : capabilities) {
-              if (networkCapabilities.hasCapability(capability)) {
-                return true;
-              }
-            }
-          }
-
-          return false;
-        }
-      };
-    }
-
-    /**
      * Determines if any of specified transport types occurred.
      *
      * @param transportTypes one or many {@code NetworkCapabilities#TRANSPORT_*}

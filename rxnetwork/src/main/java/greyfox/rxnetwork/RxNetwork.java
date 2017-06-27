@@ -21,6 +21,7 @@ import android.net.NetworkRequest;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.annotation.RequiresPermission;
 import android.support.annotation.VisibleForTesting;
 import greyfox.rxnetwork.internal.net.RxNetworkInfo;
 import greyfox.rxnetwork.internal.strategy.internet.InternetObservingStrategy;
@@ -35,6 +36,8 @@ import greyfox.rxnetwork.internal.strategy.network.providers.ObservingStrategyPr
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
+import static android.Manifest.permission.INTERNET;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNull;
 import static greyfox.rxnetwork.common.base.Preconditions.checkNotNullWithMessage;
@@ -158,6 +161,7 @@ public final class RxNetwork {
    * @return {@link NetworkInfo}
    */
   @NonNull
+  @RequiresPermission(ACCESS_NETWORK_STATE)
   public Observable<RxNetworkInfo> observe() {
     return observe(networkObservingStrategy);
   }
@@ -171,6 +175,7 @@ public final class RxNetwork {
    * @return {@link NetworkInfo} Observable
    */
   @NonNull
+  @RequiresPermission(ACCESS_NETWORK_STATE)
   public Observable<RxNetworkInfo> observe(@NonNull NetworkObservingStrategy strategy) {
     checkNotNullWithMessage(strategy, "Please provide network observing strategy or initialize"
         + " RxNetwork with proper Context to use the default one");
@@ -194,6 +199,7 @@ public final class RxNetwork {
    * @return {@code true} if network available and connected or connecting, {@code false} if not
    */
   @NonNull
+  @RequiresPermission(ACCESS_NETWORK_STATE)
   public Observable<Boolean> observeSimple() {
     return observe().map(TO_CONNECTION_STATE);
   }
@@ -204,8 +210,9 @@ public final class RxNetwork {
    * @return {@code true} if there is real internet access, {@code false} otherwise
    */
   @NonNull
-  public Observable<Boolean> observeReal() {
-    return observeReal(internetObservingStrategy);
+  @RequiresPermission(INTERNET)
+  public Observable<Boolean> observeInternetAccess() {
+    return observeInternetAccess(internetObservingStrategy);
   }
 
   /**
@@ -214,8 +221,10 @@ public final class RxNetwork {
    * @return {@code true} if there is real internet access, {@code false} otherwise
    */
   @NonNull
-  public Observable<Boolean> observeReal(@NonNull InternetObservingStrategy strategy) {
+  @RequiresPermission(INTERNET)
+  public Observable<Boolean> observeInternetAccess(@NonNull InternetObservingStrategy strategy) {
     checkNotNull(strategy, "internet observing strategy");
+
     final Observable<Boolean> observable = strategy.observe();
     if (scheduler != null) {
       observable.subscribeOn(scheduler);

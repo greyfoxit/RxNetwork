@@ -49,15 +49,15 @@ public class MainActivity extends FragmentActivity {
   }
 
   @Override
-  protected void onResume() {
-    super.onResume();
-    subscriptions.add(rxNetworkSubscription());
-  }
-
-  @Override
   protected void onPause() {
     super.onPause();
     subscriptions.clear();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    subscriptions.add(rxNetworkSubscription());
   }
 
   @NonNull
