@@ -714,11 +714,11 @@ documented in [CHANGELOG](CHANGELOG.md) file.
 
 <!-- references -->
 
-[circleci-shield]: https://circleci.com/gh/radekkozak/RxNetwork/tree/master.svg?style=shield&circle-token=8e8a3277443ce3e39756d5d9167522837a947d58
-[circleci-link]: https://circleci.com/gh/radekkozak/RxNetwork/tree/master
-[codecov-shield]: https://codecov.io/gh/radekkozak/RxNetwork/branch/master/graph/badge.svg?token=dPBP8eA8CJ
-[codecov-link]: https://codecov.io/gh/radekkozak/RxNetwork
-[maven-shield]: https://img.shields.io/maven-central/v/it.greyfox.rxnetwork/rxnetwork.svg
-[maven-link]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22it.greyfox.rxnetwork%22%20AND%20a%3A%22rxnetwork%22
+[circleci-shield]: https://img.shields.io/circleci/project/github/greyfoxit/RxNetwork/master.svg
+[circleci-link]: https://circleci.com/gh/greyfoxit/RxNetwork/tree/master
+[codecov-shield]: https://codecov.io/gh/greyfoxit/RxNetwork/branch/master/graph/badge.svg
+[codecov-link]: https://codecov.io/gh/greyfoxit/RxNetwork
+[maven-shield]: https://img.shields.io/maven-central/v/it.greyfox/rxnetwork.svg
+[maven-link]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22it.greyfox%22%20AND%20a%3A%22rxnetwork%22
 [license-shield]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
 [license-link]: https://opensource.org/licenses/Apache-2.0
