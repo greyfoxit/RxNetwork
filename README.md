@@ -107,12 +107,12 @@ RxNetwork so you could (hopefully) use it worry-free in your own projects from t
 
 ## Usage
 
-Download [the latest JAR][jar] or grab via Maven:
+Download [the latest AAR][aar] or grab via Maven:
 ```xml
 <dependency>
   <groupId>it.greyfox</groupId>
   <artifactId>rxnetwork</artifactId>
-  <version>0.0.5/version>
+  <version>0.0.5</version>
 </dependency>
 ```
 or Gradle:
@@ -122,7 +122,7 @@ compile 'it.greyfox:rxnetwork:0.0.5'
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
-[jar]: https://search.maven.org/remote_content?g=it.greyfox&a=rxnetwork&v=LATEST
+[aar]: http://search.maven.org/remotecontent?filepath=it/greyfox/rxnetwork/0.0.5/rxnetwork-0.0.5.aar
 [snap]: https://oss.sonatype.org/content/repositories/snapshots/it/greyfox/rxnetwork
 
 ## Configuration
