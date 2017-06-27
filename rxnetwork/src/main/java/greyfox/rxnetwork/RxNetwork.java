@@ -91,10 +91,10 @@ import static greyfox.rxnetwork.internal.strategy.network.helpers.Functions.TO_C
 @SuppressWarnings("WeakerAccess")
 public final class RxNetwork {
 
-  @Nullable private final Scheduler scheduler;
   @NonNull private final NetworkObservingStrategy networkObservingStrategy;
   @NonNull private final InternetObservingStrategy internetObservingStrategy;
   @Nullable private final NetworkRequest networkRequest;
+  @Nullable private final Scheduler scheduler;
 
   @VisibleForTesting
   RxNetwork() {
@@ -170,7 +170,7 @@ public final class RxNetwork {
    * RxNetworkInfo connectivity observable with all the original {@link NetworkInfo} information
    * that uses custom defined {@link NetworkObservingStrategy strategy}.
    *
-   * @param strategy custom network observing strategy of type {@link NetworkObservingStrategy}
+   * @param strategy custom {@link NetworkObservingStrategy} instance
    *
    * @return {@link NetworkInfo} Observable
    */
@@ -205,7 +205,7 @@ public final class RxNetwork {
   }
 
   /**
-   * Real internet connectivity observable.
+   * Real internet access observable.
    *
    * @return {@code true} if there is real internet access, {@code false} otherwise
    */
@@ -216,7 +216,9 @@ public final class RxNetwork {
   }
 
   /**
-   * Real internet connectivity observable with custom {@link InternetObservingStrategy}.
+   * Real internet access observable with custom defined {@link InternetObservingStrategy strategy}.
+   *
+   * @param strategy {@link InternetObservingStrategy} instance
    *
    * @return {@code true} if there is real internet access, {@code false} otherwise
    */
