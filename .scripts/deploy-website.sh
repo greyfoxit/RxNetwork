@@ -8,10 +8,10 @@ set -eo pipefail
 
 CIRCLE_REPO_SLUG="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
 
-SLUG="radekkozak/RxNetwork"
+SLUG="greyfoxit/RxNetwork"
 BRANCH="master"
 
-REPO=git@github.com:radekkozak/RxNetwork.git
+REPO=git@github.com:greyfoxit/RxNetwork.git
 GROUP_ID="it.greyfox"
 ARTIFACT_ID="rxnetwork"
 

@@ -7,7 +7,7 @@
 
 set -eo pipefail
 
-SLUG="greyfox/RxNetwork"
+SLUG="greyfoxit/RxNetwork"
 BRANCH="master"
 
 CIRCLE_REPO_SLUG="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
