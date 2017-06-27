@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  * @author Radek Kozak
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RxNetworkInfoStateTest {
+public class RxNetworkInfoPredicateStateTest {
 
   private static final Predicate<RxNetworkInfo> VALID_STATES = hasState(CONNECTING, CONNECTED);
 

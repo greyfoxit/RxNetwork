@@ -49,7 +49,7 @@ public class DefaultRxNetworkFragment extends RxNetworkFragment {
   @NonNull
   @Override
   Disposable subscription() {
-    return rxNetwork.observeReal().observeOn(AndroidSchedulers.mainThread())
+    return rxNetwork.observeInternetAccess().observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::toastInternetConnection, this::onError);
   }
 }

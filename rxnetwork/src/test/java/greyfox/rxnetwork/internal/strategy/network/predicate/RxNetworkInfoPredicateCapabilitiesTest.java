@@ -29,12 +29,9 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
-import static android.net.NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED;
 import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
-import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasCapability;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.hasTransportType;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByDownBandwidth;
 import static greyfox.rxnetwork.internal.strategy.network.predicate.RxNetworkInfoPredicate.Capabilities.isSatisfiedByUpBandwidth;
@@ -47,10 +44,7 @@ import static org.mockito.Mockito.when;
 @RequiresApi(LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = LOLLIPOP)
-public class RxNetworkInfoCapabilitiesTest {
-
-  private static final Predicate<RxNetworkInfo> VALID_NET_CAPABILITIES =
-      hasCapability(NET_CAPABILITY_INTERNET, NET_CAPABILITY_NOT_RESTRICTED);
+public class RxNetworkInfoPredicateCapabilitiesTest {
 
   private static final int INVALID_UP_BANDWIDTH = 2000;
   private static final int INVALID_DOWN_BANDWIDTH = 500;
@@ -91,23 +85,6 @@ public class RxNetworkInfoCapabilitiesTest {
     when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
 
     assertThat(VALID_TRANSPORT_TYPES.test(rxNetworkInfo)).isFalse();
-  }
-
-  @Test
-  public void shouldReturnTrue_whenAtLeastOnePredicatedCapabilityOccurred() throws Exception {
-    when(networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET)).thenReturn(true);
-    when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
-
-    assertThat(VALID_NET_CAPABILITIES.test(rxNetworkInfo)).isTrue();
-  }
-
-  @Test
-  public void shouldReturnFalse_whenNoneOfPredicatedCapabilitiesOccurred() throws Exception {
-    when(networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET)).thenReturn(false);
-    when(networkCapabilities.hasCapability(NET_CAPABILITY_NOT_RESTRICTED)).thenReturn(false);
-    when(rxNetworkInfo.getNetworkCapabilities()).thenReturn(networkCapabilities);
-
-    assertThat(VALID_NET_CAPABILITIES.test(rxNetworkInfo)).isFalse();
   }
 
   @Test

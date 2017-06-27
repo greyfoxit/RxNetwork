@@ -44,15 +44,15 @@ public class CustomRxNetworkFragment extends RxNetworkFragment {
     return super.onCreateView(inflater, container, savedInstanceState);
   }
 
-  @NonNull
-  @Override
-  Disposable subscription() {
-    return rxnetwork.observeReal().observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::toastInternetConnection, this::onError);
-  }
-
   @Override
   String getFragmentName() {
     return TAG;
+  }
+
+  @NonNull
+  @Override
+  Disposable subscription() {
+    return rxnetwork.observeInternetAccess().observeOn(AndroidSchedulers.mainThread())
+        .subscribe(this::toastInternetConnection, this::onError);
   }
 }

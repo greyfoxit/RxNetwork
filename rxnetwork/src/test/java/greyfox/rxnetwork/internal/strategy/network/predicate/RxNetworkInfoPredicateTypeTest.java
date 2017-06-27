@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  * @author Radek Kozak
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RxNetworkInfoTypeTest {
+public class RxNetworkInfoPredicateTypeTest {
 
   private static final Predicate<RxNetworkInfo> VALID_TYPES = hasType(TYPE_MOBILE, TYPE_WIFI);
 
